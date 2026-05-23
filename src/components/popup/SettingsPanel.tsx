@@ -97,6 +97,35 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [locError, setLocError] = useState("");
 
+  const isDevMode = process.env.PLASMO_PUBLIC_DEV_MODE === "true";
+
+  const handleTestNotification = (type: "overlay" | "newtab" | "alarm") => {
+    if (type === "overlay") {
+      if (typeof chrome !== "undefined" && chrome.tabs) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const activeTab = tabs[0];
+          if (activeTab && activeTab.id) {
+            chrome.tabs.sendMessage(activeTab.id, {
+              type: "SHOW_PRAYER_OVERLAY",
+              prayer: "fajr",
+              minutes: reminderMinutes,
+            });
+          }
+        });
+      }
+    } else if (type === "newtab") {
+      if (typeof chrome !== "undefined" && chrome.runtime) {
+        const url = chrome.runtime.getURL("newtab.html?reminder=fajr");
+        chrome.tabs.create({ url });
+      }
+    } else if (type === "alarm") {
+      if (typeof chrome !== "undefined" && chrome.alarms) {
+        chrome.alarms.create("prayer-maghrib", { when: Date.now() + 5000 });
+        alert("Mock alarm scheduled! It will fire in 5 seconds and trigger your configured notification style.");
+      }
+    }
+  };
+
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const countryVal = e.target.value;
     setSelectedCountryName(countryVal);
@@ -575,7 +604,43 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
             </>
           )}
         </button>
-      </div>
     </form>
+
+      {/* Developer Testing Tools */}
+      {isDevMode && (
+        <div className="space-y-2.5 pt-4 mt-4 border-t border-stone-200 dark:border-stone-800 text-left">
+          <h3 className="text-xs font-black uppercase tracking-wider text-rose-500">
+            Developer Testing Tools
+          </h3>
+          <p className="text-[10px] text-stone-500 dark:text-stone-400 leading-normal">
+            Trigger simulated reminders instantly to test all notifications without waiting for real prayer times.
+          </p>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleTestNotification("overlay")}
+              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
+            >
+              Test Overlay (Fajr)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTestNotification("newtab")}
+              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
+            >
+              Test New Tab (Fajr)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTestNotification("alarm")}
+              className="col-span-2 py-1.5 px-2 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors"
+            >
+              Trigger Background Alarm in 5s (Maghrib)
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

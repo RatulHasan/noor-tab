@@ -102,3 +102,16 @@ export function detectLocation(): Promise<{
     );
   });
 }
+
+/**
+ * Returns a Date object adjusted to the estimated timezone of the given coordinates (based on longitude).
+ * This ensures calendar dates and events update correctly to the selected city's timezone.
+ */
+export function getCoordinatesLocalDate(coordinates: { lat: number; lng: number } | null): Date {
+  const baseDate = new Date();
+  if (!coordinates) return baseDate;
+  
+  const estimatedOffsetHours = Math.round(coordinates.lng / 15);
+  const utcTime = baseDate.getTime() + (baseDate.getTimezoneOffset() * 60 * 1000);
+  return new Date(utcTime + (estimatedOffsetHours * 60 * 60 * 1000));
+}

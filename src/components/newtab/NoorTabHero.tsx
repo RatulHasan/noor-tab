@@ -34,7 +34,17 @@ export default function NoorTabHero({
   const [settings] = useSettings();
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
-  const hijri = useHijriDate(time);
+
+  // Compute timezone-adjusted local time for the coordinates
+  const getCoordinatesLocalTime = (baseTime: Date) => {
+    if (!settings?.coordinates) return baseTime;
+    const estimatedOffsetHours = Math.round(settings.coordinates.lng / 15);
+    const utcTime = baseTime.getTime() + (baseTime.getTimezoneOffset() * 60 * 1000);
+    return new Date(utcTime + (estimatedOffsetHours * 60 * 60 * 1000));
+  };
+
+  const localTime = getCoordinatesLocalTime(time);
+  const hijri = useHijriDate(localTime);
 
   const lang = settings?.language || "en";
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
@@ -71,7 +81,7 @@ export default function NoorTabHero({
     hour12: true,
   });
 
-  const formattedGregorian = time.toLocaleDateString(currentLocale, {
+  const formattedGregorian = localTime.toLocaleDateString(currentLocale, {
     weekday: "long",
     year: "numeric",
     month: "long",

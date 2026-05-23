@@ -6,8 +6,9 @@ import NextPrayer from "./components/popup/NextPrayer";
 import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
+import IslamicEventCard from "./components/popup/IslamicEventCard";
 import { Clock, Compass, Settings, MapPin, Loader2, Search } from "lucide-react";
-import { detectLocation, geocodeLocation } from "./utils/locationService";
+import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
 import type { PrayerName, UserSettings } from "./types";
@@ -156,7 +157,7 @@ export default function Popup() {
               {settings.cityName || t("calcSettings")}
             </span>
           </div>
-          <HijriDate />
+          <HijriDate date={getCoordinatesLocalDate(settings.coordinates)} />
         </header>
       )}
 
@@ -304,6 +305,7 @@ export default function Popup() {
                       isLoading={isLoadingPrayers}
                       onToggleReminder={handleToggleReminder}
                     />
+                    <IslamicEventCard />
                   </div>
                 )}
               </>
