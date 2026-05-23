@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import type { DailyPrayers, PrayerName, PrayerStatus } from "../../types";
 import { useHijriDate } from "../../hooks/useHijriDate";
 import { useSettings } from "../../hooks/useSettings";
 import { getTranslation } from "../../data/translations";
 import CountdownTimer from "../shared/CountdownTimer";
-import { Clock, MapPin, Bell, X, Calendar } from "lucide-react";
+import { Clock, MapPin, Bell, X, Calendar, Play, Pause } from "lucide-react";
 import { PRAYER_METADATA } from "../../data/prayerNames";
 import { cn } from "../../utils/cn";
+import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
 
 /**
  * @param {Object} props
@@ -35,6 +36,50 @@ export default function NoorTabHero({
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
 
+  const reminderAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [isReminderAudioPlaying, setIsReminderAudioPlaying] = useState(false);
+
+  // Listen for global STOP_ALL_ADHAN from popup/background
+  useEffect(() => {
+    const handleMessage = (message: any) => {
+      if (message.type === "STOP_ALL_ADHAN_INTERNAL") {
+        if (reminderAudioRef.current) {
+          reminderAudioRef.current.pause();
+          setIsReminderAudioPlaying(false);
+        }
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+    return () => {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleMessage);
+      }
+    };
+  }, []);
+
+  const handleToggleReminderAudio = () => {
+    if (reminderAudioRef.current) {
+      if (isReminderAudioPlaying) {
+        reminderAudioRef.current.pause();
+        setIsReminderAudioPlaying(false);
+      } else {
+        reminderAudioRef.current.play().catch(() => {});
+        setIsReminderAudioPlaying(true);
+      }
+    }
+  };
+
+  const handleCloseReminder = () => {
+    setShowReminder(false);
+    if (reminderAudioRef.current) {
+      reminderAudioRef.current.pause();
+      setIsReminderAudioPlaying(false);
+    }
+  };
+
   // Compute timezone-adjusted local time for the coordinates
   const getCoordinatesLocalTime = (baseTime: Date) => {
     if (!settings?.coordinates) return baseTime;
@@ -55,14 +100,37 @@ export default function NoorTabHero({
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-dismiss reminder banner after 10 seconds
+  // Auto-dismiss reminder banner after 15 seconds & play Adhan audio if configured
   useEffect(() => {
     if (reminderPrayer) {
       setShowReminder(true);
-      const timer = setTimeout(() => setShowReminder(false), 10000);
-      return () => clearTimeout(timer);
+
+      const configuredAdhan = settings.adhanAudio || "none";
+      if (configuredAdhan !== "none") {
+        const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === configuredAdhan);
+        if (option && option.url) {
+          const audio = new Audio(option.url);
+          reminderAudioRef.current = audio;
+          setIsReminderAudioPlaying(true);
+          audio.play().catch((err) => {
+            console.error("Autoplay of Adhan sound blocked or failed:", err);
+            setIsReminderAudioPlaying(false);
+          });
+          audio.onended = () => {
+            setIsReminderAudioPlaying(false);
+          };
+        }
+      }
+
+      return () => {
+        if (reminderAudioRef.current) {
+          reminderAudioRef.current.pause();
+          reminderAudioRef.current = null;
+          setIsReminderAudioPlaying(false);
+        }
+      };
     }
-  }, [reminderPrayer]);
+  }, [reminderPrayer, settings.adhanAudio]);
 
   // Localized date & time formatting
   const localeMap = {
@@ -104,18 +172,36 @@ export default function NoorTabHero({
               <p className="text-xs text-emerald-200 uppercase font-semibold tracking-wider">
                 Adhan Reminder
               </p>
-              <h4 className="text-sm font-bold">
+              <h4 className="text-sm font-bold text-left">
                 It is time for {activeReminderMeta.displayName} ({activeReminderMeta.arabicName})
               </h4>
             </div>
           </div>
-          <button
-            onClick={() => setShowReminder(false)}
-            className="p-1 rounded-full text-emerald-300 hover:bg-white/10 hover:text-white"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          
+          <div className="flex items-center gap-1 shrink-0 ml-4">
+            {settings.adhanAudio !== "none" && (
+              <button
+                type="button"
+                onClick={handleToggleReminderAudio}
+                className="p-1.5 rounded-full text-emerald-300 hover:bg-white/10 hover:text-white transition-colors"
+                title={isReminderAudioPlaying ? t("stop") : t("preview")}
+              >
+                {isReminderAudioPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4 fill-current ml-0.5" />
+                )}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleCloseReminder}
+              className="p-1.5 rounded-full text-emerald-300 hover:bg-white/10 hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       )}
 

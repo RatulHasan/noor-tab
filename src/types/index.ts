@@ -32,6 +32,8 @@ export interface UserSettings {
   perPrayerReminder: Record<PrayerName, boolean>;
   theme: "light" | "dark" | "system";
   language: AppLanguage;
+  adhanAudio: string; // "none" or name of the adhan file (e.g. "azan1")
+  overlayPosition: "bottom" | "modal";
 }
 
 export type DailyPrayers = Record<PrayerName, Date>;

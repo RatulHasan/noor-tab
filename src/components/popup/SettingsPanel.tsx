@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "../../types";
 import { detectLocation, geocodeLocation } from "../../utils/locationService";
 import { getTranslation } from "../../data/translations";
 import { POPULAR_LOCATIONS } from "../../data/popularLocations";
-import { MapPin, Loader2, Save, Trash2, Search } from "lucide-react";
+import { MapPin, Loader2, Save, Trash2, Search, Play, Pause, Volume2 } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
 
 /**
  * @param {Object} props
@@ -69,6 +70,55 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   );
   const [theme, setTheme] = useState<UserSettings["theme"]>(settings.theme);
   const [language, setLanguage] = useState<AppLanguage>(settings.language || "en");
+  const [adhanAudio, setAdhanAudio] = useState(settings.adhanAudio || "none");
+  const [overlayPosition, setOverlayPosition] = useState(settings.overlayPosition || "bottom");
+  const [isPlayingPreview, setIsPlayingPreview] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Stop sound on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleTogglePlayPreview = (audioKey: string) => {
+    if (audioKey === "none") return;
+    const option = ADHAN_AUDIO_OPTIONS.find((opt) => opt.key === audioKey);
+    if (!option || !option.url) return;
+
+    if (isPlayingPreview && audioRef.current && audioRef.current.src === option.url) {
+      audioRef.current.pause();
+      setIsPlayingPreview(false);
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      const audio = new Audio(option.url);
+      audioRef.current = audio;
+      setIsPlayingPreview(true);
+
+      audio.play().catch((err) => {
+        console.error("Audio playback blocked or failed:", err);
+        setIsPlayingPreview(false);
+      });
+
+      audio.onended = () => {
+        setIsPlayingPreview(false);
+      };
+    }
+  };
+
+  const handleAdhanChange = (audioKey: string) => {
+    setAdhanAudio(audioKey);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlayingPreview(false);
+    }
+  };
 
   // Country & City Dropdown states
   const initialCountry = settings.coordinates ? POPULAR_LOCATIONS.find(c =>
@@ -105,11 +155,28 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           const activeTab = tabs[0];
           if (activeTab && activeTab.id) {
-            chrome.tabs.sendMessage(activeTab.id, {
-              type: "SHOW_PRAYER_OVERLAY",
-              prayer: "fajr",
-              minutes: reminderMinutes,
-            });
+            chrome.tabs.sendMessage(
+              activeTab.id,
+              {
+                type: "SHOW_PRAYER_OVERLAY",
+                prayer: "fajr",
+                minutes: reminderMinutes,
+              },
+              (response) => {
+                if (chrome.runtime.lastError || !response?.received) {
+                    alert(
+                      "Notice: The Overlay Reminder cannot be displayed on browser settings, blank tabs (about:blank), or standard chrome:// pages because extensions are restricted there. Please open a normal webpage (e.g., https://google.com or https://github.com), make sure it is fully loaded, and try clicking this button again!"
+                    );
+                  } else {
+                    const positionDesc = overlayPosition === "modal"
+                      ? "as a centered modal overlay"
+                      : "in the bottom-right corner";
+                    alert(`Success! Check your active webpage; you should see the premium prayer reminder ${positionDesc}.`);
+                  }
+              }
+            );
+          } else {
+            alert("No active web page detected. Please open a standard webpage first.");
           }
         });
       }
@@ -249,6 +316,8 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         perPrayerReminder,
         theme,
         language,
+        adhanAudio,
+        overlayPosition,
       });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2500);
@@ -264,7 +333,8 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const selectedCountryObj = POPULAR_LOCATIONS.find(c => c.countryName === selectedCountryName);
 
   return (
-    <form onSubmit={handleSave} className="space-y-5 pb-6">
+    <div className="space-y-5 pb-6">
+    <form onSubmit={handleSave} className="space-y-5">
       {/* 1. Location Settings */}
       <div className="space-y-2.5">
         <div className="flex justify-between items-center">
@@ -579,6 +649,66 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
             ))}
           </select>
         </div>
+
+        {/* Adhan Sound Alert & Play/Pause preview */}
+        <div className="pt-1.5 space-y-1.5 border-t border-stone-100 dark:border-stone-800/60 mt-1">
+          <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase block">
+            {t("adhanSound")}
+          </label>
+          <div className="flex items-center gap-2">
+            <select
+              value={adhanAudio}
+              onChange={(e) => handleAdhanChange(e.target.value)}
+              className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+            >
+              {ADHAN_AUDIO_OPTIONS.map((opt) => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.name}
+                </option>
+              ))}
+            </select>
+
+            {adhanAudio !== "none" && (
+              <button
+                type="button"
+                onClick={() => handleTogglePlayPreview(adhanAudio)}
+                className={cn(
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all border",
+                  isPlayingPreview
+                    ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-400 hover:bg-rose-100"
+                    : "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900/50 dark:text-emerald-400 hover:bg-emerald-100"
+                )}
+                title={isPlayingPreview ? t("stop") : t("preview")}
+              >
+                {isPlayingPreview ? (
+                  <Pause className="h-3.5 w-3.5" />
+                ) : (
+                  <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
+                )}
+              </button>
+            )}
+          </div>
+          {adhanAudio !== "none" && (
+            <div className="text-[9px] text-stone-400 dark:text-stone-500 font-medium">
+              Reciter: <span className="font-bold text-stone-600 dark:text-stone-300">{ADHAN_AUDIO_OPTIONS.find(o => o.key === adhanAudio)?.reciter}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Overlay Position Settings */}
+        <div className="pt-1.5 space-y-1.5 border-t border-stone-100 dark:border-stone-800/60 mt-1">
+          <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase block">
+            {t("overlayPosition")}
+          </label>
+          <select
+            value={overlayPosition}
+            onChange={(e) => setOverlayPosition(e.target.value as "bottom" | "modal")}
+            className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+          >
+            <option value="bottom">{t("overlayPositionBottom")}</option>
+            <option value="modal">{t("overlayPositionModal")}</option>
+          </select>
+        </div>
       </div>
 
       {/* Form Submission Action */}
@@ -604,6 +734,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
             </>
           )}
         </button>
+      </div>
     </form>
 
       {/* Developer Testing Tools */}
@@ -620,14 +751,14 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
             <button
               type="button"
               onClick={() => handleTestNotification("overlay")}
-              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
+              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
             >
               Test Overlay (Fajr)
             </button>
             <button
               type="button"
               onClick={() => handleTestNotification("newtab")}
-              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
+              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
             >
               Test New Tab (Fajr)
             </button>
@@ -644,3 +775,4 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
     </div>
   );
 }
+

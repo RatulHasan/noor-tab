@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const archiver = require('archiver')
+const { ZipArchive } = require('archiver')
 
 const extPackageJson = require('../package.json')
 
@@ -25,7 +25,7 @@ const buildZip = (src, dist, zipFilename) => {
     console.info(`Building ${zipFilename}...`)
 
     const output = fs.createWriteStream(path.join(dist, zipFilename))
-    const archive = archiver('zip')
+    const archive = new ZipArchive()
     archive.pipe(output)
     archive.directory(src, false)
     archive.finalize()

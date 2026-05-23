@@ -16,4 +16,6 @@ export const DEFAULT_SETTINGS: UserSettings = {
   },
   theme: "system",
   language: "en",
+  adhanAudio: "none",
+  overlayPosition: "bottom",
 };

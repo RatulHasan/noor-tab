@@ -7,7 +7,7 @@ import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
 import IslamicEventCard from "./components/popup/IslamicEventCard";
-import { Clock, Compass, Settings, MapPin, Loader2, Search } from "lucide-react";
+import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX } from "lucide-react";
 import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
@@ -64,6 +64,12 @@ export default function Popup() {
     // Broadcast setting change to background worker to update chrome alarms
     if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    }
+  };
+
+  const handleStopAllAdhan = () => {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ type: "STOP_ALL_ADHAN" });
     }
   };
 
@@ -157,7 +163,19 @@ export default function Popup() {
               {settings.cityName || t("calcSettings")}
             </span>
           </div>
-          <HijriDate date={getCoordinatesLocalDate(settings.coordinates)} />
+          <div className="flex items-center gap-2">
+            <HijriDate date={getCoordinatesLocalDate(settings.coordinates)} />
+            {settings.adhanAudio !== "none" && (
+              <button
+                type="button"
+                onClick={handleStopAllAdhan}
+                className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 transition-colors"
+                title={t("stopAdhanGlobal")}
+              >
+                <VolumeX className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </header>
       )}
 
