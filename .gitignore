@@ -37,3 +37,17 @@ keys.json
 
 # typescript
 .tsbuildinfo
+
+# chrome test profiles
+/chrome_test_profile/
+
+# editor configs and temporary workspace states
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+Thumbs.db
