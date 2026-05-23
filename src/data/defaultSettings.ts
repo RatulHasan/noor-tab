@@ -15,4 +15,5 @@ export const DEFAULT_SETTINGS: UserSettings = {
     isha: true,
   },
   theme: "system",
+  language: "en",
 };

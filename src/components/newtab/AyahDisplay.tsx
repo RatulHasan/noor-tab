@@ -1,6 +1,8 @@
 import React from "react";
 import { AYAHS } from "../../data/ayahs";
 import IslamicPattern from "../shared/IslamicPattern";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import { cn } from "../../utils/cn";
 
 /**
@@ -12,6 +14,9 @@ interface AyahDisplayProps {
 }
 
 export default function AyahDisplay({ className = "" }: AyahDisplayProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+
   // Select daily verse using date as a seed
   const today = new Date();
   const dateSeed = today.getDate() + today.getMonth() * 31 + today.getFullYear();
@@ -45,7 +50,7 @@ export default function AyahDisplay({ className = "" }: AyahDisplayProps) {
 
       {/* Surah Reference */}
       <div className="relative z-10 mt-4 flex items-center justify-between text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-        <span>Daily Ayah</span>
+        <span>{getTranslation(lang, "dailyAyah")}</span>
         <span className="font-mono text-stone-400 dark:text-stone-500 select-text">
           {ayah.reference}
         </span>

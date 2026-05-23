@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import { ISLAMIC_EVENTS } from "../../data/islamicEvents";
 import { getHijriDateParts } from "../../utils/hijriConverter";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import IslamicPattern from "../shared/IslamicPattern";
-import { Calendar, BellRing } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 /**
@@ -14,6 +16,9 @@ interface IslamicCalendarProps {
 }
 
 export default function IslamicCalendar({ className = "" }: IslamicCalendarProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+
   const upcomingEventInfo = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -52,9 +57,54 @@ export default function IslamicCalendar({ className = "" }: IslamicCalendarProps
     return validEvents[0] || null;
   }, []);
 
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
+
   if (!upcomingEventInfo) return null;
 
   const { event, gregorianDate, daysRemaining } = upcomingEventInfo;
+
+  // Localized date formatting
+  const localeMap = {
+    en: "en-US",
+    bn: "bn-BD",
+    ar: "ar-EG",
+    hi: "hi-IN",
+    ur: "ur-PK"
+  };
+  const currentLocale = localeMap[lang] || "en-US";
+
+  const formattedExpectedDate = gregorianDate.toLocaleDateString(currentLocale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const getDaysRemainingText = () => {
+    if (daysRemaining === 0) {
+      return t("today");
+    }
+    
+    // Format numbers based on language context if needed, otherwise string interpolation
+    if (lang === "ar") {
+      // Arabic dual/plural forms or simple digits
+      const arabicDigits = daysRemaining.toString().replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[parseInt(d, 10)]);
+      return `متبقي ${arabicDigits} ${daysRemaining === 1 ? "يوم" : daysRemaining === 2 ? "يومان" : "أيام"}`;
+    }
+    if (lang === "bn") {
+      const bengaliDigits = daysRemaining.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+      return `${bengaliDigits} ${t("daysLeft")}`;
+    }
+    if (lang === "hi") {
+      const hindiDigits = daysRemaining.toString().replace(/\d/g, (d) => "०१२३४५६७८९"[parseInt(d, 10)]);
+      return `${hindiDigits} ${t("daysLeft")}`;
+    }
+    if (lang === "ur") {
+      const urduDigits = daysRemaining.toString().replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[parseInt(d, 10)]);
+      return `${urduDigits} ${t("daysLeft")}`;
+    }
+
+    return `${daysRemaining} ${t("daysLeft")}`;
+  };
 
   return (
     <div
@@ -67,7 +117,7 @@ export default function IslamicCalendar({ className = "" }: IslamicCalendarProps
       <IslamicPattern opacity={0.03} />
 
       <div className="relative z-10 flex w-full justify-between items-center text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-        <span>Islamic Events</span>
+        <span>{t("islamicEvents")}</span>
         <Calendar className="h-3.5 w-3.5" />
       </div>
 
@@ -91,18 +141,14 @@ export default function IslamicCalendar({ className = "" }: IslamicCalendarProps
 
       <div className="relative z-10 w-full pt-2 border-t border-stone-100 dark:border-stone-800 flex justify-between items-center">
         <span className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider">
-          Expected Date
+          {t("expectedDate")}
         </span>
         <div className="flex flex-col items-end">
           <span className="text-xs font-bold text-stone-700 dark:text-stone-300">
-            {gregorianDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {formattedExpectedDate}
           </span>
           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 animate-pulse mt-0.5">
-            {daysRemaining === 0 ? "Today" : `${daysRemaining} days left`}
+            {getDaysRemainingText()}
           </span>
         </div>
       </div>

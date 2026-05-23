@@ -6,8 +6,10 @@ import AyahDisplay from "./components/newtab/AyahDisplay";
 import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
-import { MapPin, Loader2 } from "lucide-react";
-import { detectLocation } from "./utils/locationService";
+import { getTranslation } from "./data/translations";
+import { MapPin, Loader2, Search } from "lucide-react";
+import { detectLocation, geocodeLocation } from "./utils/locationService";
+import { POPULAR_LOCATIONS } from "./data/popularLocations";
 import type { UserSettings } from "./types";
 
 // Import CSS style
@@ -23,8 +25,21 @@ export default function NewTab() {
   } = usePrayerTimes();
 
   const [reminderPrayer, setReminderPrayer] = useState<string | null>(null);
+  
+  // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
   const [onboardingError, setOnboardingError] = useState("");
+
+  // Onboarding popular dropdown states
+  const [onboardingCountryName, setOnboardingCountryName] = useState("");
+  const [onboardingCityName, setOnboardingCityName] = useState("");
+
+  // Onboarding Geocode Search states
+  const [onboardingCity, setOnboardingCity] = useState("");
+  const [onboardingCountry, setOnboardingCountry] = useState("");
+  const [isOnboardingSearching, setIsOnboardingSearching] = useState(false);
+
+  const lang = settings?.language || "en";
 
   // Parse "?reminder=" parameter from the URL query
   useEffect(() => {
@@ -57,14 +72,92 @@ export default function NewTab() {
       });
     } catch (err: any) {
       console.error(err);
-      setOnboardingError(
-        err.message || "Failed to detect location. Please open the extension popup to set coordinates manually."
-      );
+      setOnboardingError(err.message);
     } finally {
       setIsOnboardingDetecting(false);
     }
   };
 
+  const handleOnboardingSearch = async () => {
+    if (!onboardingCity || !onboardingCountry) return;
+    setIsOnboardingSearching(true);
+    setOnboardingError("");
+    try {
+      const result = await geocodeLocation(onboardingCity, onboardingCountry);
+      if (result) {
+        await handleSaveSettings({
+          coordinates: { lat: result.lat, lng: result.lng },
+          cityName: result.cityName,
+        });
+      } else {
+        setOnboardingError("Location not found. Please try a different query or enter coordinates.");
+      }
+    } catch (err) {
+      console.error(err);
+      setOnboardingError("Search failed. Check your internet connection.");
+    } finally {
+      setIsOnboardingSearching(false);
+    }
+  };
+
+  const handleOnboardingCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setOnboardingCountryName(val);
+    setOnboardingCityName("");
+    if (val !== "custom" && val !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === val);
+      if (country && country.cities.length > 0) {
+        const firstCity = country.cities[0];
+        setOnboardingCityName(firstCity.name);
+        handleSaveSettings({
+          coordinates: { lat: firstCity.lat, lng: firstCity.lng },
+          cityName: firstCity.name,
+        });
+      }
+    }
+  };
+
+  const handleOnboardingCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setOnboardingCityName(val);
+    if (val !== "custom" && val !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
+      const city = country?.cities.find(ct => ct.name === val);
+      if (city) {
+        handleSaveSettings({
+          coordinates: { lat: city.lat, lng: city.lng },
+          cityName: city.name,
+        });
+      }
+    }
+  };
+
+  const getBackgroundGradient = () => {
+    if (!nextPrayer) return "from-stone-50 to-stone-100 dark:from-stone-950 dark:to-stone-900";
+    
+    switch (nextPrayer.name.toLowerCase()) {
+      case "fajr":
+        // Night (Isha to Fajr): deep indigo / slate / dark green hues
+        return "from-slate-100 via-stone-50 to-emerald-50 dark:from-slate-950 dark:via-stone-950 dark:to-emerald-950";
+      case "dhuhr":
+        // Sunrise/Morning (Fajr to Dhuhr): amber dawn/morning glow
+        return "from-amber-50/40 via-stone-50 to-emerald-50/40 dark:from-stone-950 dark:via-stone-950 dark:to-amber-950";
+      case "asr":
+        // Midday (Dhuhr to Asr): sky/emerald hues
+        return "from-sky-50/40 via-stone-50 to-emerald-50/40 dark:from-stone-950 dark:via-stone-950 dark:to-emerald-950";
+      case "maghrib":
+        // Afternoon (Asr to Maghrib): sunset/warm copper/amber
+        return "from-orange-50/40 via-stone-50 to-amber-50/40 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950";
+      case "isha":
+        // Evening/Dusk (Maghrib to Isha): rose / indigo twilight
+        return "from-rose-50/40 via-indigo-50/40 to-stone-50 dark:from-rose-950 dark:via-indigo-950 dark:to-stone-950";
+      default:
+        return "from-stone-50 to-stone-100 dark:from-stone-950 dark:to-stone-900";
+    }
+  };
+
+  const bgGradient = getBackgroundGradient();
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
   const hasCoordinates = settings.coordinates !== null;
 
   if (isLoadingSettings) {
@@ -72,16 +165,50 @@ export default function NewTab() {
       <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex flex-col items-center justify-center">
         <Loader2 className="h-10 w-10 text-emerald-700 dark:text-emerald-400 animate-spin" />
         <span className="mt-4 text-sm text-stone-500 dark:text-stone-400 font-bold uppercase tracking-wider">
-          Opening NoorTab...
+          {t("openingNoorTab")}
         </span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 flex flex-col font-sans transition-colors duration-300 relative px-6 py-8 overflow-x-hidden">
+    <div className={`min-h-screen bg-gradient-to-b ${bgGradient} text-stone-800 dark:text-stone-100 flex flex-col font-sans transition-all duration-1000 relative px-6 py-8 overflow-x-hidden`}>
       {/* Pattern background overlay */}
       <div className="absolute inset-0 bg-islamic-pattern opacity-5 pointer-events-none" />
+
+      {/* Mosque Silhouette at bottom-right of the screen */}
+      {hasCoordinates && (
+        <svg
+          className="absolute bottom-0 right-0 h-48 md:h-72 w-80 md:w-[480px] text-emerald-900/10 dark:text-emerald-400/10 pointer-events-none select-none z-0"
+          viewBox="0 0 200 100"
+          fill="currentColor"
+        >
+          <rect x="0" y="96" width="200" height="4" />
+          <path d="M 40 96 L 40 70 C 40 65, 45 60, 50 60 L 150 60 C 155 60, 160 65, 160 70 L 160 96 Z" />
+          <path d="M 80 60 C 80 50, 75 42, 100 32 C 125 42, 120 50, 120 60 Z" />
+          <line x1="100" y1="32" x2="100" y2="16" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M 98.5 17 C 98.5 15.5, 100 14.5, 101.5 15 C 100.5 15.5, 100.5 16.5, 101.5 17 C 100 17.5, 98.5 18.5, 98.5 17 Z" />
+          <path d="M 54 60 C 54 52, 50 46, 66 38 C 82 46, 78 52, 78 60 Z" />
+          <line x1="66" y1="38" x2="66" y2="28" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M 122 60 C 122 52, 118 46, 134 38 C 150 46, 146 52, 146 60 Z" />
+          <line x1="134" y1="38" x2="134" y2="28" stroke="currentColor" strokeWidth="1.2" />
+          <rect x="26" y="30" width="8" height="66" />
+          <rect x="24" y="55" width="12" height="3" rx="0.5" />
+          <rect x="24" y="30" width="12" height="3" rx="0.5" />
+          <path d="M 26 30 C 26 22, 34 22, 34 30 Z" />
+          <line x1="30" y1="22" x2="30" y2="12" stroke="currentColor" strokeWidth="1" />
+          <rect x="166" y="30" width="8" height="66" />
+          <rect x="164" y="55" width="12" height="3" rx="0.5" />
+          <rect x="164" y="30" width="12" height="3" rx="0.5" />
+          <path d="M 166 30 C 166 22, 174 22, 174 30 Z" />
+          <line x1="170" y1="22" x2="170" y2="12" stroke="currentColor" strokeWidth="1" />
+          
+          {/* Archway details */}
+          <path d="M 92 96 L 92 82 C 92 78, 108 78, 108 82 L 108 96 Z" />
+          <path d="M 72 96 L 72 85 C 72 82, 84 82, 84 85 L 84 96 Z" />
+          <path d="M 116 96 L 116 85 C 116 82, 128 82, 128 85 L 128 96 Z" />
+        </svg>
+      )}
 
       {!hasCoordinates ? (
         /* Full-screen Onboarding */
@@ -91,15 +218,15 @@ export default function NewTab() {
               NoorTab
             </h1>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
-              Assalamu Alaikum. Please allow location access to calculate daily prayer times, Hijri dates, and Qibla directions.
+              {t("welcomeSub")}
             </p>
           </div>
 
-          <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
+          <div className="relative w-24 h-24 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
             <span className="text-5xl animate-bounce">🕌</span>
           </div>
 
-          <div className="w-full space-y-3">
+          <div className="w-full space-y-4">
             <button
               onClick={handleOnboardingDetect}
               disabled={isOnboardingDetecting}
@@ -110,13 +237,90 @@ export default function NewTab() {
               ) : (
                 <MapPin className="h-5 w-5" />
               )}
-              Detect My Location
+              {t("enableLocation")}
             </button>
-            <p className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              You can also input manual coordinates in the extension popup menu.
-            </p>
+
+            {/* Dropdown selectors for location */}
+            <div className="rounded-xl border border-stone-200 bg-stone-100/40 p-4 dark:border-stone-800 dark:bg-stone-900/20 space-y-3 text-left">
+              <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
+                Select Country and City
+              </span>
+              
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <select
+                    value={onboardingCountryName}
+                    onChange={handleOnboardingCountryChange}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                  >
+                    <option value="">Country...</option>
+                    {POPULAR_LOCATIONS.map((c) => (
+                      <option key={c.countryName} value={c.countryName}>
+                        {c.countryName}
+                      </option>
+                    ))}
+                    <option value="custom">Other (Search)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <select
+                    value={onboardingCityName}
+                    onChange={handleOnboardingCityChange}
+                    disabled={!onboardingCountryName || onboardingCountryName === "custom"}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
+                  >
+                    <option value="">City...</option>
+                    {POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName)?.cities.map((city) => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                    {onboardingCountryName && onboardingCountryName !== "custom" && (
+                      <option value="custom">Other (Search)</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              {/* Search Location inputs only if custom selected */}
+              {(onboardingCountryName === "custom" || onboardingCityName === "custom") && (
+                <div className="pt-2.5 space-y-3 border-t border-stone-200/50 dark:border-stone-800/50 mt-2.5">
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <input
+                      type="text"
+                      placeholder={t("city")}
+                      value={onboardingCity}
+                      onChange={(e) => setOnboardingCity(e.target.value)}
+                      className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                    />
+                    <input
+                      type="text"
+                      placeholder={t("country")}
+                      value={onboardingCountry}
+                      onChange={(e) => setOnboardingCountry(e.target.value)}
+                      className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleOnboardingSearch}
+                    disabled={isOnboardingSearching || !onboardingCity || !onboardingCountry}
+                    className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50"
+                  >
+                    {isOnboardingSearching ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                    {isOnboardingSearching ? t("searching") : t("searchLocation")}
+                  </button>
+                </div>
+              )}
+            </div>
+
             {onboardingError && (
-              <p className="text-xs text-rose-500 font-medium">{onboardingError}</p>
+              <p className="text-xs text-rose-500 font-medium leading-normal">{onboardingError}</p>
             )}
           </div>
         </div>

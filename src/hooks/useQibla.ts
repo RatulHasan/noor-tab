@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { calculateQiblaDirection, degreesToCardinal } from "../utils/qiblaCalculator";
 
 export function useQibla(coordinates: { lat: number; lng: number } | null) {
   const [deviceHeading, setDeviceHeading] = useState<number | null>(null);
   const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
+  const [isCompassSupported, setIsCompassSupported] = useState<boolean>(false);
+  const hasReceivedData = useRef(false);
 
   const staticBearing = coordinates
     ? calculateQiblaDirection(coordinates.lat, coordinates.lng)
@@ -14,12 +16,25 @@ export function useQibla(coordinates: { lat: number; lng: number } | null) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Check if the API exists at all
+    const apiExists = "DeviceOrientationEvent" in window;
+    if (!apiExists) {
+      setIsCompassSupported(false);
+      return;
+    }
+
+    // Optimistically assume supported (mobile device). If no valid data arrives
+    // within 3 seconds, mark as unsupported (desktop without sensors).
+    setIsCompassSupported(true);
+
     const handleOrientation = (event: DeviceOrientationEvent) => {
       // Safari / iOS uses webkitCompassHeading
       const webkitHeading = (event as any).webkitCompassHeading;
-      if (typeof webkitHeading === "number") {
+      if (typeof webkitHeading === "number" && !isNaN(webkitHeading)) {
+        hasReceivedData.current = true;
         setDeviceHeading(webkitHeading);
-      } else if (event.alpha !== null) {
+      } else if (typeof event.alpha === "number" && event.alpha !== null && !isNaN(event.alpha)) {
+        hasReceivedData.current = true;
         // standard alpha goes counter-clockwise, compass is clockwise
         setDeviceHeading(360 - event.alpha);
       }
@@ -30,8 +45,16 @@ export function useQibla(coordinates: { lat: number; lng: number } | null) {
 
     window.addEventListener(eventName, handleOrientation as any);
 
+    // Timeout: if no real data arrived in 3s, treat compass as unsupported (desktop)
+    const supportTimeout = setTimeout(() => {
+      if (!hasReceivedData.current) {
+        setIsCompassSupported(false);
+      }
+    }, 3000);
+
     return () => {
       window.removeEventListener(eventName, handleOrientation as any);
+      clearTimeout(supportTimeout);
     };
   }, []);
 
@@ -66,9 +89,6 @@ export function useQibla(coordinates: { lat: number; lng: number } | null) {
     staticBearing !== null && deviceHeading !== null
       ? (staticBearing - deviceHeading + 360) % 360
       : staticBearing;
-
-  const isCompassSupported =
-    typeof window !== "undefined" && "DeviceOrientationEvent" in window;
 
   return {
     staticBearing,

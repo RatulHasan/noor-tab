@@ -6,8 +6,23 @@
   "author": "Plasmo Corp. <foss@plasmo.com>",
   "scripts": {
     "dev": "plasmo dev",
-    "build": "plasmo build",
-    "package": "plasmo package"
+    "package": "plasmo package",
+    "build": "node bin/build-prod.js chrome-mv3",
+    "build:firefox": "node bin/build-prod.js firefox-mv2",
+    "build:brave": "node bin/build-prod.js brave-mv3",
+    "build:safari": "node bin/build-prod.js safari-mv3",
+    "build:edge": "node bin/build-prod.js edge-mv3",
+    "build:all": "node bin/cleanAll.js && npm run build && npm run build:firefox && npm run build:brave && npm run build:safari && npm run build:edge",
+    "zip": "node bin/build-zip.js",
+    "package:source": "node bin/package-source.js",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:all": "vitest run --coverage && playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.2.8",

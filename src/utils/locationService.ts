@@ -31,6 +31,39 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string |
   }
 }
 
+export async function geocodeLocation(
+  city: string,
+  country: string
+): Promise<{ lat: number; lng: number; cityName: string } | null> {
+  try {
+    const query = encodeURIComponent(`${city}, ${country}`);
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`,
+      {
+        headers: {
+          "Accept-Language": "en",
+          "User-Agent": "NoorTab-Browser-Extension/1.0",
+        },
+      }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (!data || data.length === 0) return null;
+
+    const lat = parseFloat(data[0].lat);
+    const lng = parseFloat(data[0].lon);
+    
+    // Extract short city name or use display_name
+    const displayName = data[0].display_name;
+    const cityName = displayName.split(",")[0] || city;
+
+    return { lat, lng, cityName };
+  } catch (e) {
+    console.error("Geocoding query failed:", e);
+    return null;
+  }
+}
+
 export function detectLocation(): Promise<{
   lat: number;
   lng: number;
@@ -57,11 +90,11 @@ export function detectLocation(): Promise<{
       (error) => {
         let msg = "Failed to detect location.";
         if (error.code === error.PERMISSION_DENIED) {
-          msg = "Location access denied by user.";
+          msg = "Location permission is blocked. Please click the site settings/lock icon in your browser address bar to allow location access, or configure it manually using City and Country.";
         } else if (error.code === error.POSITION_UNAVAILABLE) {
-          msg = "Location information is unavailable.";
+          msg = "Location information is unavailable. Please check your system settings.";
         } else if (error.code === error.TIMEOUT) {
-          msg = "Location request timed out.";
+          msg = "Location request timed out. Please try again or input manually.";
         }
         reject(new Error(msg));
       },

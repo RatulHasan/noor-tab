@@ -6,12 +6,14 @@ import NextPrayer from "./components/popup/NextPrayer";
 import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
-import { Clock, Compass, Settings, MapPin, Loader2 } from "lucide-react";
-import { detectLocation } from "./utils/locationService";
+import { Clock, Compass, Settings, MapPin, Loader2, Search } from "lucide-react";
+import { detectLocation, geocodeLocation } from "./utils/locationService";
+import { getTranslation } from "./data/translations";
+import { POPULAR_LOCATIONS } from "./data/popularLocations";
 import type { PrayerName, UserSettings } from "./types";
 import { cn } from "./utils/cn";
 
-// Import css styles
+// Import CSS style
 import "./style.css";
 
 type Tab = "prayers" | "qibla" | "settings";
@@ -25,10 +27,22 @@ export default function Popup() {
   } = usePrayerTimes();
 
   const [activeTab, setActiveTab] = useState<Tab>("prayers");
+  
+  // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
   const [onboardingError, setOnboardingError] = useState("");
 
+  // Onboarding popular dropdown states
+  const [onboardingCountryName, setOnboardingCountryName] = useState("");
+  const [onboardingCityName, setOnboardingCityName] = useState("");
+
+  // Onboarding Geocode Search states
+  const [onboardingCity, setOnboardingCity] = useState("");
+  const [onboardingCountry, setOnboardingCountry] = useState("");
+  const [isOnboardingSearching, setIsOnboardingSearching] = useState(false);
+
   const hasCoordinates = settings.coordinates !== null;
+  const lang = settings?.language || "en";
 
   const handleToggleReminder = async (name: PrayerName) => {
     const updated = {
@@ -63,28 +77,83 @@ export default function Popup() {
       });
     } catch (err: any) {
       console.error(err);
-      setOnboardingError(err.message || "Could not detect location. Please input coordinates manually.");
-      // Redirect to settings tab so they can input coordinates manually
-      setActiveTab("settings");
+      setOnboardingError(err.message);
     } finally {
       setIsOnboardingDetecting(false);
     }
   };
+
+  const handleOnboardingSearch = async () => {
+    if (!onboardingCity || !onboardingCountry) return;
+    setIsOnboardingSearching(true);
+    setOnboardingError("");
+    try {
+      const result = await geocodeLocation(onboardingCity, onboardingCountry);
+      if (result) {
+        await handleSaveSettings({
+          coordinates: { lat: result.lat, lng: result.lng },
+          cityName: result.cityName,
+        });
+      } else {
+        setOnboardingError("Location not found. Please try a different query or enter coordinates in settings.");
+      }
+    } catch (err) {
+      console.error(err);
+      setOnboardingError("Search failed. Check your internet connection.");
+    } finally {
+      setIsOnboardingSearching(false);
+    }
+  };
+
+  const handleOnboardingCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setOnboardingCountryName(val);
+    setOnboardingCityName("");
+    if (val !== "custom" && val !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === val);
+      if (country && country.cities.length > 0) {
+        const firstCity = country.cities[0];
+        setOnboardingCityName(firstCity.name);
+        handleSaveSettings({
+          coordinates: { lat: firstCity.lat, lng: firstCity.lng },
+          cityName: firstCity.name,
+        });
+      }
+    }
+  };
+
+  const handleOnboardingCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setOnboardingCityName(val);
+    if (val !== "custom" && val !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
+      const city = country?.cities.find(ct => ct.name === val);
+      if (city) {
+        handleSaveSettings({
+          coordinates: { lat: city.lat, lng: city.lng },
+          cityName: city.name,
+        });
+      }
+    }
+  };
+
+  // Translation helper
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   return (
     <div className="w-[400px] h-[580px] flex flex-col bg-stone-50 text-stone-800 dark:bg-stone-950 dark:text-stone-100 overflow-hidden relative select-none">
       {/* Pattern background overlay */}
       <div className="absolute inset-0 bg-islamic-pattern opacity-5 pointer-events-none" />
 
-      {/* Header (Only show if settings are loaded and not onboarding) */}
-      {!isLoadingSettings && hasCoordinates && (
+      {/* Header (Always show if settings are loaded) */}
+      {!isLoadingSettings && (
         <header className="relative z-10 flex items-center justify-between border-b border-stone-200/60 bg-white/70 px-4 py-3.5 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-950/70">
           <div className="flex flex-col">
             <h1 className="text-base font-extrabold text-emerald-800 dark:text-emerald-400 tracking-wide leading-none">
               NoorTab
             </h1>
             <span className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold mt-1 uppercase tracking-wider">
-              {settings.cityName || "Daily Prayers"}
+              {settings.cityName || t("calcSettings")}
             </span>
           </div>
           <HijriDate />
@@ -97,82 +166,159 @@ export default function Popup() {
           <div className="flex h-full flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 text-emerald-700 dark:text-emerald-400 animate-spin" />
             <span className="mt-2 text-xs text-stone-500 dark:text-stone-400 font-medium">
-              Loading Settings...
+              {t("loadingSettings")}
             </span>
           </div>
-        ) : !hasCoordinates ? (
-          /* Onboarding Screen */
-          <div className="flex h-full flex-col items-center justify-center text-center p-6 space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black text-emerald-800 dark:text-emerald-400">
-                Welcome to NoorTab
-              </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400 max-w-xs leading-relaxed">
-                Calculate precise prayer times, determine the Qibla, and receive reminders based on your exact location.
-              </p>
-            </div>
-
-            <div className="relative w-24 h-24 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
-              <span className="text-4xl animate-bounce">🕌</span>
-            </div>
-
-            <div className="w-full space-y-3 pt-2">
-              <button
-                onClick={handleOnboardingDetect}
-                disabled={isOnboardingDetecting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-3 text-xs font-bold text-white shadow-md hover:bg-emerald-600 transition-all duration-200 disabled:opacity-60"
-              >
-                {isOnboardingDetecting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <MapPin className="h-4 w-4" />
-                )}
-                Enable Location Access
-              </button>
-
-              <button
-                onClick={() => {
-                  // Direct to settings to input manually
-                  setActiveTab("settings");
-                  updateSettings({ coordinates: { lat: 0, lng: 0 } }); // Temporary trigger to pass screen
-                }}
-                className="text-xs font-semibold text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
-              >
-                Or configure manually in Settings
-              </button>
-
-              {onboardingError && (
-                <p className="text-[10px] text-rose-500 font-medium">{onboardingError}</p>
-              )}
-            </div>
-          </div>
         ) : (
-          /* Standard App Tabs */
           <>
-            {activeTab === "prayers" && (
-              <div className="space-y-4">
-                <NextPrayer nextPrayer={nextPrayer} isLoading={isLoadingPrayers} />
-                <PrayerList
-                  prayerStatuses={prayerStatuses}
-                  isLoading={isLoadingPrayers}
-                  onToggleReminder={handleToggleReminder}
-                />
-              </div>
-            )}
-
-            {activeTab === "qibla" && (
-              <QiblaCompass coordinates={settings.coordinates} cityName={settings.cityName} />
-            )}
-
+            {/* Settings Tab (Always accessible) */}
             {activeTab === "settings" && (
               <SettingsPanel settings={settings} onSave={handleSaveSettings} />
+            )}
+
+            {/* Prayers Tab */}
+            {activeTab === "prayers" && (
+              <>
+                {!hasCoordinates ? (
+                  /* Onboarding Panel */
+                  <div className="flex h-full flex-col items-center justify-center text-center p-4 space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-emerald-800 dark:text-emerald-400">
+                        {t("welcome")}
+                      </h2>
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400 max-w-xs leading-relaxed">
+                        {t("welcomeSub")}
+                      </p>
+                    </div>
+
+                    <div className="w-full space-y-3">
+                      <button
+                        onClick={handleOnboardingDetect}
+                        disabled={isOnboardingDetecting}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-600 transition-all duration-200 disabled:opacity-60"
+                      >
+                        {isOnboardingDetecting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                        {t("enableLocation")}
+                      </button>
+
+                      {/* Dropdown selectors for location */}
+                      <div className="rounded-xl border border-stone-200 bg-stone-100/40 p-3 dark:border-stone-800 dark:bg-stone-900/20 space-y-2 text-left">
+                        <span className="text-[9px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
+                          Select Country and City
+                        </span>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <select
+                              value={onboardingCountryName}
+                              onChange={handleOnboardingCountryChange}
+                              className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                            >
+                              <option value="">Country...</option>
+                              {POPULAR_LOCATIONS.map((c) => (
+                                <option key={c.countryName} value={c.countryName}>
+                                  {c.countryName}
+                                </option>
+                              ))}
+                              <option value="custom">Other (Search)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <select
+                              value={onboardingCityName}
+                              onChange={handleOnboardingCityChange}
+                              disabled={!onboardingCountryName || onboardingCountryName === "custom"}
+                              className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
+                            >
+                              <option value="">City...</option>
+                              {POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName)?.cities.map((city) => (
+                                <option key={city.name} value={city.name}>
+                                  {city.name}
+                                </option>
+                              ))}
+                              {onboardingCountryName && onboardingCountryName !== "custom" && (
+                                <option value="custom">Other (Search)</option>
+                              )}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Search Location inputs only if custom selected */}
+                        {(onboardingCountryName === "custom" || onboardingCityName === "custom") && (
+                          <div className="pt-1.5 space-y-2 border-t border-stone-200/50 dark:border-stone-800/50 mt-1.5">
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                placeholder={t("city")}
+                                value={onboardingCity}
+                                onChange={(e) => setOnboardingCity(e.target.value)}
+                                className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                              />
+                              <input
+                                type="text"
+                                placeholder={t("country")}
+                                value={onboardingCountry}
+                                onChange={(e) => setOnboardingCountry(e.target.value)}
+                                className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleOnboardingSearch}
+                              disabled={isOnboardingSearching || !onboardingCity || !onboardingCountry}
+                              className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50"
+                            >
+                              {isOnboardingSearching ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Search className="h-3.5 w-3.5" />
+                              )}
+                              {isOnboardingSearching ? t("searching") : t("searchLocation")}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => setActiveTab("settings")}
+                        className="text-xs font-semibold text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 block w-full text-center"
+                      >
+                        Configure Manually in Settings Panel
+                      </button>
+
+                      {onboardingError && (
+                        <p className="text-[10px] text-rose-500 font-medium leading-normal">{onboardingError}</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <NextPrayer nextPrayer={nextPrayer} isLoading={isLoadingPrayers} />
+                    <PrayerList
+                      prayerStatuses={prayerStatuses}
+                      isLoading={isLoadingPrayers}
+                      onToggleReminder={handleToggleReminder}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Qibla Tab */}
+            {activeTab === "qibla" && (
+              <QiblaCompass coordinates={settings.coordinates} cityName={settings.cityName} />
             )}
           </>
         )}
       </main>
 
-      {/* Navigation (Only show if settings are loaded and not onboarding) */}
-      {!isLoadingSettings && hasCoordinates && (
+      {/* Navigation (Always show if settings are loaded) */}
+      {!isLoadingSettings && (
         <nav className="relative z-10 flex border-t border-stone-200 bg-white dark:border-stone-800/80 dark:bg-stone-950">
           <button
             onClick={() => setActiveTab("prayers")}
@@ -184,7 +330,7 @@ export default function Popup() {
             )}
           >
             <Clock className="h-5 w-5 mb-0.5" />
-            Prayers
+            {t("prayers")}
           </button>
           <button
             onClick={() => setActiveTab("qibla")}
@@ -196,7 +342,7 @@ export default function Popup() {
             )}
           >
             <Compass className="h-5 w-5 mb-0.5" />
-            Qibla
+            {t("qibla")}
           </button>
           <button
             onClick={() => setActiveTab("settings")}
@@ -208,7 +354,7 @@ export default function Popup() {
             )}
           >
             <Settings className="h-5 w-5 mb-0.5" />
-            Settings
+            {t("settings")}
           </button>
         </nav>
       )}

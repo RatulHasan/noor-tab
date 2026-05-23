@@ -1,5 +1,7 @@
 import React from "react";
 import { useQibla } from "../../hooks/useQibla";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import { Compass, RotateCw } from "lucide-react";
 import { cn } from "../../utils/cn";
 
@@ -17,6 +19,9 @@ export default function QiblaCompass({
   coordinates,
   cityName,
 }: QiblaCompassProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+
   const {
     staticBearing,
     staticCardinal,
@@ -27,25 +32,23 @@ export default function QiblaCompass({
     isCompassSupported,
   } = useQibla(coordinates);
 
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
+
   if (!coordinates) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <Compass className="h-12 w-12 text-stone-300 dark:text-stone-700 animate-pulse" />
         <h3 className="mt-4 text-sm font-semibold text-stone-700 dark:text-stone-300">
-          Location Required
+          {t("locationRequired")}
         </h3>
         <p className="mt-1 max-w-xs text-xs text-stone-500 dark:text-stone-400">
-          Please enable location detection in settings to compute the Qibla direction.
+          {t("locationRequiredSub")}
         </p>
       </div>
     );
   }
 
   const isLive = deviceHeading !== null;
-  // Rotation degrees for the compass dial
-  // In live mode, we rotate the dial by -deviceHeading so that North points to the device's North,
-  // and we point the needle at staticBearing (Kaaba bearing).
-  // Alternatively, in static mode, we rotate the needle by staticBearing and North stays on top.
   const needleRotation = isLive ? relativeBearing ?? 0 : staticBearing ?? 0;
 
   return (
@@ -53,7 +56,7 @@ export default function QiblaCompass({
       {/* Title / Description */}
       <div className="text-center">
         <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">
-          Qibla Direction
+          {t("qiblaDirection")}
         </h3>
         <p className="text-xs text-stone-500 dark:text-stone-400">
           {cityName ? `${cityName} • ` : ""}
@@ -106,13 +109,13 @@ export default function QiblaCompass({
           <svg className="h-full w-full" viewBox="0 0 100 100" fill="none">
             {/* North pointing needle (Emerald) */}
             <path
-              d="M 50 10 L 44 50 L 50 45 Z"
+              d="M 50 10 L 44 50 L 50 46 L 56 50 Z"
               fill="currentColor"
               className="text-emerald-700 dark:text-emerald-500 drop-shadow-[0_2px_4px_rgba(16,185,129,0.2)]"
             />
             {/* South pointing needle (Stone) */}
             <path
-              d="M 50 90 L 44 50 L 50 45 Z"
+              d="M 50 90 L 56 50 L 50 54 L 44 50 Z"
               fill="currentColor"
               className="text-stone-300 dark:text-stone-700"
             />
@@ -131,29 +134,31 @@ export default function QiblaCompass({
           {staticCardinal}
         </span>
         <p className="text-[10px] text-stone-400 dark:text-stone-500 uppercase mt-0.5 tracking-wider font-semibold">
-          Kaaba Angle from North
+          {t("kaabaAngle")}
         </p>
       </div>
 
       {/* Permission request / live state indicator */}
-      {isCompassSupported && (
-        <div className="mt-5">
-          {!isLive ? (
-            <button
-              onClick={requestCompassPermission}
-              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-50/50 px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 focus:outline-none dark:border-emerald-500/10 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
-            >
-              <RotateCw className="h-3 w-3" />
-              Enable Live Compass
-            </button>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-              Live Orientation Active
-            </span>
-          )}
-        </div>
-      )}
+      <div className="mt-5">
+        {isLive ? (
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+            {t("liveActive")}
+          </span>
+        ) : isCompassSupported ? (
+          <button
+            onClick={requestCompassPermission}
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-50/50 px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 focus:outline-none dark:border-emerald-500/10 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+          >
+            <RotateCw className="h-3 w-3" />
+            {t("enableLiveCompass")}
+          </button>
+        ) : (
+          <p className="text-[10px] text-stone-400 dark:text-stone-500 text-center max-w-[200px] leading-relaxed">
+            Static direction shown. Open on a mobile device for live compass rotation.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

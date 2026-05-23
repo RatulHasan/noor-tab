@@ -1,6 +1,8 @@
 import React from "react";
 import { HADITHS } from "../../data/hadiths";
 import IslamicPattern from "../shared/IslamicPattern";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import { cn } from "../../utils/cn";
 
 /**
@@ -12,6 +14,9 @@ interface HadithOfDayProps {
 }
 
 export default function HadithOfDay({ className = "" }: HadithOfDayProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+
   // Select daily hadith based on date seed
   const today = new Date();
   const dateSeed = today.getDate() + today.getMonth() * 31 + today.getFullYear();
@@ -45,7 +50,7 @@ export default function HadithOfDay({ className = "" }: HadithOfDayProps) {
 
       {/* Hadith citation reference */}
       <div className="relative z-10 mt-3 flex items-center justify-between text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-        <span>Hadith of the Day</span>
+        <span>{getTranslation(lang, "hadithOfDay")}</span>
         <span className="font-mono text-stone-400 dark:text-stone-500 select-text">
           {hadith.reference}
         </span>

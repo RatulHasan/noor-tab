@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import type { DailyPrayers, PrayerName, PrayerStatus } from "../../types";
 import { useHijriDate } from "../../hooks/useHijriDate";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import CountdownTimer from "../shared/CountdownTimer";
 import { Clock, MapPin, Bell, X, Calendar } from "lucide-react";
 import { PRAYER_METADATA } from "../../data/prayerNames";
@@ -29,9 +31,13 @@ export default function NoorTabHero({
   cityName,
   reminderPrayer,
 }: NoorTabHeroProps) {
+  const [settings] = useSettings();
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
   const hijri = useHijriDate(time);
+
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   // Live ticking clock
   useEffect(() => {
@@ -48,14 +54,24 @@ export default function NoorTabHero({
     }
   }, [reminderPrayer]);
 
-  const formattedTime = time.toLocaleTimeString([], {
+  // Localized date & time formatting
+  const localeMap = {
+    en: "en-US",
+    bn: "bn-BD",
+    ar: "ar-EG", // Arabic digits
+    hi: "hi-IN",
+    ur: "ur-PK"
+  };
+  const currentLocale = localeMap[lang] || "en-US";
+
+  const formattedTime = time.toLocaleTimeString(currentLocale, {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
   });
 
-  const formattedGregorian = time.toLocaleDateString("en-US", {
+  const formattedGregorian = time.toLocaleDateString(currentLocale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -65,10 +81,11 @@ export default function NoorTabHero({
   const activeReminderMeta = reminderPrayer ? PRAYER_METADATA[reminderPrayer as PrayerName] : null;
 
   return (
-    <div className="w-full flex flex-col space-y-6 relative z-10 select-none">
+    <div className="w-full flex flex-col space-y-6 relative select-none bg-gradient-to-br from-white/95 via-stone-50/80 to-white/95 border border-stone-200/60 shadow-sm rounded-3xl p-6 dark:from-stone-900/40 dark:via-stone-950/20 dark:to-stone-900/40 dark:border-stone-800/80 dark:shadow-none overflow-hidden">
+
       {/* Reminder Banner (Alert Overlay) */}
       {showReminder && activeReminderMeta && (
-        <div className="mx-auto w-full max-w-lg bg-emerald-800 text-white rounded-2xl p-4 shadow-xl border border-emerald-700/50 flex items-center justify-between animate-pulse">
+        <div className="mx-auto w-full max-w-lg bg-emerald-800 text-white rounded-2xl p-4 shadow-xl border border-emerald-700/50 flex items-center justify-between animate-pulse relative z-10">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
               <Bell className="h-5 w-5 text-emerald-300" />
@@ -93,7 +110,7 @@ export default function NoorTabHero({
       )}
 
       {/* Top Bar: Dates & Location */}
-      <div className="flex flex-col md:flex-row justify-between items-center px-2 py-3 border-b border-stone-200/50 dark:border-stone-800/40 text-stone-500 dark:text-stone-400 gap-2">
+      <div className="flex flex-col md:flex-row justify-between items-center px-2 py-3 border-b border-stone-200/50 dark:border-stone-800/40 text-stone-500 dark:text-stone-400 gap-2 relative z-10">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
           <span className="text-xs font-semibold">{hijri.englishString}</span>
@@ -116,12 +133,12 @@ export default function NoorTabHero({
       </div>
 
       {/* Center Section: Greeting & Large Clock */}
-      <div className="flex flex-col items-center justify-center py-6 text-center">
-        <h1 className="font-amiri text-5xl font-black tracking-wide text-emerald-800 dark:text-emerald-400 select-text leading-tight">
-          السلام عليكم
+      <div className="flex flex-col items-center justify-center py-6 text-center relative z-10">
+        <h1 className="font-amiri text-5xl font-black tracking-wide text-emerald-800 dark:text-emerald-400 select-text leading-tight animate-fade-in">
+          {t("assalamuAlaikum")}
         </h1>
         <p className="mt-1 text-xs text-stone-400 dark:text-stone-500 font-medium uppercase tracking-widest">
-          Peace be upon you
+          {t("peaceBeUponYou")}
         </p>
 
         {/* Large Monospace Digital Clock */}
@@ -131,18 +148,18 @@ export default function NoorTabHero({
 
         {/* Next Prayer Countdown Widget */}
         {nextPrayer && (
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/10 text-xs font-medium text-emerald-800 dark:text-emerald-300 shadow-sm">
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/10 text-xs font-medium text-emerald-800 dark:text-emerald-300 shadow-sm transition-all duration-300 hover:shadow-md">
             <Clock className="h-3.5 w-3.5 animate-pulse text-emerald-600 dark:text-emerald-400" />
-            <span>Next:</span>
+            <span>{t("nextPrayer")}:</span>
             <span className="font-bold capitalize">{nextPrayer.name}</span>
-            <span>in</span>
+            <span>{t("timeRemaining").toLowerCase()}</span>
             <CountdownTimer targetTime={nextPrayer.time} className="font-bold text-emerald-700 dark:text-emerald-400" />
           </div>
         )}
       </div>
 
       {/* Horizontal Prayer Times Bar */}
-      <div className="grid grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-5 gap-2.5 relative z-10">
         {prayerStatuses.map((prayer) => {
           const isNext = prayer.state === "next";
           const isPassed = prayer.state === "passed";
@@ -151,12 +168,30 @@ export default function NoorTabHero({
             <div
               key={prayer.name}
               className={cn(
-                "flex flex-col items-center p-3 rounded-2xl border transition-all duration-300",
-                isPassed && "bg-stone-50/50 border-stone-200/40 opacity-45 dark:bg-stone-900/10 dark:border-stone-900/30",
-                isNext && "bg-white border-emerald-600/30 ring-1 ring-emerald-500/20 shadow-md scale-105 dark:bg-stone-900/60",
-                prayer.state === "upcoming" && "bg-white border-stone-200/60 dark:bg-stone-900/40 dark:border-stone-800/60"
+                "relative overflow-hidden flex flex-col items-center p-3 rounded-2xl border transition-all duration-300 select-none",
+                isPassed && "bg-stone-50/30 border-stone-200/30 opacity-45 dark:bg-stone-900/10 dark:border-stone-900/20",
+                isNext && "bg-white border-emerald-600/30 ring-1 ring-emerald-500/10 shadow-md scale-[1.03] dark:bg-stone-900/80 dark:border-emerald-500/30",
+                prayer.state === "upcoming" && "bg-white/60 border-stone-200/50 dark:bg-stone-900/30 dark:border-stone-800/50"
               )}
             >
+              {/* Mini Background Mosque Silhouette on Active Next Salat Card */}
+              {isNext && (
+                <svg
+                  className="absolute bottom-0 right-0 h-10 w-16 text-emerald-950/[0.04] dark:text-emerald-400/[0.03] pointer-events-none select-none"
+                  viewBox="0 0 200 100"
+                  fill="currentColor"
+                >
+                  <rect x="0" y="96" width="200" height="4" />
+                  <path d="M 40 96 L 40 70 C 40 65, 45 60, 50 60 L 150 60 C 155 60, 160 65, 160 70 L 160 96 Z" />
+                  <path d="M 80 60 C 80 50, 75 42, 100 32 C 125 42, 120 50, 120 60 Z" />
+                  <line x1="100" y1="32" x2="100" y2="20" stroke="currentColor" strokeWidth="1.5" />
+                  <rect x="26" y="30" width="8" height="66" />
+                  <path d="M 26 30 C 26 22, 34 22, 34 30 Z" />
+                  <rect x="166" y="30" width="8" height="66" />
+                  <path d="M 166 30 C 166 22, 174 22, 174 30 Z" />
+                </svg>
+              )}
+
               <span
                 className={cn(
                   "text-[10px] uppercase font-bold tracking-wider text-stone-400 dark:text-stone-500",
@@ -174,7 +209,7 @@ export default function NoorTabHero({
                   isNext && "text-emerald-700 dark:text-emerald-400"
                 )}
               >
-                {prayer.time.toLocaleTimeString([], {
+                {prayer.time.toLocaleTimeString(currentLocale, {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

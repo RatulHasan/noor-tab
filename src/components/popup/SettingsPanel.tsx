@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName } from "../../types";
-import { detectLocation } from "../../utils/locationService";
-import { Compass, MapPin, Loader2, Save, Bell } from "lucide-react";
+import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "../../types";
+import { detectLocation, geocodeLocation } from "../../utils/locationService";
+import { getTranslation } from "../../data/translations";
+import { POPULAR_LOCATIONS } from "../../data/popularLocations";
+import { MapPin, Loader2, Save, Trash2, Search } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 /**
@@ -45,6 +47,14 @@ const THEMES: { key: UserSettings["theme"]; label: string }[] = [
   { key: "system", label: "System" },
 ];
 
+const LANGUAGES: { key: AppLanguage; label: string }[] = [
+  { key: "en", label: "English" },
+  { key: "bn", label: "বাংলা (Bangla)" },
+  { key: "ar", label: "العربية (Arabic)" },
+  { key: "hi", label: "हिन्दी (Hindi)" },
+  { key: "ur", label: "اردو (Urdu)" },
+];
+
 export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) {
   // Local state for forms
   const [lat, setLat] = useState(settings.coordinates?.lat?.toString() || "");
@@ -58,11 +68,67 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
     settings.perPrayerReminder
   );
   const [theme, setTheme] = useState<UserSettings["theme"]>(settings.theme);
+  const [language, setLanguage] = useState<AppLanguage>(settings.language || "en");
+
+  // Country & City Dropdown states
+  const initialCountry = settings.coordinates ? POPULAR_LOCATIONS.find(c =>
+    c.cities.some(city => 
+      Math.abs(city.lat - (settings.coordinates?.lat || 0)) < 0.01 && 
+      Math.abs(city.lng - (settings.coordinates?.lng || 0)) < 0.01
+    )
+  ) : null;
+  
+  const initialCity = initialCountry && settings.coordinates ? initialCountry.cities.find(city => 
+    Math.abs(city.lat - (settings.coordinates?.lat || 0)) < 0.01 && 
+    Math.abs(city.lng - (settings.coordinates?.lng || 0)) < 0.01
+  ) : null;
+
+  const [selectedCountryName, setSelectedCountryName] = useState(initialCountry?.countryName || "");
+  const [selectedCityName, setSelectedCityName] = useState(initialCity?.name || "");
+
+  // Geocoding manual search states
+  const [searchCity, setSearchCity] = useState("");
+  const [searchCountry, setSearchCountry] = useState("");
+  const [isSearchingGeocode, setIsSearchingGeocode] = useState(false);
+  const [geocodeError, setGeocodeError] = useState("");
 
   // Status states
   const [isDetecting, setIsDetecting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [locError, setLocError] = useState("");
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const countryVal = e.target.value;
+    setSelectedCountryName(countryVal);
+    setSelectedCityName(""); // Reset city selection
+    
+    if (countryVal !== "custom" && countryVal !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === countryVal);
+      // Auto-select the first city if there are cities
+      if (country && country.cities.length > 0) {
+        const firstCity = country.cities[0];
+        setSelectedCityName(firstCity.name);
+        setLat(firstCity.lat.toString());
+        setLng(firstCity.lng.toString());
+        setCityName(firstCity.name);
+      }
+    }
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cityVal = e.target.value;
+    setSelectedCityName(cityVal);
+
+    if (cityVal !== "custom" && cityVal !== "") {
+      const country = POPULAR_LOCATIONS.find(c => c.countryName === selectedCountryName);
+      const city = country?.cities.find(ct => ct.name === cityVal);
+      if (city) {
+        setLat(city.lat.toString());
+        setLng(city.lng.toString());
+        setCityName(city.name);
+      }
+    }
+  };
 
   const handleDetectLocation = async () => {
     setIsDetecting(true);
@@ -72,12 +138,55 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
       setLat(loc.lat.toString());
       setLng(loc.lng.toString());
       setCityName(loc.cityName || "Detected Location");
+      setSelectedCountryName("");
+      setSelectedCityName("");
     } catch (err: any) {
       console.error(err);
       setLocError(err.message || "Failed to detect location.");
     } finally {
       setIsDetecting(false);
     }
+  };
+
+  const handleGeocodeSearch = async () => {
+    if (!searchCity || !searchCountry) return;
+    setIsSearchingGeocode(true);
+    setGeocodeError("");
+    setLocError("");
+    try {
+      const result = await geocodeLocation(searchCity, searchCountry);
+      if (result) {
+        setLat(result.lat.toString());
+        setLng(result.lng.toString());
+        setCityName(result.cityName);
+        setSelectedCountryName("");
+        setSelectedCityName("");
+      } else {
+        setGeocodeError("Location not found. Try correcting spelling or checking connection.");
+      }
+    } catch (e) {
+      console.error(e);
+      setGeocodeError("Search failed. Check your internet connection.");
+    } finally {
+      setIsSearchingGeocode(false);
+    }
+  };
+
+  const handleResetLocation = async () => {
+    setLat("");
+    setLng("");
+    setCityName("");
+    setSelectedCountryName("");
+    setSelectedCityName("");
+    setSearchCity("");
+    setSearchCountry("");
+    setLocError("");
+    setGeocodeError("");
+
+    await onSave({
+      coordinates: null,
+      cityName: null,
+    });
   };
 
   const handleTogglePrayerReminder = (name: PrayerName) => {
@@ -110,6 +219,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         reminderMinutes,
         perPrayerReminder,
         theme,
+        language,
       });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2500);
@@ -119,13 +229,30 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
     }
   };
 
+  // Label translations helper
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(language, key);
+
+  const selectedCountryObj = POPULAR_LOCATIONS.find(c => c.countryName === selectedCountryName);
+
   return (
     <form onSubmit={handleSave} className="space-y-5 pb-6">
       {/* 1. Location Settings */}
       <div className="space-y-2.5">
-        <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-          Location
-        </label>
+        <div className="flex justify-between items-center">
+          <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+            {t("location")}
+          </label>
+          {(lat || lng) && (
+            <button
+              type="button"
+              onClick={handleResetLocation}
+              className="text-[10px] text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-bold flex items-center gap-1 transition-colors"
+            >
+              <Trash2 className="h-3 w-3" />
+              Reset Location
+            </button>
+          )}
+        </div>
         
         <div className="flex gap-2">
           <button
@@ -139,16 +266,101 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
             ) : (
               <MapPin className="h-3.5 w-3.5" />
             )}
-            Auto-Detect Location
+            {t("autoDetect")}
           </button>
         </div>
 
-        {locError && <p className="text-[10px] font-medium text-rose-500">{locError}</p>}
+        {locError && <p className="text-[10px] font-medium text-rose-500 leading-normal">{locError}</p>}
+
+        {/* Country and City dropdown select fields */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
+              {t("country")}
+            </label>
+            <select
+              value={selectedCountryName}
+              onChange={handleCountryChange}
+              className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+            >
+              <option value="">Select Country...</option>
+              {POPULAR_LOCATIONS.map((c) => (
+                <option key={c.countryName} value={c.countryName}>
+                  {c.countryName}
+                </option>
+              ))}
+              <option value="custom">Other (Custom Search)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
+              {t("city")}
+            </label>
+            <select
+              value={selectedCityName}
+              onChange={handleCityChange}
+              disabled={!selectedCountryName || selectedCountryName === "custom"}
+              className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
+            >
+              <option value="">Select City...</option>
+              {selectedCountryObj?.cities.map((city) => (
+                <option key={city.name} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+              {selectedCountryName && selectedCountryName !== "custom" && (
+                <option value="custom">Other (Custom Search)</option>
+              )}
+            </select>
+          </div>
+        </div>
+
+        {/* Manual Geocoding Form Box (only when custom is selected or if nothing is selected yet) */}
+        {(selectedCountryName === "custom" || selectedCityName === "custom") && (
+          <div className="rounded-xl border border-stone-200 bg-stone-50/50 p-3 dark:border-stone-800 dark:bg-stone-900/30 space-y-2">
+            <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
+              {t("searchLocation")}
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                placeholder={t("city")}
+                value={searchCity}
+                onChange={(e) => setSearchCity(e.target.value)}
+                className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+              />
+              <input
+                type="text"
+                placeholder={t("country")}
+                value={searchCountry}
+                onChange={(e) => setSearchCountry(e.target.value)}
+                className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleGeocodeSearch}
+              disabled={isSearchingGeocode || !searchCity || !searchCountry}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-emerald-600/30 bg-emerald-600/10 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-600/20 disabled:opacity-50 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
+            >
+              {isSearchingGeocode ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Search className="h-3.5 w-3.5" />
+              )}
+              {isSearchingGeocode ? t("searching") : t("searchLocation")}
+            </button>
+            {geocodeError && (
+              <p className="text-[9px] text-rose-500 font-medium leading-normal">{geocodeError}</p>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Latitude
+              {t("latitude")}
             </label>
             <input
               type="number"
@@ -162,7 +374,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
           </div>
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Longitude
+              {t("longitude")}
             </label>
             <input
               type="number"
@@ -178,7 +390,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
 
         <div>
           <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-            City Name
+            {t("cityName")}
           </label>
           <input
             type="text"
@@ -193,13 +405,13 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
       {/* 2. Calculation Parameters */}
       <div className="space-y-3">
         <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-          Calculation settings
+          {t("calcSettings")}
         </label>
         
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Method
+              {t("method")}
             </label>
             <select
               value={method}
@@ -216,7 +428,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
 
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Madhab
+              {t("madhab")}
             </label>
             <select
               value={madhab}
@@ -236,12 +448,12 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
       {/* 3. Alarm and Reminders */}
       <div className="space-y-3">
         <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-          Reminders
+          {t("prayers")}
         </label>
         
         <div>
           <div className="flex justify-between text-xs text-stone-600 dark:text-stone-400">
-            <span>Global Offset</span>
+            <span>{t("timeRemaining")}</span>
             <span className="font-semibold">{reminderMinutes} min before</span>
           </div>
           <input
@@ -258,7 +470,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         {/* Per-Prayer Toggles */}
         <div className="space-y-1.5">
           <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-            Active Prayers
+            {t("calcSettings")}
           </label>
           <div className="flex flex-wrap gap-1.5">
             {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as PrayerName[]).map((p) => (
@@ -270,7 +482,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
                   "px-3 py-1 rounded-full text-xs font-medium border capitalize transition-all duration-200",
                   perPrayerReminder[p]
                     ? "bg-emerald-50 text-emerald-800 border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20"
-                    : "bg-white text-stone-400 border-stone-200 dark:bg-stone-900 dark:text-stone-600 dark:border-stone-800"
+                    : "bg-white text-stone-400 border-stone-200 dark:bg-stone-900/30 dark:text-stone-600 dark:border-stone-800"
                 )}
               >
                 {p}
@@ -280,16 +492,16 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         </div>
       </div>
 
-      {/* 4. Display & System Theme */}
+      {/* 4. Display, System Theme, and Language Preferences */}
       <div className="space-y-3">
         <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-          Preferences
+          {t("preferences")}
         </label>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Notifications
+              {t("notifications")}
             </label>
             <select
               value={notificationStyle}
@@ -306,7 +518,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
 
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-              Theme
+              {t("theme")}
             </label>
             <select
               value={theme}
@@ -320,6 +532,23 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
               ))}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
+            {t("language")}
+          </label>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as AppLanguage)}
+            className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+          >
+            {LANGUAGES.map((langOpt) => (
+              <option key={langOpt.key} value={langOpt.key}>
+                {langOpt.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -337,12 +566,12 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
           )}
         >
           {saveStatus === "saving" && <Loader2 className="h-4 w-4 animate-spin" />}
-          {saveStatus === "success" && "Settings Saved ✓"}
-          {saveStatus === "error" && "Error Saving!"}
+          {saveStatus === "success" && t("settingsSaved")}
+          {saveStatus === "error" && t("errorSaving")}
           {saveStatus === "idle" && (
             <>
               <Save className="h-4 w-4" />
-              Save Settings
+              {t("saveSettings")}
             </>
           )}
         </button>
