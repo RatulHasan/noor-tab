@@ -123,4 +123,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ success: true });
     return true;
   }
+  if (message.type === "STOP_ALL_ADHAN") {
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, { type: "STOP_ALL_ADHAN" }).catch(() => {
+            // Ignore error for pages without content script loaded
+          });
+        }
+      });
+    });
+    // Broadcast to internal extension views (e.g. New Tab)
+    chrome.runtime.sendMessage({ type: "STOP_ALL_ADHAN_INTERNAL" }).catch(() => {});
+    sendResponse({ success: true });
+    return true;
+  }
 });

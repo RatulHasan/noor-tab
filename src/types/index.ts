@@ -17,6 +17,8 @@ export type CalculationMethodKey =
 
 export type MadhabKey = "standard" | "hanafi";
 
+export type AppLanguage = "en" | "bn" | "ar" | "hi" | "ur";
+
 export interface UserSettings {
   coordinates: {
     lat: number;
@@ -29,6 +31,9 @@ export interface UserSettings {
   reminderMinutes: number; // general offset (e.g. 15 minutes before)
   perPrayerReminder: Record<PrayerName, boolean>;
   theme: "light" | "dark" | "system";
+  language: AppLanguage;
+  adhanAudio: string; // "none" or name of the adhan file (e.g. "azan1")
+  overlayPosition: "bottom" | "modal";
 }
 
 export type DailyPrayers = Record<PrayerName, Date>;

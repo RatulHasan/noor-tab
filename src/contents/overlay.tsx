@@ -1,8 +1,10 @@
 import cssText from "data-text:~style.css";
 import type { PlasmoCSConfig } from "plasmo";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReminderOverlay from "../components/shared/ReminderOverlay";
 import type { PrayerName } from "../types";
+import { Storage } from "@plasmohq/storage";
+import { ADHAN_AUDIO_OPTIONS } from "../data/adhanAudios";
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -31,6 +33,51 @@ const OverlayCSUI = () => {
   const [visible, setVisible] = useState(false);
   const [prayer, setPrayer] = useState<PrayerName | null>(null);
   const [minutes, setMinutes] = useState(15);
+  const [overlayPosition, setOverlayPosition] = useState<"bottom" | "modal">("bottom");
+  const [isOverlayAudioPlaying, setIsOverlayAudioPlaying] = useState(false);
+  const [hasAdhanConfigured, setHasAdhanConfigured] = useState(false);
+  const overlayAudioRef = useRef<HTMLAudioElement | null>(null);
+  const storage = new Storage();
+
+  // Load settings & Play configured Adhan sound if shown
+  useEffect(() => {
+    if (visible && prayer) {
+      storage.get("noortab-user-settings").then((storedSettings: any) => {
+        if (storedSettings?.overlayPosition) {
+          setOverlayPosition(storedSettings.overlayPosition);
+        }
+        
+        const adhanAudio = storedSettings?.adhanAudio || "none";
+        setHasAdhanConfigured(adhanAudio !== "none");
+        
+        if (adhanAudio !== "none") {
+          const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === adhanAudio);
+          if (option && option.url) {
+            const audio = new Audio(option.url);
+            overlayAudioRef.current = audio;
+            setIsOverlayAudioPlaying(true);
+            
+            audio.play().catch((err) => {
+              console.log("Autoplay of Adhan blocked by browser autoplay policies on this active web tab:", err);
+              setIsOverlayAudioPlaying(false);
+            });
+
+            audio.onended = () => {
+              setIsOverlayAudioPlaying(false);
+            };
+          }
+        }
+      });
+    }
+
+    return () => {
+      if (overlayAudioRef.current) {
+        overlayAudioRef.current.pause();
+        overlayAudioRef.current = null;
+        setIsOverlayAudioPlaying(false);
+      }
+    };
+  }, [visible, prayer]);
 
   useEffect(() => {
     const handleMessage = (message: any, sender: any, sendResponse: any) => {
@@ -39,6 +86,12 @@ const OverlayCSUI = () => {
         setMinutes(message.minutes);
         setVisible(true);
         sendResponse({ received: true });
+      }
+      if (message.type === "STOP_ALL_ADHAN") {
+        if (overlayAudioRef.current) {
+          overlayAudioRef.current.pause();
+          setIsOverlayAudioPlaying(false);
+        }
       }
     };
 
@@ -55,6 +108,18 @@ const OverlayCSUI = () => {
 
   if (!visible || !prayer) return null;
 
+  const handleToggleAudio = () => {
+    if (overlayAudioRef.current) {
+      if (isOverlayAudioPlaying) {
+        overlayAudioRef.current.pause();
+        setIsOverlayAudioPlaying(false);
+      } else {
+        overlayAudioRef.current.play().catch(() => {});
+        setIsOverlayAudioPlaying(true);
+      }
+    }
+  };
+
   const handleAction = () => {
     setVisible(false);
     if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
@@ -62,14 +127,35 @@ const OverlayCSUI = () => {
     }
   };
 
+  const handleDismiss = () => {
+    setVisible(false);
+    if (overlayAudioRef.current) {
+      overlayAudioRef.current.pause();
+      setIsOverlayAudioPlaying(false);
+    }
+  };
+
+  const isModal = overlayPosition === "modal";
+
+  const containerClasses = isModal
+    ? "fixed inset-0 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm z-[2147483647] p-4"
+    : "fixed bottom-6 right-6 z-[2147483647] animate-slide-in-right";
+
   return (
-    <div className="fixed bottom-6 right-6 z-[2147483647] animate-slide-in-right">
+    <div
+      className={containerClasses}
+      // Prevent backdrop clicks from bubbling; only the Close button inside dismisses
+      onClick={isModal ? (e) => e.stopPropagation() : undefined}
+    >
       <ReminderOverlay
         prayerName={prayer}
         timeRemaining={`${minutes} minutes`}
-        onDismiss={() => setVisible(false)}
+        onDismiss={handleDismiss}
         onAction={handleAction}
-        autoDismissMs={30000}
+        isModal={isModal}
+        isAdhanPlaying={isOverlayAudioPlaying}
+        onToggleAdhan={handleToggleAudio}
+        showAdhanControls={hasAdhanConfigured}
       />
     </div>
   );

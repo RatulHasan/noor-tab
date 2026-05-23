@@ -5,13 +5,15 @@ import { cn } from "../../utils/cn";
 /**
  * @param {Object} props
  * @param {string} [props.className] - Optional custom CSS class name.
+ * @param {Date} [props.date] - Optional date to compute Hijri from (defaults to now).
  */
 interface HijriDateProps {
   className?: string;
+  date?: Date;
 }
 
-export default function HijriDate({ className = "" }: HijriDateProps) {
-  const hijri = useHijriDate();
+export default function HijriDate({ className = "", date }: HijriDateProps) {
+  const hijri = useHijriDate(date);
 
   return (
     <div className={cn("flex flex-col items-end text-right", className)}>
@@ -24,3 +26,4 @@ export default function HijriDate({ className = "" }: HijriDateProps) {
     </div>
   );
 }
+

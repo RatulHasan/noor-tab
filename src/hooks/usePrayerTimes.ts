@@ -5,6 +5,7 @@ import {
   getNextPrayer,
   getPrayerStatuses,
 } from "../utils/prayerCalculator";
+import { getCoordinatesLocalDate } from "../utils/locationService";
 
 export function usePrayerTimes() {
   const [settings, , isLoadingSettings] = useSettings();
@@ -43,17 +44,18 @@ export function usePrayerTimes() {
   }
 
   const { lat, lng } = settings.coordinates;
+  const targetDate = getCoordinatesLocalDate(settings.coordinates);
   
   const prayers = calculatePrayerTimes(
     lat,
     lng,
     settings.method,
     settings.madhab,
-    date
+    targetDate
   );
 
   // Compute tomorrow's prayers to resolve correct wrapping for the "next" prayer after Isha
-  const tomorrowDate = new Date(date);
+  const tomorrowDate = new Date(targetDate);
   tomorrowDate.setDate(tomorrowDate.getDate() + 1);
   const tomorrowPrayers = calculatePrayerTimes(
     lat,

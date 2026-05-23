@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 import type { DhikrPhase } from "../../types";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 import { cn } from "../../utils/cn";
 
 /**
@@ -17,9 +19,40 @@ const PHASES: DhikrPhase[] = [
   { count: 34, max: 100, ar: "ٱللَّٰهُ أَكْبَرُ", en: "Allahu Akbar", transliteration: "Allah is the Greatest" },
 ];
 
+const TRANSLATED_MEANINGS = {
+  en: [
+    "Glory be to Allah",
+    "Praise be to Allah",
+    "Allah is the Greatest"
+  ],
+  bn: [
+    "আল্লাহ পরম পবিত্র",
+    "সকল প্রশংসা আল্লাহর জন্য",
+    "আল্লাহ সবচেয়ে মহান"
+  ],
+  ar: [
+    "سبحان الله",
+    "الحمد لله",
+    "الله أكبر"
+  ],
+  hi: [
+    "अल्लाह पवित्र है",
+    "सब तारीफें अल्लाह के लिए हैं",
+    "अल्लाह सबसे बड़ा है"
+  ],
+  ur: [
+    "اللہ پاک ہے",
+    "تمام تعریفیں اللہ کے لیے ہیں",
+    "اللہ سب سے بڑا ہے"
+  ]
+};
+
 export default function DhikrCounter({ className = "" }: DhikrCounterProps) {
-  const [count, setCount] = useState(0); // 0 to 99 representing the 100-cycle
+  const [settings] = useSettings();
+  const [count, setCount] = useState(0); // 0 to 100 representing cycle
   const [totalCount, setTotalCount] = useState(0); // overall lifetime clicks in session
+
+  const lang = settings?.language || "en";
 
   // Load persisted states from session storage
   useEffect(() => {
@@ -60,30 +93,26 @@ export default function DhikrCounter({ className = "" }: DhikrCounterProps) {
   };
 
   // Determine current active remembrance phase
+  // count ranges: 0–32 = SubhanAllah (33 clicks), 33–65 = Alhamdulillah (33 clicks), 66–99 = Allahu Akbar (34 clicks)
   const getActivePhase = (currentVal: number): { phase: DhikrPhase; index: number; relativeCount: number } => {
-    let index = 0;
-    let prevMax = 0;
-    for (let i = 0; i < PHASES.length; i++) {
-      if (currentVal < PHASES[i].max) {
-        index = i;
-        break;
-      }
-      prevMax = PHASES[i].max;
+    if (currentVal < 33) {
+      return { phase: PHASES[0], index: 0, relativeCount: currentVal };
     }
-    const phase = PHASES[index];
-    const relativeCount = currentVal - prevMax + 1; // 1-indexed count in this phase
-    return { phase, index, relativeCount };
+    if (currentVal < 66) {
+      return { phase: PHASES[1], index: 1, relativeCount: currentVal - 33 };
+    }
+    return { phase: PHASES[2], index: 2, relativeCount: currentVal - 66 };
   };
 
-  const { phase, relativeCount } = getActivePhase(count);
+  const { phase, index, relativeCount } = getActivePhase(count);
 
   const handleIncrement = () => {
-    // Attempt haptic feedback
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(30);
     }
 
-    const nextCount = (count + 1) % 100;
+    // After 100 clicks (indices 0–99), reset to 0 for the next cycle
+    const nextCount = count >= 99 ? 0 : count + 1;
     const nextTotal = totalCount + 1;
     setCount(nextCount);
     setTotalCount(nextTotal);
@@ -98,13 +127,16 @@ export default function DhikrCounter({ className = "" }: DhikrCounterProps) {
   };
 
   // Circular progress ring calculations
-  // Radius = 54, strokeWidth = 6. Circumference = 2 * PI * 54 = 339.292
   const radius = 54;
   const strokeWidth = 5;
   const circumference = 2 * Math.PI * radius;
-  // Progress within the current active phase
-  const progressPercent = (relativeCount / phase.count) * 100;
+  // Progress within the current active phase (handle 0 case gracefully)
+  const progressPercent = relativeCount === 0 ? 0 : (relativeCount / phase.count) * 100;
   const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
+
+  // Retrieve translation meanings
+  const phaseTranslations = TRANSLATED_MEANINGS[lang] || TRANSLATED_MEANINGS.en;
+  const localizedMeaning = phaseTranslations[index] || phase.transliteration;
 
   return (
     <div
@@ -114,11 +146,11 @@ export default function DhikrCounter({ className = "" }: DhikrCounterProps) {
       )}
     >
       <div className="flex w-full justify-between items-center text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-        <span>Tasbih Counter</span>
+        <span>{getTranslation(lang, "tasbihCounter")}</span>
         <button
           onClick={handleReset}
           className="flex items-center gap-1 rounded p-1 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
-          title="Reset Session"
+          title={getTranslation(lang, "resetSession")}
         >
           <RotateCcw className="h-3.5 w-3.5" />
         </button>
@@ -174,12 +206,13 @@ export default function DhikrCounter({ className = "" }: DhikrCounterProps) {
           {phase.en}
         </p>
         <p className="text-[9px] text-stone-400 dark:text-stone-500 italic leading-none">
-          {phase.transliteration}
+          {localizedMeaning}
         </p>
       </div>
 
       <div className="mt-2 text-[9px] font-semibold text-stone-400 dark:text-stone-600 uppercase tracking-widest">
-        Session Total: <span className="font-mono text-stone-500 dark:text-stone-400 font-bold">{totalCount}</span>
+        {getTranslation(lang, "sessionTotal")}:{" "}
+        <span className="font-mono text-stone-500 dark:text-stone-400 font-bold">{totalCount}</span>
       </div>
     </div>
   );

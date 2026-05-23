@@ -1,0 +1,29 @@
+<svg
+        viewBox="0 0 200 100"
+        fill="currentColor"
+>
+    <rect x="0" y="96" width="200" height="4" />
+    <path d="M 40 96 L 40 70 C 40 65, 45 60, 50 60 L 150 60 C 155 60, 160 65, 160 70 L 160 96 Z" />
+    <path d="M 80 60 C 80 50, 75 42, 100 32 C 125 42, 120 50, 120 60 Z" />
+    <line x1="100" y1="32" x2="100" y2="16" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M 98.5 17 C 98.5 15.5, 100 14.5, 101.5 15 C 100.5 15.5, 100.5 16.5, 101.5 17 C 100 17.5, 98.5 18.5, 98.5 17 Z" />
+    <path d="M 54 60 C 54 52, 50 46, 66 38 C 82 46, 78 52, 78 60 Z" />
+    <line x1="66" y1="38" x2="66" y2="28" stroke="currentColor" strokeWidth="1.2" />
+    <path d="M 122 60 C 122 52, 118 46, 134 38 C 150 46, 146 52, 146 60 Z" />
+    <line x1="134" y1="38" x2="134" y2="28" stroke="currentColor" strokeWidth="1.2" />
+    <rect x="26" y="30" width="8" height="66" />
+    <rect x="24" y="55" width="12" height="3" rx="0.5" />
+    <rect x="24" y="30" width="12" height="3" rx="0.5" />
+    <path d="M 26 30 C 26 22, 34 22, 34 30 Z" />
+    <line x1="30" y1="22" x2="30" y2="12" stroke="currentColor" strokeWidth="1" />
+    <rect x="166" y="30" width="8" height="66" />
+    <rect x="164" y="55" width="12" height="3" rx="0.5" />
+    <rect x="164" y="30" width="12" height="3" rx="0.5" />
+    <path d="M 166 30 C 166 22, 174 22, 174 30 Z" />
+    <line x1="170" y1="22" x2="170" y2="12" stroke="currentColor" strokeWidth="1" />
+
+    {/* Archway details */}
+    <path d="M 92 96 L 92 82 C 92 78, 108 78, 108 82 L 108 96 Z" />
+    <path d="M 72 96 L 72 85 C 72 82, 84 82, 84 85 L 84 96 Z" />
+    <path d="M 116 96 L 116 85 C 116 82, 128 82, 128 85 L 128 96 Z" />
+</svg>
