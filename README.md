@@ -314,6 +314,14 @@ npm run build
 
 The production bundle is output to `build/chrome-mv3-prod/`.
 
+### 🛠️ Developer Mode & Testing Tools
+
+NoorTab includes a built-in suite of Developer Testing Tools, which are consolidated in the **Widget Customizer** sidebar (New Tab page) when built in dev mode:
+- **Enable Developer Mode**: Build or start the extension with the environment variable `PLASMO_PUBLIC_DEV_MODE=true` set in the environment or `.env` file.
+- **Local Time Simulator**: Speed up testing by simulating any hour/minute of the day. The tab's dynamic background gradient transitions and clock adjust instantly.
+- **Global Location Simulator**: Select any country and city from a dropdown to simulate different geographic locations. The prayer times and timezone offset recalculate instantly.
+- **Immediate Notifications Tester**: Fire mock prayer alarms (Maghrib), center-modal overlays (Fajr), or new tab notifications instantly to test the notification triggers.
+
 ---
 
 ## ⚙️ Settings Reference
