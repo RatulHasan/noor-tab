@@ -9,6 +9,7 @@ import { PRAYER_METADATA } from "../../data/prayerNames";
 import { cn } from "../../utils/cn";
 import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
 import { Storage } from "@plasmohq/storage";
+import { useStorage } from "@plasmohq/storage/hook";
 
 const globalStorage = new Storage();
 
@@ -38,6 +39,7 @@ export default function NoorTabHero({
   const [settings] = useSettings();
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
+  const [devMockTime] = useStorage<string>("devMockTime", "");
 
   const reminderAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isReminderAudioPlaying, setIsReminderAudioPlaying] = useState(false);
@@ -104,11 +106,18 @@ export default function NoorTabHero({
   const lang = settings?.language || "en";
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
-  // Live ticking clock
+  // Live ticking clock (unless time is mocked by developer tools)
   useEffect(() => {
+    if (devMockTime) {
+      const d = new Date();
+      const [h, m] = devMockTime.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+      setTime(d);
+      return;
+    }
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [devMockTime]);
 
   // Auto-dismiss reminder banner after 15 seconds & play Adhan audio if configured
   useEffect(() => {

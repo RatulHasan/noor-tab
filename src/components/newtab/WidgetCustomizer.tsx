@@ -57,6 +57,9 @@ interface WidgetCustomizerProps {
 export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerProps) {
   const [widgets, setWidgets] = useStorage<WidgetConfig[]>("widgetLayout", DEFAULT_WIDGETS);
   const [showWarning, setShowWarning] = useState(false);
+  const [devMockTime, setDevMockTime] = useStorage<string>("devMockTime", "");
+
+  const isDev = process.env.NODE_ENV === "development" || (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"));
 
   // Setup sensors for dnd-kit
   const sensors = useSensors(
@@ -75,10 +78,10 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
     if (!target.visible) {
       // Trying to enable
       const currentVisibleCount = widgets.filter((w) => w.visible).length;
-      if (currentVisibleCount >= 6) {
-        setShowWarning(true);
-        return;
-      }
+      // if (currentVisibleCount >= 6) {
+      //   setShowWarning(true);
+      //   return;
+      // }
     }
 
     setShowWarning(false);
@@ -174,11 +177,50 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
         {/* Reset layout action */}
         <button
           onClick={handleReset}
-          className="flex items-center justify-center gap-1.5 py-2 border border-stone-200/60 dark:border-stone-800 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-850 transition-all duration-200"
+          className="flex items-center justify-center gap-1.5 py-2 border border-stone-200/60 dark:border-stone-850 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-200"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset Layout to Defaults</span>
         </button>
+
+        {/* Developer Testing Tools (Visible in Development Mode) */}
+        {isDev && (
+          <div className="p-3 rounded-xl border border-rose-200/60 bg-rose-50/10 dark:border-rose-950/20 dark:bg-rose-950/10 space-y-2.5 mt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-rose-700 dark:text-rose-455 uppercase tracking-wider flex items-center gap-1">
+                <span>🛠️</span> Developer Tools
+              </span>
+              {devMockTime && (
+                <button
+                  onClick={() => setDevMockTime("")}
+                  className="text-[9px] text-rose-600 dark:text-rose-400 hover:underline font-bold"
+                >
+                  Reset Time
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-[10px] text-stone-500 dark:text-stone-400 font-semibold">
+                <span>Simulate Local Time:</span>
+                <span className="text-stone-800 dark:text-stone-100 font-bold">
+                  {devMockTime || "Realtime"}
+                </span>
+              </div>
+              
+              <input
+                type="time"
+                value={devMockTime || ""}
+                onChange={(e) => setDevMockTime(e.target.value)}
+                className="w-full text-xs rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 px-2 py-1.5 outline-none focus:border-rose-500 dark:focus:border-rose-600 transition-colors"
+              />
+            </div>
+
+            <p className="text-[8px] text-stone-400 dark:text-stone-550 italic leading-normal">
+              Simulates the clock, prayer times, and new tab background gradient changes dynamically.
+            </p>
+          </div>
+        )}
 
       </div>
     </>

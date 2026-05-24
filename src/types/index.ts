@@ -207,6 +207,7 @@ export interface QuizRecord {
   answeredCorrectly: boolean;
   totalCorrect: number;
   totalAnswered: number;
+  selectedIndex?: number;
 }
 
 // ── Focus / DND Mode ───────────────────────────────────────

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, X, ExternalLink } from "lucide-react";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 function isJumuah(): boolean {
   return new Date().getDay() === 5; // Friday
@@ -12,6 +14,10 @@ function getTodayKey(): string {
 
 export default function JumuahBanner() {
   const [dismissed, setDismissed] = useState(false);
+  const [settings] = useSettings();
+
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   // On mount, check if already dismissed today
   useEffect(() => {
@@ -21,7 +27,7 @@ export default function JumuahBanner() {
         setDismissed(true);
       }
     } catch {
-      // localStorage not available (unlikely in extension newtab but safe)
+      // localStorage not available
     }
   }, []);
 
@@ -64,7 +70,7 @@ export default function JumuahBanner() {
               Jumu&apos;ah Mubarak
             </span>
             <span className="text-sm font-bold text-emerald-800 dark:text-emerald-300">
-              Blessed Friday
+              {t("blessedFriday")}
             </span>
           </div>
         </div>
@@ -92,7 +98,7 @@ export default function JumuahBanner() {
           className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors duration-200 w-fit"
         >
           <ExternalLink className="h-3.5 w-3.5" />
-          Read Surah Al-Kahf today
+          {t("readSurahKahf")}
         </a>
       </div>
     </div>

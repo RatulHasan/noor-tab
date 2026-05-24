@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useStorage } from "@plasmohq/storage/hook";
 import { useSettings } from "./useSettings";
 import {
   calculatePrayerTimes,
@@ -10,6 +11,8 @@ import { getCoordinatesLocalDate } from "../utils/locationService";
 export function usePrayerTimes() {
   const [settings, , isLoadingSettings] = useSettings();
   const [date, setDate] = useState(() => new Date());
+
+  const [devMockTime] = useStorage<string>("devMockTime", "");
 
   // Handle midnight date rollover
   useEffect(() => {
@@ -44,8 +47,19 @@ export function usePrayerTimes() {
   }
 
   const { lat, lng } = settings.coordinates;
-  const targetDate = getCoordinatesLocalDate(settings.coordinates);
   
+  const baseDate = (() => {
+    if (devMockTime) {
+      const d = new Date();
+      const [h, m] = devMockTime.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+      return d;
+    }
+    return date;
+  })();
+
+  const targetDate = getCoordinatesLocalDate(settings.coordinates, baseDate);
+
   const prayers = calculatePrayerTimes(
     lat,
     lng,
@@ -65,11 +79,12 @@ export function usePrayerTimes() {
     tomorrowDate
   );
 
-  const nextPrayer = getNextPrayer(prayers, tomorrowPrayers);
+  const nextPrayer = getNextPrayer(prayers, tomorrowPrayers, baseDate);
   const prayerStatuses = getPrayerStatuses(
     prayers,
     settings.perPrayerReminder,
-    tomorrowPrayers
+    tomorrowPrayers,
+    baseDate
   );
 
   return {

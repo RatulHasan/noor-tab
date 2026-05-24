@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import type { DayPrayerRecord, PrayerStreakData, PrayerStatus } from "../../types";
 import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, parseISO, isFuture } from "../../utils/dateUtils";
-import { Flame, Trophy, Calendar, Check, AlertCircle, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Flame, Trophy, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { getDayScore, calculateCurrentStreak, calculateLongestStreak } from "../../utils/streakCalculator";
 import { cn } from "../../utils/cn";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 export default function PrayerStreakTracker() {
   const [streakData, setStreakData] = useStorage<PrayerStreakData>("prayerStreak", {
@@ -16,8 +18,12 @@ export default function PrayerStreakTracker() {
     totalMissed: 0
   });
 
+  const [settings] = useSettings();
   const [selectedDate, setSelectedDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [showMonthView, setShowMonthView] = useState(false);
+
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   const activeRecord: DayPrayerRecord = streakData.records[selectedDate] || {
     date: selectedDate,
@@ -104,6 +110,14 @@ export default function PrayerStreakTracker() {
     return "bg-rose-500 text-white"; // Missed all
   };
 
+  const getScoreTranslation = (lbl: string) => {
+    if (lbl === "Perfect") return t("perfect");
+    if (lbl === "Good") return t("good");
+    if (lbl === "Partial") return t("partial");
+    if (lbl === "Missed") return t("missed");
+    return t("unmarked");
+  };
+
   return (
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 border border-stone-200/50 dark:border-stone-800/60 flex flex-col space-y-4 font-sans select-none">
       {/* 1. Header: Streak Indicators */}
@@ -114,17 +128,17 @@ export default function PrayerStreakTracker() {
           </div>
           <div>
             <span className="text-xs text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block">
-              Current Streak
+              {t("currentStreak")}
             </span>
             <span className="text-lg font-black text-stone-800 dark:text-stone-100 leading-none block">
-              {streakData.currentStreak} Days
+              {streakData.currentStreak} {t("days")}
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-50 dark:bg-stone-800/40 text-stone-600 dark:text-stone-400 border border-stone-200/50 dark:border-stone-800/30 text-xs font-semibold">
           <Trophy className="h-4 w-4 text-amber-500 fill-current" />
-          <span>Longest: {streakData.longestStreak} days</span>
+          <span>{t("longestStreak")}: {streakData.longestStreak} {t("days")}</span>
         </div>
       </div>
 
@@ -162,7 +176,7 @@ export default function PrayerStreakTracker() {
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
-            Logged: {format(parseISO(selectedDate), "MMMM dd, yyyy")}
+            {t("prayersLoggedToday")}: {format(parseISO(selectedDate), "MMMM dd, yyyy")}
           </span>
           <span className={cn(
             "text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border",
@@ -172,7 +186,7 @@ export default function PrayerStreakTracker() {
             currentScore.label === "Missed" && "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/10 dark:text-rose-400 dark:border-rose-900/20",
             currentScore.label === "Unmarked" && "bg-stone-50 text-stone-400 border-stone-200 dark:bg-stone-900/20 dark:text-stone-500 dark:border-stone-800"
           )}>
-            {currentScore.label}
+            {getScoreTranslation(currentScore.label)}
           </span>
         </div>
 
@@ -185,7 +199,7 @@ export default function PrayerStreakTracker() {
                 className="flex items-center justify-between rounded-xl border border-stone-200/50 bg-stone-50/10 p-2.5 dark:border-stone-800/40 dark:bg-stone-900/10"
               >
                 <span className="text-xs font-bold text-stone-700 dark:text-stone-300 capitalize">
-                  {prayer}
+                  {t(prayer)}
                 </span>
 
                 <div className="flex gap-1.5">
@@ -198,7 +212,7 @@ export default function PrayerStreakTracker() {
                         : "bg-white border-stone-200 text-stone-500 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400"
                     )}
                   >
-                    On Time
+                    {t("onTime")}
                   </button>
                   <button
                     onClick={() => handleMarkPrayer(prayer, "late")}
@@ -209,7 +223,7 @@ export default function PrayerStreakTracker() {
                         : "bg-white border-stone-200 text-stone-500 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400"
                     )}
                   >
-                    Late
+                    {t("late")}
                   </button>
                   <button
                     onClick={() => handleMarkPrayer(prayer, "missed")}
@@ -220,7 +234,7 @@ export default function PrayerStreakTracker() {
                         : "bg-white border-stone-200 text-stone-500 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400"
                     )}
                   >
-                    Missed
+                    {t("missed")}
                   </button>
                 </div>
               </div>
@@ -238,7 +252,7 @@ export default function PrayerStreakTracker() {
         >
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4" />
-            <span>Monthly Heatmap Grid</span>
+            <span>{t("monthlyHeatmap")}</span>
           </div>
           {showMonthView ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
@@ -280,7 +294,7 @@ export default function PrayerStreakTracker() {
             
             {/* Color key guide */}
             <div className="flex justify-between items-center text-[9px] text-stone-400 dark:text-stone-500 font-medium">
-              <span>Missed (0/5)</span>
+              <span>{t("missed")} (0/5)</span>
               <div className="flex gap-1">
                 <div className="h-2 w-2 rounded bg-rose-500" />
                 <div className="h-2 w-2 rounded bg-stone-100 border border-stone-200" />
@@ -288,7 +302,7 @@ export default function PrayerStreakTracker() {
                 <div className="h-2 w-2 rounded bg-emerald-500" />
                 <div className="h-2 w-2 rounded bg-emerald-700" />
               </div>
-              <span>Perfect (5/5)</span>
+              <span>{t("perfect")} (5/5)</span>
             </div>
           </div>
         )}

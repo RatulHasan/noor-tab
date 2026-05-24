@@ -48,9 +48,9 @@ export function calculatePrayerTimes(
 
 export function getNextPrayer(
   prayers: DailyPrayers,
-  tomorrowPrayers?: DailyPrayers
+  tomorrowPrayers?: DailyPrayers,
+  now: Date = new Date()
 ): { name: PrayerName; time: Date } {
-  const now = new Date();
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   
   for (const name of prayerNames) {
@@ -73,9 +73,10 @@ export function getNextPrayer(
 export function getPrayerStatuses(
   prayers: DailyPrayers,
   perPrayerReminder: Record<PrayerName, boolean>,
-  tomorrowPrayers?: DailyPrayers
+  tomorrowPrayers?: DailyPrayers,
+  now: Date = new Date()
 ): PrayerUIStatus[] {
-  const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers);
+  const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers, now);
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   
   return prayerNames.map((name) => {
@@ -92,7 +93,7 @@ export function getPrayerStatuses(
     
     if (isNext) {
       state = "next";
-    } else if (time < new Date()) {
+    } else if (time < now) {
       state = "passed";
     }
     

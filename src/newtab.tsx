@@ -275,7 +275,7 @@ export default function NewTab() {
             {/* Dropdown selectors for location */}
             <div className="rounded-xl border border-stone-200 bg-stone-100/40 p-4 dark:border-stone-800 dark:bg-stone-900/20 space-y-3 text-left">
               <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
-                Select Country and City
+                {t("selectCountryCity")}
               </span>
               
               <div className="grid grid-cols-2 gap-2.5">
@@ -285,13 +285,13 @@ export default function NewTab() {
                     onChange={handleOnboardingCountryChange}
                     className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
                   >
-                    <option value="">Country...</option>
+                    <option value="">{t("countryPlaceholder")}</option>
                     {POPULAR_LOCATIONS.map((c) => (
                       <option key={c.countryName} value={c.countryName}>
                         {c.countryName}
                       </option>
                     ))}
-                    <option value="custom">Other (Search)</option>
+                    <option value="custom">{t("otherSearch")}</option>
                   </select>
                 </div>
 
@@ -302,14 +302,14 @@ export default function NewTab() {
                     disabled={!onboardingCountryName || onboardingCountryName === "custom"}
                     className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
                   >
-                    <option value="">City...</option>
+                    <option value="">{t("cityPlaceholder")}</option>
                     {POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName)?.cities.map((city) => (
                       <option key={city.name} value={city.name}>
                         {city.name}
                       </option>
                     ))}
                     {onboardingCountryName && onboardingCountryName !== "custom" && (
-                      <option value="custom">Other (Search)</option>
+                      <option value="custom">{t("otherSearch")}</option>
                     )}
                   </select>
                 </div>
@@ -436,7 +436,7 @@ export default function NewTab() {
               className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white/80 dark:border-stone-850 dark:bg-stone-900/80 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 shadow-sm transition-all duration-200"
             >
               <Settings2 className="h-4 w-4" />
-              Customize Dashboard
+              {t("customizeDashboard")}
             </button>
           </div>
 

@@ -3,13 +3,19 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { calculatePrayerTimes } from "../../utils/prayerCalculator";
 import { POPULAR_LOCATIONS } from "../../data/popularLocations";
 import { format } from "../../utils/dateUtils";
-import { Globe, Settings2, Check, Plus, Trash2, X } from "lucide-react";
+import { Globe, Settings2, Check, Plus, X } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 export default function GlobalPrayerWidget() {
   const [worldCities, setWorldCities] = useStorage<string[]>("worldCities", ["Istanbul", "London", "New York"]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [settings] = useSettings();
+
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   // Coordinates
   const MAKKAH = { name: "Makkah", lat: 21.3891, lng: 39.8579 };
@@ -41,10 +47,11 @@ export default function GlobalPrayerWidget() {
       setWorldCities(list.filter((name) => name !== cityName));
     } else {
       if (list.length >= 3) {
-        // limit to 3 custom cities
-        return;
+        // Automatically cycle: remove the oldest city and add the new one
+        setWorldCities([...list.slice(1), cityName]);
+      } else {
+        setWorldCities([...list, cityName]);
       }
-      setWorldCities([...list, cityName]);
     }
   };
 
@@ -74,7 +81,7 @@ export default function GlobalPrayerWidget() {
         <div className="flex items-center gap-2">
           <Globe className="w-4 h-4 text-emerald-700 dark:text-emerald-500" />
           <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">
-            Global Prayer Times
+            {t("globalPrayerTimes")}
           </p>
         </div>
 
@@ -85,7 +92,7 @@ export default function GlobalPrayerWidget() {
             className="p-1.5 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors flex items-center gap-1 text-[10px] font-bold"
           >
             <Settings2 className="w-3.5 h-3.5" />
-            <span>Manage Cities ({currentCitiesLength}/3)</span>
+            <span>{t("manageCities")} ({currentCitiesLength}/3)</span>
           </button>
 
           {/* Select Cities Dropdown */}
@@ -93,7 +100,7 @@ export default function GlobalPrayerWidget() {
             <div className="absolute right-0 mt-1 z-[9999] w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl p-3 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
-                  Select Custom Cities
+                  {t("selectCustomCities")}
                 </span>
                 <button
                   onClick={() => setDropdownOpen(false)}
@@ -105,7 +112,7 @@ export default function GlobalPrayerWidget() {
 
               <input
                 type="text"
-                placeholder="Search cities..."
+                placeholder={t("searchCities")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full text-xs rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-800 dark:text-stone-100 px-3 py-2 outline-none focus:border-emerald-500 transition-colors"
@@ -114,7 +121,7 @@ export default function GlobalPrayerWidget() {
               <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
                 {filteredCities.length === 0 ? (
                   <span className="text-[10px] text-stone-400 italic block text-center py-2">
-                    No cities found
+                    {t("noCitiesFound")}
                   </span>
                 ) : (
                   filteredCities.map((city) => {
@@ -125,10 +132,10 @@ export default function GlobalPrayerWidget() {
                         key={city.name}
                         onClick={() => handleToggleCity(city.name)}
                         className={cn(
-                          "w-full flex items-center justify-between text-left px-2 py-1.5 rounded-lg text-xs font-semibold hover:bg-stone-50 dark:hover:bg-stone-750 transition-colors",
+                          "w-full flex items-center justify-between text-left px-2 py-1.5 rounded-lg text-xs font-semibold transition-colors",
                           isSelected
-                            ? "bg-emerald-50/50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
-                            : "text-stone-600 dark:text-stone-300"
+                            ? "bg-emerald-50/50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/50"
+                            : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800"
                         )}
                       >
                         <div>
@@ -140,8 +147,10 @@ export default function GlobalPrayerWidget() {
                         {isSelected ? (
                           <Check className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                         ) : (
-                          list.length < 3 && (
-                            <Plus className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600" />
+                          list.length < 3 ? (
+                            <Plus className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600 dark:text-stone-550 dark:hover:text-stone-300" />
+                          ) : (
+                            <span className="text-[8px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider">Replace</span>
                           )
                         )}
                       </button>
@@ -149,6 +158,11 @@ export default function GlobalPrayerWidget() {
                   })
                 )}
               </div>
+              {currentCitiesLength >= 3 && (
+                <div className="pt-2 border-t border-stone-100 dark:border-stone-800 text-[9px] text-stone-400 dark:text-stone-500 text-center italic">
+                  3/3 custom cities chosen. Selecting a new one replaces the oldest.
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -159,12 +173,12 @@ export default function GlobalPrayerWidget() {
         <table className="w-full text-[11px] text-left border-collapse">
           <thead>
             <tr className="border-b border-stone-100 dark:border-stone-800 text-stone-400 font-bold uppercase tracking-wider">
-              <th className="py-2.5 font-bold">City</th>
-              <th className="py-2.5 text-center font-bold">Fajr</th>
-              <th className="py-2.5 text-center font-bold">Dhuhr</th>
-              <th className="py-2.5 text-center font-bold">Asr</th>
-              <th className="py-2.5 text-center font-bold">Maghrib</th>
-              <th className="py-2.5 text-center font-bold">Isha</th>
+              <th className="py-2.5 font-bold">{t("cityLabel")}</th>
+              <th className="py-2.5 text-center font-bold">{t("fajr")}</th>
+              <th className="py-2.5 text-center font-bold">{t("dhuhr")}</th>
+              <th className="py-2.5 text-center font-bold">{t("asr")}</th>
+              <th className="py-2.5 text-center font-bold">{t("maghrib")}</th>
+              <th className="py-2.5 text-center font-bold">{t("isha")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100/50 dark:divide-stone-800/40">

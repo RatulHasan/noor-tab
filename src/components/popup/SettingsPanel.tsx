@@ -152,7 +152,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [locError, setLocError] = useState("");
 
-  const isDevMode = process.env.PLASMO_PUBLIC_DEV_MODE === "true";
+  const isDevMode = process.env.PLASMO_PUBLIC_DEV_MODE;
 
   const handleTestNotification = (type: "overlay" | "newtab" | "alarm") => {
     if (type === "overlay") {
