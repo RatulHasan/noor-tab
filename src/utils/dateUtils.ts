@@ -1,5 +1,5 @@
 /**
- * dateUtils.ts — Native JS date helpers replacing date-fns.
+ * dateUtils.ts - Native JS date helpers replacing date-fns.
  *
  * date-fns v4 has a known incompatibility with Plasmo/Parcel's bundler where
  * the internal token formatters (e.g. the "y" year token) are not included in

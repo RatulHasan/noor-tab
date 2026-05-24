@@ -144,7 +144,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
                     "Open a normal webpage (e.g. https://google.com), make sure it is fully loaded, then try again."
                   );
                 } else {
-                  alert("Success! Check your active webpage — the prayer reminder overlay should be visible.");
+                  alert("Success! Check your active webpage - the prayer reminder overlay should be visible.");
                 }
               }
             );

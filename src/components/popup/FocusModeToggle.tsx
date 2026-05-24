@@ -85,7 +85,7 @@ export default function FocusModeToggle() {
     <div className="relative" ref={dropdownRef}>
       <button
         type="button"
-        title={isActive ? `Focus Mode active — ${remaining}` : "Enable Focus Mode (snooze reminders)"}
+        title={isActive ? `Focus Mode active - ${remaining}` : "Enable Focus Mode (snooze reminders)"}
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "relative flex items-center gap-1 p-1.5 rounded-lg border transition-colors duration-200",

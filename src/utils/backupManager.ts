@@ -88,7 +88,7 @@ export async function exportPrayerLogPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(22);
-  doc.text("NoorTab — Monthly Prayer Log", 14, 20);
+  doc.text("NoorTab - Monthly Prayer Log", 14, 20);
   
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(10);

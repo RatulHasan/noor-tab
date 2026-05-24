@@ -147,7 +147,7 @@ export default function AsmaUlHusna() {
           </p>
         </div>
 
-        {/* Benefit — uses CSS grid transition to avoid max-h glitch */}
+        {/* Benefit - uses CSS grid transition to avoid max-h glitch */}
         <div
           className="grid transition-all duration-300 ease-out"
           style={{ gridTemplateRows: showBenefit ? "1fr" : "0fr" }}
@@ -180,7 +180,7 @@ export default function AsmaUlHusna() {
         </div>
       </div>
 
-      {/* Portal-rendered modal — escapes overflow-x-hidden parent */}
+      {/* Portal-rendered modal - escapes overflow-x-hidden parent */}
       {modal}
     </>
   );

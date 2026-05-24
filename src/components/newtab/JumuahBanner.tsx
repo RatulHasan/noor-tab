@@ -86,7 +86,7 @@ export default function JumuahBanner() {
           </p>
           <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed italic">
             "O you who have believed, when the call to prayer is made on the day of Jumu&apos;ah, then proceed to the remembrance of Allah"
-            <span className="not-italic font-semibold text-stone-400 dark:text-stone-500 ml-1">— Al-Jumu&apos;ah 62:9</span>
+            <span className="not-italic font-semibold text-stone-400 dark:text-stone-500 ml-1">- Al-Jumu&apos;ah 62:9</span>
           </p>
         </div>
 

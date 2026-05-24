@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="NoorTab — Your Islamic New Tab Experience" width="100%" />
+  <img src="assets/banner.png" alt="NoorTab - Your Islamic New Tab Experience" width="100%" />
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion — delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, a Qibla compass, and much more, all wrapped in a beautifully designed, distraction-free experience.
+  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, a Qibla compass, and much more, all wrapped in a beautifully designed, distraction-free experience.
 </p>
 
 <br/>
@@ -31,17 +31,17 @@
 ### 🕌 Prayer Times & Adhan
 - **Accurate prayer time calculation** using industry-standard algorithms (Adhan.js) supporting 8+ calculation methods (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
 - **Madhab support** for Hanafi and standard Asr calculation
-- **Per-prayer reminders** — individually enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha notifications
-- **Configurable reminder offset** — be notified 0–30 minutes before each prayer
-- **Adhan audio playback** — choose from a curated selection of high-quality Adhan recordings; audio plays automatically when the prayer reminder fires
-- **Global stop control** — a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
+- **Per-prayer reminders** - individually enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha notifications
+- **Configurable reminder offset** - be notified 0–30 minutes before each prayer
+- **Adhan audio playback** - choose from a curated selection of high-quality Adhan recordings; audio plays automatically when the prayer reminder fires
+- **Global stop control** - a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
 - **Live countdown** to the next prayer with a smooth animated timer
-- **Dynamic background gradients** in the new tab that shift throughout the day — dawn blues, midday greens, sunset ambers, and night indigos
+- **Dynamic background gradients** in the new tab that shift throughout the day - dawn blues, midday greens, sunset ambers, and night indigos
 
 ### 📅 Islamic Calendar
 - **Hijri date** displayed in both English transliteration and Arabic script
-- **Islamic event cards** — automatically surfaces upcoming events (Ramadan, Eid, Muharram, Mawlid, etc.) with days-remaining countdown
-- **Friday (Jumu'ah) banner** — special contextual greeting every Friday
+- **Islamic event cards** - automatically surfaces upcoming events (Ramadan, Eid, Muharram, Mawlid, etc.) with days-remaining countdown
+- **Friday (Jumu'ah) banner** - special contextual greeting every Friday
 
 ### 🧭 Qibla Compass
 - **Geolocation-aware Qibla direction** calculated from the user's coordinates to Makkah
@@ -61,7 +61,7 @@
 - **Customisable digital counter** for Tasbih, Tahmid, Takbir, and custom Dhikr
 - Set personal goals (e.g. 33, 99, 100) with visual progress tracking
 - Haptic-style feedback on each count; auto-resets when goal is reached
-- Persistent storage — counts survive browser restarts
+- Persistent storage - counts survive browser restarts
 
 ---
 
@@ -71,7 +71,7 @@
 A full **morning & evening Adhkar companion** built into both the new tab and the popup:
 - Structured Adhkar sessions split into Morning and Evening categories
 - Each Dhikr item shows its Arabic text, transliteration, translation, and recommended count
-- **Progress tracking** — completed items are persisted per day; sessions auto-reset the following morning/evening
+- **Progress tracking** - completed items are persisted per day; sessions auto-reset the following morning/evening
 - Daily completion percentage with a visual progress bar
 - Reminder alarms that fire at Fajr + 30 min (morning) and at Asr time (evening) if enabled in settings
 
@@ -81,11 +81,11 @@ A motivational accountability tool for establishing consistent Salah:
 - Monthly calendar view showing which prayers were prayed, missed, or skipped
 - Mark each prayer as **Prayed ✓**, **Missed ✗**, or **Excused (Qada) ◎**
 - Current streak counter and longest-ever streak badge
-- All data stored locally — 100% private, no account required
+- All data stored locally - 100% private, no account required
 
 ### 🌙 Fasting Tracker
 Tracks Ramadan and voluntary fasting with full historical logging:
-- **Ramadan Mode** — auto-detects the Ramadan month or can be toggled manually
+- **Ramadan Mode** - auto-detects the Ramadan month or can be toggled manually
 - Mark each day as fasted, not fasted, or excused
 - Displays Suhoor and Iftar times based on the user's location (Fajr and Maghrib)
 - **Live countdown** to Iftar with seconds precision during a fast
@@ -96,13 +96,13 @@ Tracks Ramadan and voluntary fasting with full historical logging:
 A lightweight reading-progress companion:
 - Save your current Surah and Ayah position
 - Browse all 114 Surahs by name, number, and revelation type (Makki / Madani)
-- Multiple bookmarks supported — pick up exactly where you left off
+- Multiple bookmarks supported - pick up exactly where you left off
 - Clean two-panel layout: bookmark list on the left, detail view on the right
 
-### 🔤 Asma ul-Husna — The 99 Names of Allah
-- **Name of the Day** card — date-seeded so a different name is highlighted every day
+### 🔤 Asma ul-Husna - The 99 Names of Allah
+- **Name of the Day** card - date-seeded so a different name is highlighted every day
 - Displays the Arabic calligraphy, transliteration, English meaning, and a devotional benefit/supplication
-- **Smooth animated benefit reveal** — click "Show benefit" to expand the card without layout glitches
+- **Smooth animated benefit reveal** - click "Show benefit" to expand the card without layout glitches
 - **View all 99 names** opens a full-screen modal (rendered via React Portal to prevent clipping) with a 3-column searchable grid; the today's name is highlighted in emerald
 
 ### 🌍 Global Prayer Times
@@ -110,7 +110,7 @@ A world-clock-style table showing prayer times for multiple cities simultaneousl
 - **Always-on Makkah and Madinah rows** as anchors
 - Add up to **3 custom cities** from a searchable dropdown spanning 500+ cities worldwide
 - Live prayer time calculations using each city's coordinates and the Umm al-Qura method
-- Persistent city selections via storage — survives page refreshes
+- Persistent city selections via storage - survives page refreshes
 
 ### 🧠 Islamic Quiz
 A gamified knowledge tool to deepen Islamic understanding:
@@ -123,7 +123,7 @@ A gamified knowledge tool to deepen Islamic understanding:
 A searchable library of authentic supplications:
 - 100+ duas organised by category (Morning, Evening, Eating, Travelling, Sleep, etc.)
 - Full Arabic text with transliteration and translation for each dua
-- **Favourite system** — star any dua to pin it to a personal quick-access list
+- **Favourite system** - star any dua to pin it to a personal quick-access list
 - Copy to clipboard in one tap
 
 ### ☕ Jumuah Banner
@@ -142,7 +142,7 @@ A drag-and-drop-style widget manager:
 - Moon icon in the popup header opens the **Silence Reminders** dropdown
 - Snooze all prayer notifications for **1 hour, 2 hours, or 4 hours**
 - Active snooze shows a pulsing indicator and live remaining time countdown
-- Background worker respects the snooze window — no alarms fire until it expires
+- Background worker respects the snooze window - no alarms fire until it expires
 - Disable at any time with the "Disable Focus Mode" option
 
 ---
@@ -190,7 +190,7 @@ NoorTab is **entirely local**. There are no accounts, no tracking, and no data i
 | Prayer Calculation | `adhan` (Adhan.js) |
 | Icons | `lucide-react` |
 | Build | Parcel (via Plasmo) |
-| Testing | — (unit tests planned) |
+| Testing | - (unit tests planned) |
 
 ---
 
@@ -199,7 +199,7 @@ NoorTab is **entirely local**. There are no accounts, no tracking, and no data i
 ```
 noor-tab/
 ├── src/
-│   ├── background.ts              # Service worker — alarm scheduling & message routing
+│   ├── background.ts              # Service worker - alarm scheduling & message routing
 │   ├── newtab.tsx                 # New Tab page entry point
 │   ├── popup.tsx                  # Browser action popup entry point
 │   ├── content.ts                 # Content script for overlay injection

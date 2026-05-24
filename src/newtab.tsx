@@ -433,14 +433,14 @@ export default function NewTab() {
           <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
             <BuyMeCoffee variant="badge" />
             <span className="text-[11px] text-stone-500 dark:text-stone-400 font-medium text-center">
-              Made with ❤️ for the Muslim Ummah and{" "}
+              Made with ❤️ for the Muslim Ummah.{" "}
               <a
                 href="https://github.com/RatulHasan/noor-tab"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
               >
-                GitHub
+                See in GitHub
               </a>
             </span>
             <button
