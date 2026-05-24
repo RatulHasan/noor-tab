@@ -3,8 +3,10 @@ import { useStorage } from "@plasmohq/storage/hook";
 import type { AdhkarProgress, AdhkarItem, AdhkarSession } from "../../types";
 import { morningAdhkar, eveningAdhkar } from "../../data/adhkar";
 import { format } from "../../utils/dateUtils";
-import { Sun, Moon, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, AlertCircle, Heart } from "lucide-react";
+import { Sun, Moon, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, Heart } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 interface AdhkarPlayerProps {
   currentPrayer?: string | null;
@@ -13,6 +15,10 @@ interface AdhkarPlayerProps {
 export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps) {
   const [session, setSession] = useState<AdhkarSession>("morning");
   const [index, setIndex] = useState(0);
+  const [settings] = useSettings();
+
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   const [progress, setProgress] = useStorage<AdhkarProgress>("adhkarProgress", {
     date: format(new Date(), "yyyy-MM-dd"),
@@ -61,21 +67,16 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
 
   const handleIncrement = () => {
     if (!currentItem) return;
-
+    const isMorning = session === "morning";
     const newCount = Math.min(currentItem.count, completedCount + 1);
     const updatedCounts = { ...completedCounts, [currentItem.id]: newCount };
     
     // Check if session is fully complete (all items completed)
-    let isAllDone = true;
-    items.forEach((item) => {
+    const isAllDone = items.every((item) => {
       const c = item.id === currentItem.id ? newCount : completedCounts[item.id] || 0;
-      if (c < item.count) {
-        isAllDone = false;
-      }
+      return c >= item.count;
     });
 
-    const isMorning = session === "morning";
-    
     setProgress({
       ...progress,
       morning: isMorning ? updatedCounts : progress.morning,
@@ -84,20 +85,19 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
       eveningCompleted: !isMorning ? isAllDone : progress.eveningCompleted
     });
 
-    // Auto advance to next card if count met
+    // Auto-advance to next item if completed current reps
     if (newCount === currentItem.count && index < items.length - 1) {
       setTimeout(() => {
         setIndex((prev) => prev + 1);
-      }, 350);
+      }, 300);
     }
   };
 
   const handleDecrement = () => {
     if (!currentItem) return;
-
+    const isMorning = session === "morning";
     const newCount = Math.max(0, completedCount - 1);
     const updatedCounts = { ...completedCounts, [currentItem.id]: newCount };
-    const isMorning = session === "morning";
 
     setProgress({
       ...progress,
@@ -141,7 +141,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
             )}
           >
             <Sun className="h-3.5 w-3.5" />
-            <span>Morning Adhkar</span>
+            <span>{t("morningAdhkar")}</span>
           </button>
           <button
             type="button"
@@ -154,7 +154,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
             )}
           >
             <Moon className="h-3.5 w-3.5" />
-            <span>Evening Adhkar</span>
+            <span>{t("eveningAdhkar")}</span>
           </button>
         </div>
 
@@ -173,8 +173,8 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
       {/* 2. Progress Bar */}
       <div className="space-y-1">
         <div className="flex justify-between items-center text-[10px] font-bold text-stone-400 uppercase tracking-wider">
-          <span>Session Progress</span>
-          <span>{progressPercent}% Completed</span>
+          <span>{t("sessionProgress")}</span>
+          <span>{progressPercent}% {t("completed")}</span>
         </div>
         <div className="h-1.5 w-full bg-stone-100 dark:bg-stone-950 rounded-full overflow-hidden border border-stone-200/10 dark:border-stone-800/10">
           <div
@@ -193,7 +193,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
               تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ
             </h3>
             <p className="text-xs text-emerald-700 dark:text-emerald-400 font-bold tracking-wide">
-              Adhkar Session Completed!
+              {t("sessionCompletedTitle")}
             </p>
             <p className="text-[10px] text-stone-400 dark:text-stone-500 max-w-xs leading-relaxed pt-1.5">
               May Allah accept your supplications, grant you protection, and fill your day with barakah and divine blessings.
@@ -214,7 +214,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
                 {currentItem?.arabic}
               </p>
               
-              <p className="text-[11px] text-stone-400 dark:text-stone-500 italic leading-relaxed pt-1 border-t border-stone-200/20 dark:border-stone-800/20">
+              <p className="text-[11px] text-stone-400 dark:text-stone-555 italic leading-relaxed pt-1 border-t border-stone-200/20 dark:border-stone-800/20">
                 {currentItem?.transliteration}
               </p>
               
@@ -228,10 +228,10 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
               {/* Left: display counters indicator */}
               <div className="flex flex-col">
                 <span className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider leading-none">
-                  Required: {currentItem?.count}
+                  {t("required")}: {currentItem?.count}
                 </span>
                 <span className="text-sm font-black text-stone-700 dark:text-stone-300 mt-1">
-                  Completed: {completedCount} / {currentItem?.count}
+                  {t("completed")}: {completedCount} / {currentItem?.count}
                 </span>
               </div>
 
@@ -251,7 +251,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
                   disabled={completedCount === currentItem?.count}
                   className="px-6 py-1.5 text-xs font-bold rounded-lg bg-emerald-700 text-white shadow-sm hover:bg-emerald-600 transition-all duration-200 disabled:bg-stone-200 disabled:text-stone-400 dark:disabled:bg-stone-800 dark:disabled:text-stone-600"
                 >
-                  {completedCount === currentItem?.count ? "Done" : "+"}
+                  {completedCount === currentItem?.count ? t("done") : "+"}
                 </button>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
               className="flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 disabled:opacity-40 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
+              <span>{t("previous")}</span>
             </button>
             <button
               type="button"
@@ -289,7 +289,7 @@ export default function AdhkarPlayer({ currentPrayer = null }: AdhkarPlayerProps
               onClick={() => setIndex((prev) => prev + 1)}
               className="flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 disabled:opacity-40 transition-colors"
             >
-              <span>Next</span>
+              <span>{t("next")}</span>
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>

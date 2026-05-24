@@ -4,6 +4,8 @@ import { duas } from "../../data/duas";
 import type { Dua, DuaCategory } from "../../types";
 import { cn } from "../../utils/cn";
 import { Heart, Search, ChevronRight, BookOpen, Star } from "lucide-react";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 const CATEGORY_LABELS: Record<DuaCategory, string> = {
   morning_evening: "Morning & Evening",
@@ -24,6 +26,9 @@ export default function DuaLibrary() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(10);
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
   // Toggle favorite
   const handleToggleFavorite = (id: string) => {
@@ -61,7 +66,7 @@ export default function DuaLibrary() {
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 border border-stone-200/50 dark:border-stone-800/60 flex flex-col space-y-4 font-sans select-none">
       <div className="flex flex-col space-y-2.5">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">
-          Supplications Library
+          {t("duaLibrary")}
         </p>
 
         {/* Search bar */}

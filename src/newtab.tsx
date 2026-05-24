@@ -444,7 +444,7 @@ export default function NewTab() {
           <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
 
           {/* Floating Buy Me a Coffee Button */}
-          <BuyMeCoffee variant="floating" />
+          {/*<BuyMeCoffee variant="floating" />*/}
         </div>
       )}
     </div>

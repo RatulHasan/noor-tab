@@ -13,6 +13,7 @@ export function usePrayerTimes() {
   const [date, setDate] = useState(() => new Date());
 
   const [devMockTime] = useStorage<string>("devMockTime", "");
+  const [devMockCoordinates] = useStorage<{ lat: number; lng: number } | null>("devMockCoordinates", null);
 
   // Handle midnight date rollover
   useEffect(() => {
@@ -46,7 +47,9 @@ export function usePrayerTimes() {
     };
   }
 
-  const { lat, lng } = settings.coordinates;
+  // Allow dev tools to override coordinates for global location simulation
+  const activeCoordinates = devMockCoordinates || settings.coordinates;
+  const { lat, lng } = activeCoordinates;
   
   const baseDate = (() => {
     if (devMockTime) {
@@ -58,7 +61,7 @@ export function usePrayerTimes() {
     return date;
   })();
 
-  const targetDate = getCoordinatesLocalDate(settings.coordinates, baseDate);
+  const targetDate = getCoordinatesLocalDate(activeCoordinates, baseDate);
 
   const prayers = calculatePrayerTimes(
     lat,

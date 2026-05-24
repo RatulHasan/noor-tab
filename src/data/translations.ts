@@ -122,6 +122,19 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "Other (Search)",
     countryPlaceholder: "Country...",
     cityPlaceholder: "City...",
+
+    // Adhkar Player Widget translations
+    sessionProgress: "Session Progress",
+    required: "Required",
+    completed: "Completed",
+    sessionCompletedTitle: "Adhkar Session Completed!",
+    previous: "Previous",
+    next: "Next",
+    morningAdhkar: "Morning Adhkar",
+    eveningAdhkar: "Evening Adhkar",
+    adhkarTitle: "Morning & Evening Adhkar",
+    duaLibrary: "Supplications Library",
+    done: "Done",
   },
   bn: {
     nextPrayer: "পরবর্তী সালাত",
@@ -242,6 +255,19 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "অন্যান্য (অনুসন্ধান)",
     countryPlaceholder: "দেশ...",
     cityPlaceholder: "শহর...",
+
+    // Adhkar Player Widget translations
+    sessionProgress: "সেশনের অগ্রগতি",
+    required: "প্রয়োজনীয়",
+    completed: "সম্পূর্ণ",
+    sessionCompletedTitle: "আজকার সেশন সম্পূর্ণ!",
+    previous: "পূর্ববর্তী",
+    next: "পরবর্তী",
+    morningAdhkar: "সকালের আজকার",
+    eveningAdhkar: "সন্ধ্যার আজকার",
+    adhkarTitle: "সকাল ও সন্ধ্যার আজকার",
+    duaLibrary: "দোয়া লাইব্রেরি",
+    done: "সম্পন্ন",
   },
   ar: {
     nextPrayer: "الصلاة القادمة",
@@ -362,6 +388,19 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "أخرى (بحث)",
     countryPlaceholder: "البلد...",
     cityPlaceholder: "المدينة...",
+
+    // Adhkar Player Widget translations
+    sessionProgress: "تقدم الجلسة",
+    required: "المطلوب",
+    completed: "مكتمل",
+    sessionCompletedTitle: "اكتملت جلسة الأذكار!",
+    previous: "السابق",
+    next: "التالي",
+    morningAdhkar: "أذكار الصباح",
+    eveningAdhkar: "أذكار المساء",
+    adhkarTitle: "أذكار الصباح والمساء",
+    duaLibrary: "مكتبة الأدعية",
+    done: "تم",
   },
   hi: {
     nextPrayer: "अगली प्रार्थना",
@@ -482,6 +521,19 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "अन्य (खोज)",
     countryPlaceholder: "देश...",
     cityPlaceholder: "शहर...",
+
+    // Adhkar Player Widget translations
+    sessionProgress: "सत्र की प्रगति",
+    required: "आवश्यक",
+    completed: "पूरा हुआ",
+    sessionCompletedTitle: "अज़कार सत्र पूरा हुआ!",
+    previous: "पिछला",
+    next: "अगला",
+    morningAdhkar: "सुबह के अज़कार",
+    eveningAdhkar: "शाम के अज़कार",
+    adhkarTitle: "सुबह और शाम के अज़कार",
+    duaLibrary: "दुआ लाइब्रेरी",
+    done: "हो गया",
   },
   ur: {
     nextPrayer: "اگلی نماز",
@@ -602,6 +654,19 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "دوسرا (تلاش)",
     countryPlaceholder: "ملک...",
     cityPlaceholder: "شہر...",
+
+    // Adhkar Player Widget translations
+    sessionProgress: "سیشن کی پیشرفت",
+    required: "ضروری",
+    completed: "مکمل",
+    sessionCompletedTitle: "اذکار کا سیشن مکمل ہو گیا!",
+    previous: "پچھلا",
+    next: "اگلا",
+    morningAdhkar: "صبح کے اذکار",
+    eveningAdhkar: "شام کے اذکار",
+    adhkarTitle: "صبح و شام کے اذکار",
+    duaLibrary: "دعاؤوں کی لائبریری",
+    done: "ہو گیا",
   },
 };
 
