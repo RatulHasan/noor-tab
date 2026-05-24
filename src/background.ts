@@ -1,5 +1,5 @@
 import { Storage } from "@plasmohq/storage";
-import type { UserSettings } from "./types";
+import type { UserSettings, FocusMode } from "./types";
 import { DEFAULT_SETTINGS } from "./data/defaultSettings";
 import { calculatePrayerTimes } from "./utils/prayerCalculator";
 import {
@@ -48,6 +48,28 @@ async function refreshAlarms() {
       settings.perPrayerReminder
     );
     scheduleMidnightReset();
+
+    // Schedule morning adhkar reset at Fajr time + 30 min if enabled
+    if (settings.remindMorningAdhkar) {
+      const fajrTime = prayers.fajr;
+      const adhkarTime = new Date(fajrTime.getTime() + 30 * 60 * 1000); // 30 min after Fajr
+      const now = new Date();
+      if (adhkarTime > now) {
+        const delayMs = adhkarTime.getTime() - now.getTime();
+        chrome.alarms.create("adhkar-morning-reset", { delayInMinutes: delayMs / 60000 });
+      }
+    }
+
+    // Schedule evening adhkar reset at Asr time if enabled
+    if (settings.remindEveningAdhkar) {
+      const asrTime = prayers.asr;
+      const now = new Date();
+      if (asrTime > now) {
+        const delayMs = asrTime.getTime() - now.getTime();
+        chrome.alarms.create("adhkar-evening-reset", { delayInMinutes: delayMs / 60000 });
+      }
+    }
+
     console.log("Alarms successfully rescheduled.");
   } catch (error) {
     console.error("Error refreshing alarms:", error);
@@ -63,11 +85,38 @@ chrome.runtime.onInstalled.addListener(async () => {
 // Alarm firing listener
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   console.log(`Alarm fired: ${alarm.name}`);
-  
+
   if (alarm.name === "prayer-midnight-reset") {
     console.log("Midnight reached. Recalculating times...");
     await refreshAlarms();
     return;
+  }
+
+  if (alarm.name === "adhkar-morning-reset") {
+    console.log("Morning adhkar reminder time!");
+    await refreshAlarms(); // Reschedule for tomorrow
+    return;
+  }
+
+  if (alarm.name === "adhkar-evening-reset") {
+    console.log("Evening adhkar reminder time!");
+    await refreshAlarms();
+    return;
+  }
+
+  // Check Focus Mode - skip prayer notifications if snoozed
+  if (alarm.name.startsWith("prayer-")) {
+    const focusMode = await storage.get<FocusMode>("focusMode");
+    if (focusMode?.enabled && focusMode?.snoozedUntil) {
+      const snoozedUntil = new Date(focusMode.snoozedUntil);
+      if (snoozedUntil > new Date()) {
+        console.log(`Focus Mode active. Skipping prayer alarm: ${alarm.name}`);
+        return;
+      } else {
+        // Snooze expired, disable focus mode
+        await storage.set("focusMode", { enabled: false, snoozedUntil: null, snoozeDuration: 60 });
+      }
+    }
   }
 
   if (alarm.name.startsWith("prayer-")) {
@@ -117,12 +166,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     refreshAlarms().then(() => sendResponse({ success: true }));
     return true; // Keep channel open for async response
   }
+
   if (message.type === "OPEN_NEW_TAB") {
     const url = chrome.runtime.getURL(`newtab.html?reminder=${message.prayer}`);
     chrome.tabs.create({ url });
     sendResponse({ success: true });
     return true;
   }
+
   if (message.type === "STOP_ALL_ADHAN") {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
@@ -136,6 +187,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Broadcast to internal extension views (e.g. New Tab)
     chrome.runtime.sendMessage({ type: "STOP_ALL_ADHAN_INTERNAL" }).catch(() => {});
     sendResponse({ success: true });
+    return true;
+  }
+
+  if (message.type === "TOGGLE_FOCUS_MODE") {
+    const { enabled, snoozedUntil } = message;
+    storage.set("focusMode", { enabled, snoozedUntil, snoozeDuration: 60 }).then(() => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
+
+  if (message.type === "CHECK_FOCUS_MODE") {
+    storage.get<FocusMode>("focusMode").then((focusMode) => {
+      sendResponse({ focusMode: focusMode || { enabled: false, snoozedUntil: null, snoozeDuration: 60 } });
+    });
+    return true;
+  }
+
+  if (message.type === "MARK_PRAYER") {
+    // Storage update handled by component directly via @plasmohq/storage
+    // Background just logs for debugging
+    console.log("Prayer marked:", message.prayer, message.status, "for", message.date);
+    sendResponse({ success: true });
+    return true;
+  }
+
+  if (message.type === "GET_BACKUP_DATA") {
+    Promise.all([
+      storage.get("noortab-user-settings"),
+      storage.get("prayerStreak"),
+      storage.get("fastingData"),
+      storage.get("quranBookmark"),
+      storage.get("dhikrGoals"),
+      storage.get("adhkarProgress"),
+      storage.get("duaFavorites"),
+      storage.get("quizRecord"),
+      storage.get("widgetLayout"),
+    ]).then(([settings, prayerStreak, fastingData, quranBookmark, dhikrGoals, adhkarProgress, duaFavorites, quizRecord, widgetLayout]) => {
+      sendResponse({ settings, prayerStreak, fastingData, quranBookmark, dhikrGoals, adhkarProgress, duaFavorites, quizRecord, widgetLayout });
+    });
     return true;
   }
 });

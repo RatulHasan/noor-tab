@@ -7,10 +7,29 @@ import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
 import { getTranslation } from "./data/translations";
-import { MapPin, Loader2, Search } from "lucide-react";
+import { MapPin, Loader2, Search, Settings2 } from "lucide-react";
 import { detectLocation, geocodeLocation } from "./utils/locationService";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
-import type { UserSettings } from "./types";
+import type { UserSettings, WidgetConfig, WidgetId, FastingData } from "./types";
+import { useStorage } from "@plasmohq/storage/hook";
+
+// Import Phase 2 widgets and components
+import PrayerStreakWidget from "./components/newtab/PrayerStreakWidget";
+import AsmaUlHusna from "./components/newtab/AsmaUlHusna";
+import GlobalPrayerWidget from "./components/newtab/GlobalPrayerWidget";
+import JumuahBanner from "./components/newtab/JumuahBanner";
+import WidgetCustomizer, { DEFAULT_WIDGETS } from "./components/newtab/WidgetCustomizer";
+import AdhkarPlayer from "./components/shared/AdhkarPlayer";
+import FastingTracker from "./components/shared/FastingTracker";
+import QuranBookmark from "./components/shared/QuranBookmark";
+import IslamicQuiz from "./components/shared/IslamicQuiz";
+import AsmaCard from "./components/shared/AsmaCard";
+import DuaLibrary from "./components/shared/DuaLibrary";
+import BuyMeCoffee from "./components/shared/BuyMeCoffee";
+
+// Import helpers
+import { isTodayFriday } from "./utils/jumuahHelper";
+import { isTodayRamadan } from "./utils/fastingHelper";
 
 // Import CSS style
 import "./style.css";
@@ -25,6 +44,13 @@ export default function NewTab() {
   } = usePrayerTimes();
 
   const [reminderPrayer, setReminderPrayer] = useState<string | null>(null);
+
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [widgetLayout] = useStorage<WidgetConfig[]>("widgetLayout", DEFAULT_WIDGETS);
+  const [fastingData] = useStorage<FastingData>("fastingData");
+  const [devMockCityName] = useStorage<string>("devMockCityName", "");
+  const isRamadan = fastingData?.isRamadanMode || isTodayRamadan();
+  const isFriday = isTodayFriday();
   
   // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
@@ -133,6 +159,13 @@ export default function NewTab() {
   };
 
   const getBackgroundGradient = () => {
+    if (isRamadan) {
+      return "from-emerald-950/20 via-stone-900 to-stone-950 dark:from-emerald-950/20 dark:via-stone-950 dark:to-stone-950";
+    }
+    if (isFriday) {
+      return "from-emerald-50/20 via-stone-50 to-stone-100 dark:from-emerald-950/20 dark:via-stone-950 dark:to-stone-900";
+    }
+
     if (!nextPrayer) return "from-stone-50 to-stone-100 dark:from-stone-950 dark:to-stone-900";
     
     switch (nextPrayer.name.toLowerCase()) {
@@ -243,7 +276,7 @@ export default function NewTab() {
             {/* Dropdown selectors for location */}
             <div className="rounded-xl border border-stone-200 bg-stone-100/40 p-4 dark:border-stone-800 dark:bg-stone-900/20 space-y-3 text-left">
               <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
-                Select Country and City
+                {t("selectCountryCity")}
               </span>
               
               <div className="grid grid-cols-2 gap-2.5">
@@ -253,13 +286,13 @@ export default function NewTab() {
                     onChange={handleOnboardingCountryChange}
                     className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
                   >
-                    <option value="">Country...</option>
+                    <option value="">{t("countryPlaceholder")}</option>
                     {POPULAR_LOCATIONS.map((c) => (
                       <option key={c.countryName} value={c.countryName}>
                         {c.countryName}
                       </option>
                     ))}
-                    <option value="custom">Other (Search)</option>
+                    <option value="custom">{t("otherSearch")}</option>
                   </select>
                 </div>
 
@@ -270,14 +303,14 @@ export default function NewTab() {
                     disabled={!onboardingCountryName || onboardingCountryName === "custom"}
                     className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
                   >
-                    <option value="">City...</option>
+                    <option value="">{t("cityPlaceholder")}</option>
                     {POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName)?.cities.map((city) => (
                       <option key={city.name} value={city.name}>
                         {city.name}
                       </option>
                     ))}
                     {onboardingCountryName && onboardingCountryName !== "custom" && (
-                      <option value="custom">Other (Search)</option>
+                      <option value="custom">{t("otherSearch")}</option>
                     )}
                   </select>
                 </div>
@@ -333,20 +366,97 @@ export default function NewTab() {
               prayers={prayers}
               prayerStatuses={prayerStatuses}
               nextPrayer={nextPrayer}
-              cityName={settings.cityName}
+              cityName={devMockCityName || settings.cityName}
               reminderPrayer={reminderPrayer}
             />
           )}
 
-          {/* Daily Quranic Verse display */}
-          <AyahDisplay />
+          {/* Friday Jumu'ah Banner */}
+          <JumuahBanner />
 
-          {/* Bottom row grid: Tasbih counter, Hadith, Calendar events */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <DhikrCounter />
-            <HadithOfDay />
-            <IslamicCalendar />
+          {/* Dynamic Widget Grid */}
+          {(() => {
+            const sortedVisible = [...widgetLayout]
+              .filter((w) => w.visible)
+              .sort((a, b) => a.order - b.order);
+
+            const renderWidget = (id: WidgetId) => {
+              switch (id) {
+                case "ayah":
+                  return <AyahDisplay key={id} />;
+                case "hadith":
+                  return <HadithOfDay key={id} />;
+                case "dhikr":
+                  return <DhikrCounter key={id} />;
+                case "islamicCalendar":
+                  return <IslamicCalendar key={id} />;
+                case "adhkar":
+                  return <AdhkarPlayer key={id} />;
+                case "asmaName":
+                  return <AsmaUlHusna key={id} />;
+                case "duaLibrary":
+                  return <DuaLibrary key={id} />;
+                case "quiz":
+                  return <IslamicQuiz key={id} />;
+                case "fastingTracker":
+                  return <FastingTracker key={id} />;
+                case "quranBookmark":
+                  return <QuranBookmark key={id} />;
+                case "prayerStreak":
+                  return <PrayerStreakWidget key={id} />;
+                default:
+                  return null;
+              }
+            };
+
+            // Full-width widgets (ayah always full width)
+            const fullWidthIds: WidgetId[] = ["ayah", "adhkar", "duaLibrary", "prayerStreak", "fastingTracker", "quranBookmark"];
+            const gridIds = sortedVisible.filter((w) => !fullWidthIds.includes(w.id));
+            const fullIds = sortedVisible.filter((w) => fullWidthIds.includes(w.id));
+
+            return (
+              <div className="space-y-6">
+                {fullIds.map((w) => renderWidget(w.id))}
+                {gridIds.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {gridIds.map((w) => renderWidget(w.id))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Global Prayer Times */}
+          <GlobalPrayerWidget />
+
+          {/* Buy Me a Coffee + Customize button */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <BuyMeCoffee variant="badge" />
+            <span className="text-[11px] text-stone-500 dark:text-stone-400 font-medium text-center">
+              Made with ❤️ for the Muslim Ummah.{" "}
+              <a
+                href="https://github.com/RatulHasan/noor-tab"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+              >
+                See in GitHub
+              </a>
+            </span>
+            <button
+              onClick={() => setShowCustomizer(true)}
+              className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white/80 dark:border-stone-850 dark:bg-stone-900/80 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 shadow-sm transition-all duration-200"
+            >
+              <Settings2 className="h-4 w-4" />
+              {t("customizeDashboard")}
+            </button>
           </div>
+
+          {/* Widget Customizer Drawer */}
+          <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
+
+          {/* Floating Buy Me a Coffee Button */}
+          {/*<BuyMeCoffee variant="floating" />*/}
         </div>
       )}
     </div>

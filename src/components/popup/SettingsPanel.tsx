@@ -72,6 +72,11 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const [language, setLanguage] = useState<AppLanguage>(settings.language || "en");
   const [adhanAudio, setAdhanAudio] = useState(settings.adhanAudio || "none");
   const [overlayPosition, setOverlayPosition] = useState(settings.overlayPosition || "bottom");
+  const [enableAutoRamadan, setEnableAutoRamadan] = useState(settings.enableAutoRamadan ?? true);
+  const [trackSunnahFasts, setTrackSunnahFasts] = useState(settings.trackSunnahFasts ?? true);
+  const [showFastingCountdown, setShowFastingCountdown] = useState(settings.showFastingCountdown ?? true);
+  const [remindMorningAdhkar, setRemindMorningAdhkar] = useState(settings.remindMorningAdhkar ?? true);
+  const [remindEveningAdhkar, setRemindEveningAdhkar] = useState(settings.remindEveningAdhkar ?? true);
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -147,51 +152,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [locError, setLocError] = useState("");
 
-  const isDevMode = process.env.PLASMO_PUBLIC_DEV_MODE === "true";
 
-  const handleTestNotification = (type: "overlay" | "newtab" | "alarm") => {
-    if (type === "overlay") {
-      if (typeof chrome !== "undefined" && chrome.tabs) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const activeTab = tabs[0];
-          if (activeTab && activeTab.id) {
-            chrome.tabs.sendMessage(
-              activeTab.id,
-              {
-                type: "SHOW_PRAYER_OVERLAY",
-                prayer: "fajr",
-                minutes: reminderMinutes,
-              },
-              (response) => {
-                if (chrome.runtime.lastError || !response?.received) {
-                    alert(
-                      "Notice: The Overlay Reminder cannot be displayed on browser settings, blank tabs (about:blank), or standard chrome:// pages because extensions are restricted there. Please open a normal webpage (e.g., https://google.com or https://github.com), make sure it is fully loaded, and try clicking this button again!"
-                    );
-                  } else {
-                    const positionDesc = overlayPosition === "modal"
-                      ? "as a centered modal overlay"
-                      : "in the bottom-right corner";
-                    alert(`Success! Check your active webpage; you should see the premium prayer reminder ${positionDesc}.`);
-                  }
-              }
-            );
-          } else {
-            alert("No active web page detected. Please open a standard webpage first.");
-          }
-        });
-      }
-    } else if (type === "newtab") {
-      if (typeof chrome !== "undefined" && chrome.runtime) {
-        const url = chrome.runtime.getURL("newtab.html?reminder=fajr");
-        chrome.tabs.create({ url });
-      }
-    } else if (type === "alarm") {
-      if (typeof chrome !== "undefined" && chrome.alarms) {
-        chrome.alarms.create("prayer-maghrib", { when: Date.now() + 5000 });
-        alert("Mock alarm scheduled! It will fire in 5 seconds and trigger your configured notification style.");
-      }
-    }
-  };
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const countryVal = e.target.value;
@@ -318,6 +279,11 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         language,
         adhanAudio,
         overlayPosition,
+        enableAutoRamadan,
+        trackSunnahFasts,
+        showFastingCountdown,
+        remindMorningAdhkar,
+        remindEveningAdhkar,
       });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2500);
@@ -711,6 +677,83 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         </div>
       </div>
 
+      {/* 5. Islamic Features */}
+      <div className="space-y-3">
+        <label className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+          Islamic Features
+        </label>
+        
+        <div className="space-y-3 rounded-xl border border-stone-200 dark:border-stone-800 p-3 bg-stone-50/50 dark:bg-stone-900/20">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-stone-800 dark:text-stone-100">
+                Ramadan Auto-Mode
+              </span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400">
+                Automatic suhoor/iftar countdowns
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              checked={enableAutoRamadan}
+              onChange={(e) => setEnableAutoRamadan(e.target.checked)}
+              className="rounded border-stone-300 text-emerald-700 focus:ring-emerald-500 h-4 w-4 accent-emerald-700"
+            />
+          </div>
+
+          <div className="flex items-center justify-between border-t border-stone-100 dark:border-stone-800 pt-2.5">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-stone-800 dark:text-stone-100">
+                Track Sunnah Fasts
+              </span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400">
+                Monday/Thursday, Ayyam al-Bidh logs
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              checked={trackSunnahFasts}
+              onChange={(e) => setTrackSunnahFasts(e.target.checked)}
+              className="rounded border-stone-300 text-emerald-700 focus:ring-emerald-500 h-4 w-4 accent-emerald-700"
+            />
+          </div>
+
+          <div className="flex items-center justify-between border-t border-stone-100 dark:border-stone-800 pt-2.5">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-stone-800 dark:text-stone-100">
+                Morning Adhkar Reminders
+              </span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400">
+                Show reminder notification after Fajr
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              checked={remindMorningAdhkar}
+              onChange={(e) => setRemindMorningAdhkar(e.target.checked)}
+              className="rounded border-stone-300 text-emerald-700 focus:ring-emerald-500 h-4 w-4 accent-emerald-700"
+            />
+          </div>
+
+          <div className="flex items-center justify-between border-t border-stone-100 dark:border-stone-800 pt-2.5">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-stone-800 dark:text-stone-100">
+                Evening Adhkar Reminders
+              </span>
+              <span className="text-[10px] text-stone-500 dark:text-stone-400">
+                Show reminder notification after Asr
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              checked={remindEveningAdhkar}
+              onChange={(e) => setRemindEveningAdhkar(e.target.checked)}
+              className="rounded border-stone-300 text-emerald-700 focus:ring-emerald-500 h-4 w-4 accent-emerald-700"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Form Submission Action */}
       <div className="pt-2">
         <button
@@ -737,41 +780,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
       </div>
     </form>
 
-      {/* Developer Testing Tools */}
-      {isDevMode && (
-        <div className="space-y-2.5 pt-4 mt-4 border-t border-stone-200 dark:border-stone-800 text-left">
-          <h3 className="text-xs font-black uppercase tracking-wider text-rose-500">
-            Developer Testing Tools
-          </h3>
-          <p className="text-[10px] text-stone-500 dark:text-stone-400 leading-normal">
-            Trigger simulated reminders instantly to test all notifications without waiting for real prayer times.
-          </p>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleTestNotification("overlay")}
-              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
-            >
-              Test Overlay (Fajr)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTestNotification("newtab")}
-              className="py-1.5 px-2 bg-stone-100 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-[10px] font-bold rounded-lg transition-colors"
-            >
-              Test New Tab (Fajr)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTestNotification("alarm")}
-              className="col-span-2 py-1.5 px-2 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors"
-            >
-              Trigger Background Alarm in 5s (Maghrib)
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -110,7 +110,7 @@ export default function ReminderOverlay({
               "{hadith.translation}"
             </p>
             <span className="block text-right text-[9px] font-mono text-stone-450 dark:text-stone-500 font-bold select-text">
-              — {hadith.reference}
+              - {hadith.reference}
             </span>
           </div>
         </div>

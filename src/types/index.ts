@@ -34,11 +34,18 @@ export interface UserSettings {
   language: AppLanguage;
   adhanAudio: string; // "none" or name of the adhan file (e.g. "azan1")
   overlayPosition: "bottom" | "modal";
+  // Phase 2 Settings
+  enableAutoRamadan: boolean;
+  trackSunnahFasts: boolean;
+  showFastingCountdown: boolean;
+  remindMorningAdhkar: boolean;
+  remindEveningAdhkar: boolean;
+  worldCities: string[];
 }
 
 export type DailyPrayers = Record<PrayerName, Date>;
 
-export interface PrayerStatus {
+export interface PrayerUIStatus {
   name: PrayerName;
   arabicName: string;
   transliteration: string;
@@ -72,7 +79,171 @@ export interface IslamicEvent {
 export interface DhikrPhase {
   count: number;
   max: number;
-  arabic: string;
-  english: string;
+  ar: string;
+  en: string;
   transliteration: string;
 }
+
+// ── Prayer Streak ──────────────────────────────────────────
+export type PrayerStatus = 'on_time' | 'late' | 'missed' | null;
+
+export interface DayPrayerRecord {
+  date: string; // ISO date string "2026-05-24"
+  fajr: PrayerStatus;
+  dhuhr: PrayerStatus;
+  asr: PrayerStatus;
+  maghrib: PrayerStatus;
+  isha: PrayerStatus;
+}
+
+export interface PrayerStreakData {
+  records: Record<string, DayPrayerRecord>; // keyed by ISO date
+  currentStreak: number;
+  longestStreak: number;
+  totalOnTime: number;
+  totalLate: number;
+  totalMissed: number;
+}
+
+// ── Fasting ────────────────────────────────────────────────
+export type FastType = 'ramadan' | 'monday' | 'thursday' | 'ayyamul_bidh' | 'custom';
+
+export interface FastingRecord {
+  date: string;
+  type: FastType;
+  completed: boolean;
+  suhoorTime?: string;
+  iftarTime?: string;
+}
+
+export interface FastingData {
+  isRamadanMode: boolean;
+  records: Record<string, FastingRecord>;
+  currentFastingStreak: number;
+}
+
+// ── Quran Bookmark ─────────────────────────────────────────
+export interface QuranBookmark {
+  surah: number;       // 1-114
+  ayah: number;        // 1-N
+  surahName: string;
+  savedAt: string;     // ISO timestamp
+  note?: string;
+}
+
+// ── Dhikr Goals ────────────────────────────────────────────
+export interface DhikrGoal {
+  id: string;
+  label: string;
+  arabicLabel: string;
+  targetCount: number;
+  todayCount: number;
+  lastResetDate: string;
+}
+
+// ── Morning/Evening Adhkar ─────────────────────────────────
+export type AdhkarSession = 'morning' | 'evening';
+
+export interface AdhkarItem {
+  id: string;
+  arabic: string;
+  transliteration: string;
+  translation: string;
+  count: number;         // required repetitions
+  benefit?: string;
+  source: string;        // e.g. "Hisnul Muslim #23"
+}
+
+export interface AdhkarProgress {
+  date: string;
+  morning: Record<string, number>; // adhkarId → completedCount
+  evening: Record<string, number>;
+  morningCompleted: boolean;
+  eveningCompleted: boolean;
+}
+
+// ── 99 Names ───────────────────────────────────────────────
+export interface AsmaName {
+  number: number;       // 1-99
+  arabic: string;
+  transliteration: string;
+  meaning: string;
+  benefit: string;
+}
+
+// ── Dua Library ────────────────────────────────────────────
+export type DuaCategory =
+  | 'morning_evening' | 'travel' | 'eating' | 'sleeping'
+  | 'stress' | 'gratitude' | 'protection' | 'forgiveness'
+  | 'family' | 'knowledge' | 'general';
+
+export interface Dua {
+  id: string;
+  category: DuaCategory;
+  title: string;
+  arabic: string;
+  transliteration: string;
+  translation: string;
+  source: string;
+  isFavorite?: boolean;
+}
+
+// ── Islamic Quiz ────────────────────────────────────────────
+export type QuizCategory = 'quran' | 'history' | 'fiqh' | 'seerah' | 'general';
+
+export interface QuizQuestion {
+  id: string;
+  category: QuizCategory;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export interface QuizRecord {
+  date: string;
+  questionId: string;
+  answeredCorrectly: boolean;
+  totalCorrect: number;
+  totalAnswered: number;
+  selectedIndex?: number;
+}
+
+// ── Focus / DND Mode ───────────────────────────────────────
+export interface FocusMode {
+  enabled: boolean;
+  snoozedUntil: string | null; // ISO timestamp
+  snoozeDuration: 60 | 120 | 240; // minutes
+}
+
+// ── Widget Layout ──────────────────────────────────────────
+export type WidgetId =
+  | 'ayah' | 'hadith' | 'dhikr' | 'islamicCalendar'
+  | 'adhkar' | 'asmaName' | 'duaLibrary' | 'quiz'
+  | 'fastingTracker' | 'quranBookmark' | 'prayerStreak';
+
+export interface WidgetConfig {
+  id: WidgetId;
+  visible: boolean;
+  order: number;
+}
+
+// ── Backup / Export / Import ───────────────────────────────
+export interface NoorTabBackup {
+  version: '1.0';
+  app: 'NoorTab';
+  exportedAt: string;       // ISO timestamp
+  settings: UserSettings;
+  prayerStreak: PrayerStreakData;
+  fastingData: FastingData;
+  quranBookmark: QuranBookmark | null;
+  dhikrGoals: DhikrGoal[];
+  adhkarProgress: AdhkarProgress;
+  duaFavorites: string[];   // dua IDs
+  quizRecord: QuizRecord;
+  widgetLayout: WidgetConfig[];
+}
+
+export type BackupVersion = '1.0';
+export const SUPPORTED_BACKUP_VERSIONS: BackupVersion[] = ['1.0'];

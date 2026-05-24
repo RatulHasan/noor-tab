@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import type { DailyPrayers, PrayerName, PrayerStatus } from "../../types";
+import type { DailyPrayers, PrayerName, PrayerUIStatus } from "../../types";
 import { useHijriDate } from "../../hooks/useHijriDate";
 import { useSettings } from "../../hooks/useSettings";
 import { getTranslation } from "../../data/translations";
@@ -8,18 +8,22 @@ import { Clock, MapPin, Bell, X, Calendar, Play, Pause } from "lucide-react";
 import { PRAYER_METADATA } from "../../data/prayerNames";
 import { cn } from "../../utils/cn";
 import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
+import { Storage } from "@plasmohq/storage";
+import { useStorage } from "@plasmohq/storage/hook";
+
+const globalStorage = new Storage();
 
 /**
  * @param {Object} props
  * @param {DailyPrayers} props.prayers - Computed prayer times.
- * @param {PrayerStatus[]} props.prayerStatuses - Status metadata for each prayer.
+ * @param {PrayerUIStatus[]} props.prayerStatuses - Status metadata for each prayer.
  * @param {{ name: PrayerName, time: Date } | null} props.nextPrayer - The next prayer details.
  * @param {string | null} props.cityName - Detected city name.
  * @param {string | null} props.reminderPrayer - The prayer name passed via URL reminder parameter.
  */
 interface NoorTabHeroProps {
   prayers: DailyPrayers;
-  prayerStatuses: PrayerStatus[];
+  prayerStatuses: PrayerUIStatus[];
   nextPrayer: { name: PrayerName; time: Date } | null;
   cityName: string | null;
   reminderPrayer: string | null;
@@ -35,6 +39,8 @@ export default function NoorTabHero({
   const [settings] = useSettings();
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
+  const [devMockTime] = useStorage<string>("devMockTime", "");
+  const [devMockCoordinates] = useStorage<{ lat: number; lng: number } | null>("devMockCoordinates", null);
 
   const reminderAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isReminderAudioPlaying, setIsReminderAudioPlaying] = useState(false);
@@ -60,14 +66,20 @@ export default function NoorTabHero({
     };
   }, []);
 
+  const setAdhanPlayingInStorage = (playing: boolean) => {
+    globalStorage.set("adhanIsPlaying", playing).catch(() => {});
+  };
+
   const handleToggleReminderAudio = () => {
     if (reminderAudioRef.current) {
       if (isReminderAudioPlaying) {
         reminderAudioRef.current.pause();
         setIsReminderAudioPlaying(false);
+        setAdhanPlayingInStorage(false);
       } else {
         reminderAudioRef.current.play().catch(() => {});
         setIsReminderAudioPlaying(true);
+        setAdhanPlayingInStorage(true);
       }
     }
   };
@@ -77,13 +89,16 @@ export default function NoorTabHero({
     if (reminderAudioRef.current) {
       reminderAudioRef.current.pause();
       setIsReminderAudioPlaying(false);
+      setAdhanPlayingInStorage(false);
     }
   };
 
   // Compute timezone-adjusted local time for the coordinates
   const getCoordinatesLocalTime = (baseTime: Date) => {
-    if (!settings?.coordinates) return baseTime;
-    const estimatedOffsetHours = Math.round(settings.coordinates.lng / 15);
+    if (devMockTime) return baseTime;
+    const activeCoords = devMockCoordinates || settings?.coordinates;
+    if (!activeCoords) return baseTime;
+    const estimatedOffsetHours = Math.round(activeCoords.lng / 15);
     const utcTime = baseTime.getTime() + (baseTime.getTimezoneOffset() * 60 * 1000);
     return new Date(utcTime + (estimatedOffsetHours * 60 * 60 * 1000));
   };
@@ -94,11 +109,18 @@ export default function NoorTabHero({
   const lang = settings?.language || "en";
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
 
-  // Live ticking clock
+  // Live ticking clock (unless time is mocked by developer tools)
   useEffect(() => {
+    if (devMockTime) {
+      const d = new Date();
+      const [h, m] = devMockTime.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+      setTime(d);
+      return;
+    }
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [devMockTime]);
 
   // Auto-dismiss reminder banner after 15 seconds & play Adhan audio if configured
   useEffect(() => {
@@ -112,12 +134,15 @@ export default function NoorTabHero({
           const audio = new Audio(option.url);
           reminderAudioRef.current = audio;
           setIsReminderAudioPlaying(true);
+          setAdhanPlayingInStorage(true);
           audio.play().catch((err) => {
             console.error("Autoplay of Adhan sound blocked or failed:", err);
             setIsReminderAudioPlaying(false);
+            setAdhanPlayingInStorage(false);
           });
           audio.onended = () => {
             setIsReminderAudioPlaying(false);
+            setAdhanPlayingInStorage(false);
           };
         }
       }
@@ -127,6 +152,7 @@ export default function NoorTabHero({
           reminderAudioRef.current.pause();
           reminderAudioRef.current = null;
           setIsReminderAudioPlaying(false);
+          setAdhanPlayingInStorage(false);
         }
       };
     }

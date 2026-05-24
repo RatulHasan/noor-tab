@@ -4,7 +4,7 @@ import type {
   CalculationMethodKey,
   MadhabKey,
   DailyPrayers,
-  PrayerStatus,
+  PrayerUIStatus,
 } from "../types";
 import { PRAYER_METADATA } from "../data/prayerNames";
 
@@ -48,9 +48,9 @@ export function calculatePrayerTimes(
 
 export function getNextPrayer(
   prayers: DailyPrayers,
-  tomorrowPrayers?: DailyPrayers
+  tomorrowPrayers?: DailyPrayers,
+  now: Date = new Date()
 ): { name: PrayerName; time: Date } {
-  const now = new Date();
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   
   for (const name of prayerNames) {
@@ -73,16 +73,17 @@ export function getNextPrayer(
 export function getPrayerStatuses(
   prayers: DailyPrayers,
   perPrayerReminder: Record<PrayerName, boolean>,
-  tomorrowPrayers?: DailyPrayers
-): PrayerStatus[] {
-  const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers);
+  tomorrowPrayers?: DailyPrayers,
+  now: Date = new Date()
+): PrayerUIStatus[] {
+  const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers, now);
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   
   return prayerNames.map((name) => {
     const meta = PRAYER_METADATA[name];
     const time = prayers[name];
     
-    let state: PrayerStatus["state"] = "upcoming";
+    let state: PrayerUIStatus["state"] = "upcoming";
     
     // Check if this prayer matches the next prayer name and time
     // (Ensure we correctly match Fajr if next prayer is Fajr tomorrow)
@@ -92,7 +93,7 @@ export function getPrayerStatuses(
     
     if (isNext) {
       state = "next";
-    } else if (time < new Date()) {
+    } else if (time < now) {
       state = "passed";
     }
     
