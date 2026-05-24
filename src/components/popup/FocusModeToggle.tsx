@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { Moon, MoonStar, X, ChevronDown } from "lucide-react";
-import type { FocusMode } from "../../types";
-import { cn } from "../../utils/cn";
+import type { FocusMode } from "~types";
+import { cn } from "~utils/cn";
 
 type SnoozeDuration = 60 | 120 | 240;
 

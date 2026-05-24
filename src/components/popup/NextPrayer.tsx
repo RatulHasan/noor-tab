@@ -1,9 +1,9 @@
 import React from "react";
-import type { PrayerName } from "../../types";
-import { PRAYER_METADATA } from "../../data/prayerNames";
+import type { PrayerName } from "~types";
+import { PRAYER_METADATA } from "~data/prayerNames";
 import CountdownTimer from "../shared/CountdownTimer";
 import IslamicPattern from "../shared/IslamicPattern";
-import { cn } from "../../utils/cn";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

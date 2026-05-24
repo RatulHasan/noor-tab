@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import type { AdhkarProgress, AdhkarItem, AdhkarSession } from "../../types";
-import { morningAdhkar, eveningAdhkar } from "../../data/adhkar";
-import { format } from "../../utils/dateUtils";
+import type { AdhkarProgress, AdhkarItem, AdhkarSession } from "~types";
+import { morningAdhkar, eveningAdhkar } from "~data/adhkar";
+import { format } from "~utils/dateUtils";
 import { Sun, Moon, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, Heart } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 interface AdhkarPlayerProps {
   currentPrayer?: string | null;

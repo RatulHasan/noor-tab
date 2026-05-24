@@ -1,9 +1,9 @@
 import React from "react";
-import { AYAHS } from "../../data/ayahs";
+import { AYAHS } from "~data/ayahs";
 import IslamicPattern from "../shared/IslamicPattern";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
-import { cn } from "../../utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

@@ -1,6 +1,6 @@
 import React from "react";
-import { useHijriDate } from "../../hooks/useHijriDate";
-import { cn } from "../../utils/cn";
+import { useHijriDate } from "~hooks/useHijriDate";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

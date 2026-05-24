@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, X, ExternalLink } from "lucide-react";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 function isJumuah(): boolean {
   return new Date().getDay() === 5; // Friday

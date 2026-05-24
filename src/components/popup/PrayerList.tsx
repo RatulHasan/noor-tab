@@ -1,7 +1,7 @@
 import React from "react";
-import type { PrayerName, PrayerUIStatus } from "../../types";
+import type { PrayerName, PrayerUIStatus } from "~types";
 import { Bell, BellOff } from "lucide-react";
-import { cn } from "../../utils/cn";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

@@ -17,13 +17,13 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { WidgetConfig, WidgetId } from "../../types";
+import type { WidgetConfig, WidgetId } from "~types";
 import { GripVertical, Eye, EyeOff, X, RotateCcw, AlertTriangle } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { POPULAR_LOCATIONS } from "../../data/popularLocations";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
-import type { TranslationKey } from "../../data/translations";
+import { cn } from "~utils/cn";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
+import type { TranslationKey } from "~data/translations";
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: "ayah", visible: true, order: 0 },

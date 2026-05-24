@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "../../types";
-import { detectLocation, geocodeLocation } from "../../utils/locationService";
-import { getTranslation } from "../../data/translations";
-import { POPULAR_LOCATIONS } from "../../data/popularLocations";
+import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "~types";
+import { detectLocation, geocodeLocation } from "~utils/locationService";
+import { getTranslation } from "~data/translations";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
 import { MapPin, Loader2, Save, Trash2, Search, Play, Pause, Volume2 } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
+import { cn } from "~utils/cn";
+import { ADHAN_AUDIO_OPTIONS } from "~data/adhanAudios";
 
 /**
  * @param {Object} props

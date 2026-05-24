@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
-import type { DhikrPhase } from "../../types";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
-import { cn } from "../../utils/cn";
+import type { DhikrPhase } from "~types";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

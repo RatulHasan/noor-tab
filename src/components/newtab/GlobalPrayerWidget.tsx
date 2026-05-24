@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { calculatePrayerTimes } from "../../utils/prayerCalculator";
-import { POPULAR_LOCATIONS } from "../../data/popularLocations";
-import { format } from "../../utils/dateUtils";
+import { calculatePrayerTimes } from "~utils/prayerCalculator";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
+import { format } from "~utils/dateUtils";
 import { Globe, Settings2, Check, Plus, X } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function GlobalPrayerWidget() {
   const [worldCities, setWorldCities] = useStorage<string[]>("worldCities", ["Istanbul", "London", "New York"]);

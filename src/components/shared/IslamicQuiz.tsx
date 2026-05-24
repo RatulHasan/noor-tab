@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { format } from "../../utils/dateUtils";
-import { quizQuestions } from "../../data/quizQuestions";
-import type { QuizQuestion, QuizRecord } from "../../types";
-import { cn } from "../../utils/cn";
+import { format } from "~utils/dateUtils";
+import { quizQuestions } from "~data/quizQuestions";
+import type { QuizQuestion, QuizRecord } from "~types";
+import { cn } from "~utils/cn";
 import { HelpCircle, Award, CheckCircle2, AlertCircle } from "lucide-react";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function IslamicQuiz() {
   const [quizRecord, setQuizRecord] = useStorage<QuizRecord>("quizRecord", {

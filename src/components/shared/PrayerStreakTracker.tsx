@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import type { DayPrayerRecord, PrayerStreakData, PrayerStatus } from "../../types";
-import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, parseISO, isFuture } from "../../utils/dateUtils";
+import type { DayPrayerRecord, PrayerStreakData, PrayerStatus } from "~types";
+import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, parseISO, isFuture } from "~utils/dateUtils";
 import { Flame, Trophy, Calendar, ChevronDown, ChevronUp } from "lucide-react";
-import { getDayScore, calculateCurrentStreak, calculateLongestStreak } from "../../utils/streakCalculator";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { getDayScore, calculateCurrentStreak, calculateLongestStreak } from "~utils/streakCalculator";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function PrayerStreakTracker() {
   const [streakData, setStreakData] = useStorage<PrayerStreakData>("prayerStreak", {

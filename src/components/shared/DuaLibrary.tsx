@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { duas } from "../../data/duas";
-import type { Dua, DuaCategory } from "../../types";
-import { cn } from "../../utils/cn";
+import { duas } from "~data/duas";
+import type { Dua, DuaCategory } from "~types";
+import { cn } from "~utils/cn";
 import { Heart, Search, ChevronRight, BookOpen, Star } from "lucide-react";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 const CATEGORY_LABELS: Record<DuaCategory, string> = {
   morning_evening: "Morning & Evening",

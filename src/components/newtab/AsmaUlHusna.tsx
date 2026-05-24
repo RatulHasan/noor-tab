@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, BookOpen } from "lucide-react";
-import { asmaUlHusna as ASMA_UL_HUSNA } from "../../data/asmaUlHusna";
-import type { AsmaName } from "../../types";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { asmaUlHusna as ASMA_UL_HUSNA } from "~data/asmaUlHusna";
+import type { AsmaName } from "~types";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function AsmaUlHusna() {
   const [showAll, setShowAll] = useState(false);

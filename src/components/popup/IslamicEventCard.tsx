@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
-import { ISLAMIC_EVENTS } from "../../data/islamicEvents";
-import { getHijriDateParts } from "../../utils/hijriConverter";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { ISLAMIC_EVENTS } from "~data/islamicEvents";
+import { getHijriDateParts } from "~utils/hijriConverter";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 import { Calendar } from "lucide-react";
-import { getCoordinatesLocalDate } from "../../utils/locationService";
+import { getCoordinatesLocalDate } from "~utils/locationService";
 
 export default function IslamicEventCard() {
   const [settings] = useSettings();
