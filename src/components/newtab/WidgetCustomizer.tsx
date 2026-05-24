@@ -26,17 +26,18 @@ import { getTranslation } from "~data/translations";
 import type { TranslationKey } from "~data/translations";
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
-  { id: "ayah", visible: true, order: 0 },
-  { id: "prayerStreak", visible: true, order: 1 },
-  { id: "hadith", visible: true, order: 2 },
-  { id: "islamicCalendar", visible: true, order: 3 },
-  { id: "adhkar", visible: true, order: 4 },
-  { id: "asmaName", visible: true, order: 5 },
-  { id: "duaLibrary", visible: false, order: 6 },
-  { id: "quiz", visible: false, order: 7 },
-  { id: "fastingTracker", visible: false, order: 8 },
-  { id: "quranBookmark", visible: false, order: 9 },
-  { id: "dhikr", visible: false, order: 10 },
+  { id: "prayerStreak", visible: true, order: 1, panel: "left" },
+  { id: "fastingTracker", visible: true, order: 2, panel: "left" },
+  { id: "adhkar", visible: false, order: 3, panel: "left" },
+  { id: "asmaName", visible: true, order: 1, panel: "right" },
+  { id: "islamicCalendar", visible: true, order: 2, panel: "right" },
+  { id: "globalPrayer", visible: false, order: 3, panel: "right" },
+  { id: "dhikr", visible: true, order: 1, panel: "bottom" },
+  { id: "hadith", visible: true, order: 2, panel: "bottom" },
+  { id: "quiz", visible: false, order: 3, panel: "bottom" },
+  { id: "quranBookmark", visible: false, order: 4, panel: "bottom" },
+  { id: "duaLibrary", visible: false, order: 5, panel: "bottom" },
+  { id: "ayah", visible: false, order: 6, panel: "bottom" },
 ];
 
 export const WIDGET_TRANSLATION_KEYS: Record<WidgetId, TranslationKey> = {
@@ -51,6 +52,7 @@ export const WIDGET_TRANSLATION_KEYS: Record<WidgetId, TranslationKey> = {
   fastingTracker: "fastingTracker",
   quranBookmark: "quranBookmarkTitle",
   prayerStreak: "prayerStreakTitle",
+  globalPrayer: "globalPrayerTimes",
 };
 
 interface WidgetCustomizerProps {
@@ -94,6 +96,13 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
     setShowWarning(false);
     const updated = widgets.map((w) =>
       w.id === id ? { ...w, visible: !w.visible } : w
+    );
+    setWidgets(updated);
+  };
+
+  const handlePanelChange = (id: WidgetId, panel: 'left' | 'center' | 'right' | 'bottom') => {
+    const updated = widgets.map((w) =>
+      w.id === id ? { ...w, panel } : w
     );
     setWidgets(updated);
   };
@@ -223,6 +232,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
                     widget={widget}
                     label={t(WIDGET_TRANSLATION_KEYS[widget.id])}
                     onToggle={handleToggleVisibility}
+                    onPanelChange={handlePanelChange}
                   />
                 ))}
               </div>
@@ -390,9 +400,10 @@ interface SortableItemProps {
   widget: WidgetConfig;
   label: string;
   onToggle: (id: WidgetId) => void;
+  onPanelChange: (id: WidgetId, panel: 'left' | 'center' | 'right' | 'bottom') => void;
 }
 
-function SortableItem({ widget, label, onToggle }: SortableItemProps) {
+function SortableItem({ widget, label, onToggle, onPanelChange }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -413,9 +424,9 @@ function SortableItem({ widget, label, onToggle }: SortableItemProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center justify-between p-3 rounded-xl border bg-stone-50/50 dark:bg-stone-900/40 transition-all duration-200 select-none",
+        "flex items-center justify-between p-3 rounded-xl border bg-white dark:bg-stone-900 transition-all duration-200 select-none",
         isDragging
-          ? "border-emerald-600 shadow-md bg-white dark:bg-stone-900 scale-[1.02]"
+          ? "border-emerald-600 shadow-md scale-[1.02]"
           : "border-stone-200/60 dark:border-stone-800/60"
       )}
     >
@@ -432,17 +443,30 @@ function SortableItem({ widget, label, onToggle }: SortableItemProps) {
         </span>
       </div>
 
-      <button
-        onClick={() => onToggle(widget.id)}
-        className={cn(
-          "p-1.5 rounded-lg border transition-all duration-200",
-          widget.visible
-            ? "border-emerald-200/60 bg-emerald-50/20 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-950/40 dark:bg-emerald-950/20 dark:text-emerald-400"
-            : "border-stone-200 bg-white text-stone-400 hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
-        )}
-      >
-        {widget.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-      </button>
+      <div className="flex items-center gap-2">
+        <select
+          value={widget.panel}
+          onChange={(e) => onPanelChange(widget.id, e.target.value as any)}
+          className="text-[10px] bg-stone-50 dark:bg-stone-800 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500/30 text-stone-500 dark:text-stone-400 font-bold uppercase"
+        >
+          <option value="left">Left</option>
+          <option value="center">Center</option>
+          <option value="right">Right</option>
+          <option value="bottom">Bottom</option>
+        </select>
+
+        <button
+          onClick={() => onToggle(widget.id)}
+          className={cn(
+            "p-1.5 rounded-lg border transition-all duration-200",
+            widget.visible
+              ? "border-emerald-200/60 bg-emerald-50/20 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-950/40 dark:bg-emerald-950/20 dark:text-emerald-400"
+              : "border-stone-200 bg-white text-stone-400 hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
+          )}
+        >
+          {widget.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+        </button>
+      </div>
     </div>
   );
 }

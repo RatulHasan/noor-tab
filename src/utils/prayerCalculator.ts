@@ -39,6 +39,7 @@ export function calculatePrayerTimes(
   
   return {
     fajr: prayerTimes.fajr,
+    sunrise: prayerTimes.sunrise,
     dhuhr: prayerTimes.dhuhr,
     asr: prayerTimes.asr,
     maghrib: prayerTimes.maghrib,
@@ -77,7 +78,7 @@ export function getPrayerStatuses(
   now: Date = new Date()
 ): PrayerUIStatus[] {
   const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers, now);
-  const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+  const prayerNames: PrayerName[] = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"];
   
   return prayerNames.map((name) => {
     const meta = PRAYER_METADATA[name];

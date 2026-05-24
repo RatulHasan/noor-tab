@@ -1,4 +1,4 @@
-export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+export type PrayerName = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
 
 export type NotificationStyle = "newtab" | "overlay" | "both";
 
@@ -17,6 +17,7 @@ export type CalculationMethodKey =
 
 export type MadhabKey = "standard" | "hanafi";
 
+export type SearchEngine = 'google' | 'duckduckgo' | 'bing' | 'ecosia';
 export type AppLanguage = "en" | "bn" | "ar" | "hi" | "ur";
 
 export interface UserSettings {
@@ -32,6 +33,7 @@ export interface UserSettings {
   perPrayerReminder: Record<PrayerName, boolean>;
   theme: "light" | "dark" | "system";
   language: AppLanguage;
+  searchEngine: SearchEngine;
   adhanAudio: string; // "none" or name of the adhan file (e.g. "azan1")
   overlayPosition: "bottom" | "modal";
   // Phase 2 Settings
@@ -221,12 +223,14 @@ export interface FocusMode {
 export type WidgetId =
   | 'ayah' | 'hadith' | 'dhikr' | 'islamicCalendar'
   | 'adhkar' | 'asmaName' | 'duaLibrary' | 'quiz'
-  | 'fastingTracker' | 'quranBookmark' | 'prayerStreak';
+  | 'fastingTracker' | 'quranBookmark' | 'prayerStreak'
+  | 'globalPrayer';
 
 export interface WidgetConfig {
   id: WidgetId;
   visible: boolean;
   order: number;
+  panel: 'left' | 'center' | 'right' | 'bottom';
 }
 
 // ── Backup / Export / Import ───────────────────────────────

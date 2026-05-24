@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   reminderMinutes: 15,
   perPrayerReminder: {
     fajr: true,
+    sunrise: false,
     dhuhr: true,
     asr: true,
     maghrib: true,
@@ -16,6 +17,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   },
   theme: "system",
   language: "en",
+  searchEngine: "google",
   adhanAudio: "none",
   overlayPosition: "bottom",
   // Phase 2 Settings
