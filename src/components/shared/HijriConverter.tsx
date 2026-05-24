@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { gregorianToHijri, hijriToGregorian, getHijriDateParts } from "../../utils/hijriConverter";
-import { format } from "date-fns";
+import { format } from "../../utils/dateUtils";
 import { Calendar, ArrowRightLeft, RefreshCw } from "lucide-react";
 import { cn } from "../../utils/cn";
 

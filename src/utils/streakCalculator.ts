@@ -1,5 +1,5 @@
 import type { DayPrayerRecord, PrayerStatus } from "../types";
-import { subDays, format, parseISO, startOfDay, differenceInDays } from "date-fns";
+import { subDays, format, parseISO, startOfDay, differenceInDays } from "./dateUtils";
 
 /**
  * Calculates the score for a single day.

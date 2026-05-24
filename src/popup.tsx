@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSettings } from "./hooks/useSettings";
 import { usePrayerTimes } from "./hooks/usePrayerTimes";
+import { useStorage } from "@plasmohq/storage/hook";
 import HijriDate from "./components/popup/HijriDate";
 import NextPrayer from "./components/popup/NextPrayer";
 import PrayerList from "./components/popup/PrayerList";
@@ -18,6 +19,7 @@ import { cn } from "./utils/cn";
 import AdhkarPlayer from "./components/shared/AdhkarPlayer";
 import PrayerStreakTracker from "./components/shared/PrayerStreakTracker";
 import FastingTracker from "./components/shared/FastingTracker";
+import QuranBookmark from "./components/shared/QuranBookmark";
 import FocusModeToggle from "./components/popup/FocusModeToggle";
 import BackupManager from "./components/popup/BackupManager";
 import BuyMeCoffee from "./components/shared/BuyMeCoffee";
@@ -35,6 +37,9 @@ export default function Popup() {
     nextPrayer,
     isLoading: isLoadingPrayers,
   } = usePrayerTimes();
+
+  // Track whether adhan is actively playing (written by NoorTabHero)
+  const [adhanIsPlaying] = useStorage<boolean>("adhanIsPlaying", false);
 
   const [activeTab, setActiveTab] = useState<Tab>("prayers");
   
@@ -163,7 +168,7 @@ export default function Popup() {
 
       {/* Header (Always show if settings are loaded) */}
       {!isLoadingSettings && (
-        <header className="relative z-10 flex items-center justify-between border-b border-stone-200/60 bg-white/70 px-4 py-3.5 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-950/70">
+        <header className="relative z-20 overflow-visible flex items-center justify-between border-b border-stone-200/60 bg-white/70 px-4 py-3.5 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-950/70">
           <div className="flex flex-col">
             <h1 className="text-base font-extrabold text-emerald-800 dark:text-emerald-400 tracking-wide leading-none">
               NoorTab
@@ -174,11 +179,12 @@ export default function Popup() {
           </div>
           <div className="flex items-center gap-2">
             <HijriDate date={getCoordinatesLocalDate(settings.coordinates)} />
-            {settings.adhanAudio !== "none" && (
+            {/* Only show mute button while adhan is actually playing */}
+            {adhanIsPlaying && (
               <button
                 type="button"
                 onClick={handleStopAllAdhan}
-                className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 transition-colors"
+                className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 transition-colors animate-pulse"
                 title={t("stopAdhanGlobal")}
               >
                 <VolumeX className="h-3.5 w-3.5" />
@@ -219,6 +225,7 @@ export default function Popup() {
             {/* Quran Tab */}
             {activeTab === "quran" && (
               <div className="space-y-4">
+                <QuranBookmark />
                 <PrayerStreakTracker />
                 <FastingTracker />
               </div>

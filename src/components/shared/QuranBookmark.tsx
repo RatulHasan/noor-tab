@@ -1,5 +1,5 @@
 import { useStorage } from "@plasmohq/storage/hook";
-import { format } from "date-fns";
+import { format } from "../../utils/dateUtils";
 import { BookOpen, ChevronDown, ChevronUp, ExternalLink, Save } from "lucide-react";
 import { useState } from "react";
 

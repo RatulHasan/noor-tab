@@ -392,7 +392,7 @@ export default function NewTab() {
                 case "adhkar":
                   return <AdhkarPlayer key={id} />;
                 case "asmaName":
-                  return <AsmaCard key={id} />;
+                  return <AsmaUlHusna key={id} />;
                 case "duaLibrary":
                   return <DuaLibrary key={id} />;
                 case "quiz":

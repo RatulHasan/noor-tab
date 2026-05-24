@@ -11,7 +11,7 @@ import {
   getBackupSummary,
 } from "../../utils/backupManager";
 import { cn } from "../../utils/cn";
-import { format, subMonths, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { format, subMonths, startOfMonth, endOfMonth, eachDayOfInterval } from "../../utils/dateUtils";
 
 type ImportMode = "replace" | "merge";
 type Status = { type: "success" | "error"; message: string } | null;

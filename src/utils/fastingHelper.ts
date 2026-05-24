@@ -1,6 +1,6 @@
 import type { FastingRecord, FastType } from "../types";
 import { getHijriDateParts, type HijriDateParts } from "./hijriConverter";
-import { format, subDays, isMonday, isThursday, parseISO } from "date-fns";
+import { format, subDays, isMonday, isThursday, parseISO } from "./dateUtils";
 
 /**
  * Checks if the current date is in the month of Ramadan.

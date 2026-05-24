@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { calculatePrayerTimes } from "../../utils/prayerCalculator";
 import { POPULAR_LOCATIONS } from "../../data/popularLocations";
-import { format } from "date-fns";
+import { format } from "../../utils/dateUtils";
 import { Globe, Settings2, Check, Plus, Trash2, X } from "lucide-react";
 import { cn } from "../../utils/cn";
 
@@ -36,14 +36,15 @@ export default function GlobalPrayerWidget() {
   );
 
   const handleToggleCity = (cityName: string) => {
-    if (worldCities.includes(cityName)) {
-      setWorldCities(worldCities.filter((name) => name !== cityName));
+    const list = worldCities || [];
+    if (list.includes(cityName)) {
+      setWorldCities(list.filter((name) => name !== cityName));
     } else {
-      if (worldCities.length >= 3) {
+      if (list.length >= 3) {
         // limit to 3 custom cities
         return;
       }
-      setWorldCities([...worldCities, cityName]);
+      setWorldCities([...list, cityName]);
     }
   };
 
@@ -51,7 +52,7 @@ export default function GlobalPrayerWidget() {
   const citiesToDisplay = [
     MAKKAH,
     MADINAH,
-    ...worldCities.map((cityName) => {
+    ...(worldCities || []).map((cityName) => {
       const found = selectableCities.find((c) => c.name === cityName);
       return found || { name: cityName, lat: 0, lng: 0 };
     }).filter((c) => c.lat !== 0)
@@ -64,6 +65,8 @@ export default function GlobalPrayerWidget() {
       return "--:--";
     }
   };
+
+  const currentCitiesLength = (worldCities || []).length;
 
   return (
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 border border-stone-200/50 dark:border-stone-800/60 flex flex-col space-y-4 font-sans select-none">
@@ -82,12 +85,12 @@ export default function GlobalPrayerWidget() {
             className="p-1.5 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors flex items-center gap-1 text-[10px] font-bold"
           >
             <Settings2 className="w-3.5 h-3.5" />
-            <span>Manage Cities ({worldCities.length}/3)</span>
+            <span>Manage Cities ({currentCitiesLength}/3)</span>
           </button>
 
           {/* Select Cities Dropdown */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-1 z-30 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 shadow-xl p-3 space-y-3">
+            <div className="absolute right-0 mt-1 z-[9999] w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl p-3 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">
                   Select Custom Cities
@@ -105,7 +108,7 @@ export default function GlobalPrayerWidget() {
                 placeholder="Search cities..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full text-xs rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850 text-stone-800 dark:text-stone-100 px-3 py-2 outline-none focus:border-emerald-500 transition-colors"
+                className="w-full text-xs rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-800 dark:text-stone-100 px-3 py-2 outline-none focus:border-emerald-500 transition-colors"
               />
 
               <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
@@ -115,7 +118,8 @@ export default function GlobalPrayerWidget() {
                   </span>
                 ) : (
                   filteredCities.map((city) => {
-                    const isSelected = worldCities.includes(city.name);
+                    const list = worldCities || [];
+                    const isSelected = list.includes(city.name);
                     return (
                       <button
                         key={city.name}
@@ -136,7 +140,7 @@ export default function GlobalPrayerWidget() {
                         {isSelected ? (
                           <Check className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                         ) : (
-                          worldCities.length < 3 && (
+                          list.length < 3 && (
                             <Plus className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600" />
                           )
                         )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { format } from "date-fns";
+import { format } from "../../utils/dateUtils";
 import { quizQuestions } from "../../data/quizQuestions";
 import type { QuizQuestion, QuizRecord } from "../../types";
 import { cn } from "../../utils/cn";

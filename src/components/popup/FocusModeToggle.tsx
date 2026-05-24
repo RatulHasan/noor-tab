@@ -33,21 +33,23 @@ export default function FocusModeToggle() {
   const [remaining, setRemaining] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const currentFocus = focusMode || { enabled: false, snoozedUntil: null, snoozeDuration: 60 };
+
   const isActive =
-    focusMode.enabled &&
-    focusMode.snoozedUntil !== null &&
-    new Date(focusMode.snoozedUntil) > new Date();
+    currentFocus.enabled &&
+    currentFocus.snoozedUntil !== null &&
+    new Date(currentFocus.snoozedUntil) > new Date();
 
   // Update remaining time every minute
   useEffect(() => {
-    if (!isActive || !focusMode.snoozedUntil) return;
-    setRemaining(formatRemaining(focusMode.snoozedUntil));
+    if (!isActive || !currentFocus.snoozedUntil) return;
+    setRemaining(formatRemaining(currentFocus.snoozedUntil));
     const interval = setInterval(() => {
-      if (!focusMode.snoozedUntil) return;
-      setRemaining(formatRemaining(focusMode.snoozedUntil));
+      if (!currentFocus.snoozedUntil) return;
+      setRemaining(formatRemaining(currentFocus.snoozedUntil));
     }, 60000);
     return () => clearInterval(interval);
-  }, [isActive, focusMode.snoozedUntil]);
+  }, [isActive, currentFocus.snoozedUntil]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -108,7 +110,7 @@ export default function FocusModeToggle() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 z-50 w-48 rounded-xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950 shadow-lg overflow-hidden">
+        <div className="absolute right-0 top-full mt-1.5 z-[9999] w-48 rounded-xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950 shadow-xl overflow-hidden">
           <div className="px-3 py-2 border-b border-stone-100 dark:border-stone-800">
             <span className="text-[9px] font-bold uppercase tracking-widest text-stone-400">
               Silence Reminders

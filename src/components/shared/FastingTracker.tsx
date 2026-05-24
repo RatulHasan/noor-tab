@@ -4,7 +4,7 @@ import { usePrayerTimes } from "../../hooks/usePrayerTimes";
 import type { FastingData, FastType, FastingRecord } from "../../types";
 import { isTodayRamadan, isTodayMonday, isTodayThursday, isAyyamulBidh, getSuhoorTime, getIftarTime, calculateFastingStreak } from "../../utils/fastingHelper";
 import { getHijriDateParts, getHijriDateString } from "../../utils/hijriConverter";
-import { format, subDays, isSameDay, differenceInSeconds } from "date-fns";
+import { format, subDays, isSameDay, differenceInSeconds } from "../../utils/dateUtils";
 import { Moon, Sun, Flame, Check, X, ShieldAlert, Award, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../../utils/cn";
 

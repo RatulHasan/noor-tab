@@ -8,6 +8,9 @@ import { Clock, MapPin, Bell, X, Calendar, Play, Pause } from "lucide-react";
 import { PRAYER_METADATA } from "../../data/prayerNames";
 import { cn } from "../../utils/cn";
 import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
+import { Storage } from "@plasmohq/storage";
+
+const globalStorage = new Storage();
 
 /**
  * @param {Object} props
@@ -60,14 +63,20 @@ export default function NoorTabHero({
     };
   }, []);
 
+  const setAdhanPlayingInStorage = (playing: boolean) => {
+    globalStorage.set("adhanIsPlaying", playing).catch(() => {});
+  };
+
   const handleToggleReminderAudio = () => {
     if (reminderAudioRef.current) {
       if (isReminderAudioPlaying) {
         reminderAudioRef.current.pause();
         setIsReminderAudioPlaying(false);
+        setAdhanPlayingInStorage(false);
       } else {
         reminderAudioRef.current.play().catch(() => {});
         setIsReminderAudioPlaying(true);
+        setAdhanPlayingInStorage(true);
       }
     }
   };
@@ -77,6 +86,7 @@ export default function NoorTabHero({
     if (reminderAudioRef.current) {
       reminderAudioRef.current.pause();
       setIsReminderAudioPlaying(false);
+      setAdhanPlayingInStorage(false);
     }
   };
 
@@ -112,12 +122,15 @@ export default function NoorTabHero({
           const audio = new Audio(option.url);
           reminderAudioRef.current = audio;
           setIsReminderAudioPlaying(true);
+          setAdhanPlayingInStorage(true);
           audio.play().catch((err) => {
             console.error("Autoplay of Adhan sound blocked or failed:", err);
             setIsReminderAudioPlaying(false);
+            setAdhanPlayingInStorage(false);
           });
           audio.onended = () => {
             setIsReminderAudioPlaying(false);
+            setAdhanPlayingInStorage(false);
           };
         }
       }
@@ -127,6 +140,7 @@ export default function NoorTabHero({
           reminderAudioRef.current.pause();
           reminderAudioRef.current = null;
           setIsReminderAudioPlaying(false);
+          setAdhanPlayingInStorage(false);
         }
       };
     }

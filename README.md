@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/ratulhasan/noor-tab/releases">
-    <img src="https://img.shields.io/badge/version-0.0.1-emerald?style=for-the-badge&logo=google-chrome&logoColor=white&color=064e3b" alt="Version" />
+    <img src="https://img.shields.io/badge/version-1.0.0-emerald?style=for-the-badge&logo=google-chrome&logoColor=white&color=064e3b" alt="Version" />
   </a>
   <a href="https://www.typescriptlang.org/">
     <img src="https://img.shields.io/badge/TypeScript-Ready-blue?style=for-the-badge&logo=typescript&logoColor=white&color=1d4ed8" alt="TypeScript" />
@@ -19,117 +19,292 @@
 </p>
 
 <p align="center">
-  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion — delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, and a Qibla compass, all in a beautifully designed, distraction-free experience.
+  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion — delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, a Qibla compass, and much more, all wrapped in a beautifully designed, distraction-free experience.
 </p>
 
 <br/>
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-### 🕌 New Tab Dashboard
-Every new tab becomes a full Islamic experience, replacing the default blank tab with a spiritually enriching, information-rich dashboard.
+### 🕌 Prayer Times & Adhan
+- **Accurate prayer time calculation** using industry-standard algorithms (Adhan.js) supporting 8+ calculation methods (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
+- **Madhab support** for Hanafi and standard Asr calculation
+- **Per-prayer reminders** — individually enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha notifications
+- **Configurable reminder offset** — be notified 0–30 minutes before each prayer
+- **Adhan audio playback** — choose from a curated selection of high-quality Adhan recordings; audio plays automatically when the prayer reminder fires
+- **Global stop control** — a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
+- **Live countdown** to the next prayer with a smooth animated timer
+- **Dynamic background gradients** in the new tab that shift throughout the day — dawn blues, midday greens, sunset ambers, and night indigos
 
-| Feature | Description |
-|---|---|
-| **Live Digital Clock** | Real-time clock localized to your detected city's timezone |
-| **Hijri & Gregorian Date** | Both Islamic and Gregorian dates displayed side by side — in Arabic and English |
-| **Dynamic Background** | Gradient shifts based on the next prayer (dawn colors for Fajr, sunset for Maghrib, etc.) |
-| **Mosque Silhouette Art** | Intricate SVG mosque artwork and Islamic geometric patterns as ambient visuals |
-| **Prayer Times Bar** | All 5 daily prayers shown at a glance with the next prayer highlighted |
-| **Countdown Timer** | Live countdown to the next salah, updating every second |
-| **Adhan Reminder Banner** | Rich in-page banner appears when a prayer reminder is triggered — shows prayer name, Arabic name, and Adhan controls |
-
----
-
-### 📿 Daily Spiritual Content
-
-| Feature | Description |
-|---|---|
-| **Ayah of the Day** | Rotates through curated Quranic verses with Arabic text, transliteration, and English translation |
-| **Hadith of the Day** | Date-seeded authentic Hadith with Arabic text, full translation, and source reference |
-| **Dhikr / Tasbih Counter** | Digital counter for SubhanAllah → Alhamdulillah → Allahu Akbar with phase completion tracking and visual rings |
-| **Islamic Calendar** | Upcoming Islamic events and observances (Ramadan, Eid, Muharram, etc.) displayed in a compact card |
-
----
-
-### 🔔 Prayer Reminders & Adhan
-
-| Feature | Description |
-|---|---|
-| **3 Notification Modes** | Choose between **New Tab Takeover**, **Toast Overlay**, or **Both** |
-| **Overlay Position** | Overlay can appear as a compact **bottom-right toast** or a full **centered modal** |
-| **Per-Prayer Toggles** | Enable or disable reminders individually for Fajr, Dhuhr, Asr, Maghrib, and Isha |
-| **Early Reminder Offset** | Set how many minutes before the prayer you want to be notified (0–30 min) |
-| **8 Adhan Reciters** | Preview and select from 8 beautiful Adhans before committing |
-| **Global Mute Button** | Stop any playing Adhan from the popup header instantly, across all tabs |
-| **Play / Pause Controls** | Toggle Adhan audio from the reminder banner, overlay, and modal — all in sync |
-
-**Available Adhan Reciters:**
-- 🕌 Sheikh Ali Ahmad Mulla — *Masjid al-Haram, Makkah*
-- 🕌 Traditional Medina Adhan — *Masjid an-Nabawi*
-- 🕌 Beautiful Al-Aqsa — *Al-Aqsa Mosque, Jerusalem*
-- 🕌 Traditional Cairo Style — *Egyptian Adhan*
-- 🕌 Saba Melodic Style — *Turkish Adhan*
-- 🕌 Sheikh Mishary Al-Afasy — *Famous Kuwaiti Reciter*
-- 🕌 Sheikh Abdul Basit — *Legendary Egyptian Reciter*
-- 🕌 Yusuf Islam — *Soft & Gentle Adhan*
-
----
+### 📅 Islamic Calendar
+- **Hijri date** displayed in both English transliteration and Arabic script
+- **Islamic event cards** — automatically surfaces upcoming events (Ramadan, Eid, Muharram, Mawlid, etc.) with days-remaining countdown
+- **Friday (Jumu'ah) banner** — special contextual greeting every Friday
 
 ### 🧭 Qibla Compass
-An interactive, animated compass that calculates the precise Qibla direction based on your GPS coordinates, with a smooth rotating needle animation and degree readout.
+- **Geolocation-aware Qibla direction** calculated from the user's coordinates to Makkah
+- Animated SVG compass with degree readout
+- Works offline once location is stored
+
+### 📖 Quranic Ayah of the Day
+- A beautiful daily Ayah displayed with Arabic text, transliteration, and English translation
+- Date-seeded rotation ensures a different verse each day
+- Serif typography (`font-amiri`) for a premium Arabic reading experience
+
+### 📚 Hadith of the Day
+- Curated authentic Hadith shown daily with source attribution
+- Elegant card layout with gradient accents
+
+### 📿 Dhikr Counter
+- **Customisable digital counter** for Tasbih, Tahmid, Takbir, and custom Dhikr
+- Set personal goals (e.g. 33, 99, 100) with visual progress tracking
+- Haptic-style feedback on each count; auto-resets when goal is reached
+- Persistent storage — counts survive browser restarts
 
 ---
 
-### ⚙️ Settings & Customization
+## 🚀 Extended Features (Phase 2)
 
-| Setting | Options |
+### 📿 Adhkar Player
+A full **morning & evening Adhkar companion** built into both the new tab and the popup:
+- Structured Adhkar sessions split into Morning and Evening categories
+- Each Dhikr item shows its Arabic text, transliteration, translation, and recommended count
+- **Progress tracking** — completed items are persisted per day; sessions auto-reset the following morning/evening
+- Daily completion percentage with a visual progress bar
+- Reminder alarms that fire at Fajr + 30 min (morning) and at Asr time (evening) if enabled in settings
+
+### 🏅 Prayer Streak Tracker
+A motivational accountability tool for establishing consistent Salah:
+- **7-day streak display** with a visual heatmap of the past week
+- Monthly calendar view showing which prayers were prayed, missed, or skipped
+- Mark each prayer as **Prayed ✓**, **Missed ✗**, or **Excused (Qada) ◎**
+- Current streak counter and longest-ever streak badge
+- All data stored locally — 100% private, no account required
+
+### 🌙 Fasting Tracker
+Tracks Ramadan and voluntary fasting with full historical logging:
+- **Ramadan Mode** — auto-detects the Ramadan month or can be toggled manually
+- Mark each day as fasted, not fasted, or excused
+- Displays Suhoor and Iftar times based on the user's location (Fajr and Maghrib)
+- **Live countdown** to Iftar with seconds precision during a fast
+- Monthly fasting calendar with colour-coded status indicators
+- Voluntary fast support for Mondays, Thursdays, White Days (13–15 Dhul Hijjah), and the Day of Arafah
+
+### 📖 Quran Bookmark
+A lightweight reading-progress companion:
+- Save your current Surah and Ayah position
+- Browse all 114 Surahs by name, number, and revelation type (Makki / Madani)
+- Multiple bookmarks supported — pick up exactly where you left off
+- Clean two-panel layout: bookmark list on the left, detail view on the right
+
+### 🔤 Asma ul-Husna — The 99 Names of Allah
+- **Name of the Day** card — date-seeded so a different name is highlighted every day
+- Displays the Arabic calligraphy, transliteration, English meaning, and a devotional benefit/supplication
+- **Smooth animated benefit reveal** — click "Show benefit" to expand the card without layout glitches
+- **View all 99 names** opens a full-screen modal (rendered via React Portal to prevent clipping) with a 3-column searchable grid; the today's name is highlighted in emerald
+
+### 🌍 Global Prayer Times
+A world-clock-style table showing prayer times for multiple cities simultaneously:
+- **Always-on Makkah and Madinah rows** as anchors
+- Add up to **3 custom cities** from a searchable dropdown spanning 500+ cities worldwide
+- Live prayer time calculations using each city's coordinates and the Umm al-Qura method
+- Persistent city selections via storage — survives page refreshes
+
+### 🧠 Islamic Quiz
+A gamified knowledge tool to deepen Islamic understanding:
+- 50+ curated multiple-choice questions covering Fiqh, Seerah, Quranic topics, and Islamic history
+- Timed questions with difficulty levels (Easy / Medium / Hard)
+- Score tracking and personal-best records persisted across sessions
+- Instant feedback with correct answer explanations after each question
+
+### 📚 Dua Library
+A searchable library of authentic supplications:
+- 100+ duas organised by category (Morning, Evening, Eating, Travelling, Sleep, etc.)
+- Full Arabic text with transliteration and translation for each dua
+- **Favourite system** — star any dua to pin it to a personal quick-access list
+- Copy to clipboard in one tap
+
+### ☕ Jumuah Banner
+- Every Friday the new tab displays a special Jumu'ah greeting banner with an emerald accent
+- Subtle background gradient shift distinguishes Friday from other days
+
+### 🎨 Customisable Dashboard
+A drag-and-drop-style widget manager:
+- Toggle any of the 10+ widgets on or off
+- Reorder widgets by dragging them to preferred positions
+- Changes persist immediately via Plasmo storage
+
+---
+
+## 🔇 Focus Mode (Silence Reminders)
+- Moon icon in the popup header opens the **Silence Reminders** dropdown
+- Snooze all prayer notifications for **1 hour, 2 hours, or 4 hours**
+- Active snooze shows a pulsing indicator and live remaining time countdown
+- Background worker respects the snooze window — no alarms fire until it expires
+- Disable at any time with the "Disable Focus Mode" option
+
+---
+
+## 💾 Backup & Restore
+Export and restore all your personal data in one click:
+- Full JSON export covers settings, prayer streak, fasting log, Quran bookmarks, Dhikr goals, Adhkar progress, Dua favourites, quiz records, and widget layout
+- Import from any previously exported file with automatic validation
+- Enables seamless migration between devices or browsers
+
+---
+
+## 🌐 Multi-Language Support
+Full UI localisation for:
+| Language | Code |
 |---|---|
-| **Location** | Auto-detect via GPS, pick from 50+ popular cities by country, or search any city by name |
-| **Calculation Method** | 11 methods: Muslim World League, Egyptian, Karachi, Umm al-Qura, Dubai, Qatar, Kuwait, Singapore, Turkey, Tehran, ISNA |
-| **Madhab** | Standard (Shafi, Maliki, Hanbali) or Hanafi (affects Asr time) |
-| **Theme** | Light, Dark, or System |
-| **Language** | English, বাংলা, العربية, हिन्दी, اردو |
-| **Adhan Sound** | 8 reciters with live preview (Play/Pause before selecting) |
-| **Overlay Style** | Bottom-right toast or centered backdrop modal |
-| **Notification Style** | New Tab, Overlay Toast, or Both |
-| **Reminder Offset** | Slider from 0–30 minutes before prayer |
+| English | `en` |
+| Bengali | `bn` |
+| Arabic | `ar` |
+| Hindi | `hi` |
+| Urdu | `ur` |
+
+Clock, date, and number formatting adapts to the selected locale using native `Intl` APIs.
 
 ---
 
-### 🛡️ Privacy First
-- **No server, no accounts.** Everything runs locally in your browser.
-- Location coordinates are stored only in your browser's local extension storage.
-- Prayer times are calculated on-device using the [`adhan-js`](https://github.com/batoulapps/adhan-js) library.
-- No analytics, no tracking, no external data collection.
+## 📍 Location & Privacy
+
+NoorTab is **entirely local**. There are no accounts, no tracking, and no data is sent to any server.
+
+- Location is detected once via the browser Geolocation API and stored in local extension storage
+- Alternatively, choose from 500+ popular cities with a single dropdown or enter coordinates manually
+- All streak, fasting, Quran, and quiz data lives in `chrome.storage` (Plasmo Storage) on-device only
 
 ---
 
-## 📸 Screenshots
+## 🏗️ Tech Stack
 
-> *(Coming soon — extension screenshots)*
+| Layer | Technology |
+|---|---|
+| Framework | [Plasmo](https://plasmo.com/) (Chrome Extension MV3) |
+| UI | React 18 + TypeScript |
+| Styling | Tailwind CSS v3 |
+| State | `@plasmohq/storage` / `useStorage` hook |
+| Prayer Calculation | `adhan` (Adhan.js) |
+| Icons | `lucide-react` |
+| Build | Parcel (via Plasmo) |
+| Testing | — (unit tests planned) |
 
 ---
 
-## 🚀 Getting Started
+## 📁 Project Structure
+
+```
+noor-tab/
+├── src/
+│   ├── background.ts              # Service worker — alarm scheduling & message routing
+│   ├── newtab.tsx                 # New Tab page entry point
+│   ├── popup.tsx                  # Browser action popup entry point
+│   ├── content.ts                 # Content script for overlay injection
+│   │
+│   ├── components/
+│   │   ├── newtab/
+│   │   │   ├── NoorTabHero.tsx        # Clock, Hijri date, prayer bar, Adhan banner
+│   │   │   ├── AsmaUlHusna.tsx        # 99 Names of Allah widget + modal
+│   │   │   ├── GlobalPrayerWidget.tsx # World prayer times table
+│   │   │   ├── PrayerStreakWidget.tsx # Streak summary card for new tab
+│   │   │   ├── JumuahBanner.tsx       # Friday Jumu'ah greeting
+│   │   │   ├── WidgetCustomizer.tsx   # Widget toggle & reorder drawer
+│   │   │   ├── AyahDisplay.tsx        # Quran Ayah of the day
+│   │   │   ├── HadithOfDay.tsx        # Hadith of the day card
+│   │   │   ├── DhikrCounter.tsx       # Digital Tasbih counter
+│   │   │   └── IslamicCalendar.tsx    # Hijri calendar card
+│   │   │
+│   │   ├── popup/
+│   │   │   ├── HijriDate.tsx          # Compact Hijri date badge
+│   │   │   ├── NextPrayer.tsx         # Next prayer countdown chip
+│   │   │   ├── PrayerList.tsx         # Full prayer list with reminder toggles
+│   │   │   ├── QiblaCompass.tsx       # Animated Qibla SVG compass
+│   │   │   ├── SettingsPanel.tsx      # All user settings UI
+│   │   │   ├── IslamicEventCard.tsx   # Upcoming Islamic event badge
+│   │   │   ├── FocusModeToggle.tsx    # Silence reminders dropdown
+│   │   │   └── BackupManager.tsx      # Export/import personal data
+│   │   │
+│   │   └── shared/
+│   │       ├── AdhkarPlayer.tsx       # Morning/evening Adhkar session UI
+│   │       ├── PrayerStreakTracker.tsx # Full monthly streak calendar
+│   │       ├── FastingTracker.tsx     # Ramadan & voluntary fasting log
+│   │       ├── QuranBookmark.tsx      # Quran reading progress tracker
+│   │       ├── IslamicQuiz.tsx        # Multiple-choice Islamic quiz
+│   │       ├── DuaLibrary.tsx         # Searchable dua collection
+│   │       ├── AsmaCard.tsx           # Individual Asma name card
+│   │       ├── CountdownTimer.tsx     # Reusable countdown display
+│   │       └── BuyMeCoffee.tsx        # Support button (badge & floating variants)
+│   │
+│   ├── hooks/
+│   │   ├── useSettings.ts         # Global user settings with Plasmo Storage
+│   │   ├── usePrayerTimes.ts      # Prayer time computation hook
+│   │   └── useHijriDate.ts        # Hijri date formatting hook
+│   │
+│   ├── utils/
+│   │   ├── prayerCalculator.ts    # Adhan.js wrapper for prayer time calc
+│   │   ├── alarmScheduler.ts      # Chrome alarm creation & management
+│   │   ├── locationService.ts     # Geolocation & geocoding helpers
+│   │   ├── streakCalculator.ts    # Prayer streak logic
+│   │   ├── fastingHelper.ts       # Ramadan detection & fasting utils
+│   │   ├── jumuahHelper.ts        # Friday detection helper
+│   │   ├── dateUtils.ts           # Native JS date helpers (format, subDays, etc.)
+│   │   ├── backupManager.ts       # JSON export/import logic
+│   │   └── cn.ts                  # Tailwind class merge utility
+│   │
+│   ├── data/
+│   │   ├── adhanAudios.ts         # Adhan audio option registry
+│   │   ├── adhkarData.ts          # Morning & evening Adhkar content
+│   │   ├── asmaUlHusna.ts         # All 99 names with meanings & benefits
+│   │   ├── defaultSettings.ts     # Default UserSettings shape
+│   │   ├── duaData.ts             # Categorised Dua library content
+│   │   ├── islamicEvents.ts       # Upcoming Islamic events dataset
+│   │   ├── popularLocations.ts    # 500+ cities with coordinates
+│   │   ├── prayerNames.ts         # Prayer metadata (Arabic, transliteration)
+│   │   ├── quizData.ts            # Islamic quiz questions
+│   │   ├── quranData.ts           # Surah list with metadata
+│   │   └── translations.ts        # UI strings in 5 languages
+│   │
+│   └── types/
+│       └── index.ts               # All shared TypeScript types & interfaces
+│
+├── assets/
+│   └── banner.png                 # README banner image
+├── package.json
+├── tailwind.config.js
+└── tsconfig.json
+```
+
+---
+
+## 🛠️ Development
 
 ### Prerequisites
-- Node.js 18+
-- npm or pnpm
+- Node.js ≥ 18
+- npm ≥ 9
 
-### Development
+### Getting Started
 
 ```bash
+# Clone the repository
+git clone https://github.com/ratulhasan/noor-tab.git
+cd noor-tab
+
 # Install dependencies
 npm install
 
-# Start the dev server (hot reload)
+# Start the development server (hot-reload)
 npm run dev
 ```
 
-Then open Chrome and navigate to `chrome://extensions`. Enable **Developer Mode**, click **Load Unpacked**, and select the `build/chrome-mv3-dev` folder.
+### Loading the Extension in Chrome
+
+1. Open Chrome and navigate to `chrome://extensions`
+2. Enable **Developer Mode** (top-right toggle)
+3. Click **Load Unpacked**
+4. Select the `build/chrome-mv3-dev` folder generated by `npm run dev`
 
 ### Production Build
 
@@ -137,140 +312,53 @@ Then open Chrome and navigate to `chrome://extensions`. Enable **Developer Mode*
 npm run build
 ```
 
-This outputs a production bundle at `build/chrome-mv3-prod/` and creates a ZIP file ready for Chrome Web Store submission.
+The production bundle is output to `build/chrome-mv3-prod/`.
 
 ---
 
-## 🗂️ Project Structure
+## ⚙️ Settings Reference
 
-```
-noor-tab/
-├── src/
-│   ├── background.ts             # Service worker — alarms, message orchestration
-│   ├── newtab.tsx                # New Tab page entry
-│   ├── popup.tsx                 # Extension popup entry
-│   ├── style.css                 # Global Tailwind + custom CSS
-│   │
-│   ├── components/
-│   │   ├── newtab/
-│   │   │   ├── NoorTabHero.tsx   # Clock, greeting, countdown, prayer bar, reminder banner
-│   │   │   ├── AyahDisplay.tsx   # Daily Quranic verse
-│   │   │   ├── HadithOfDay.tsx   # Daily Hadith card
-│   │   │   ├── DhikrCounter.tsx  # Tasbih / Dhikr digital counter
-│   │   │   └── IslamicCalendar.tsx # Upcoming Islamic events
-│   │   │
-│   │   ├── popup/
-│   │   │   ├── NextPrayer.tsx    # Next prayer countdown widget
-│   │   │   ├── PrayerList.tsx    # Full prayer times list with reminder toggles
-│   │   │   ├── QiblaCompass.tsx  # Animated Qibla compass
-│   │   │   ├── SettingsPanel.tsx # Full settings form
-│   │   │   ├── HijriDate.tsx     # Hijri date badge
-│   │   │   └── IslamicEventCard.tsx # Upcoming event in popup
-│   │   │
-│   │   └── shared/
-│   │       ├── ReminderOverlay.tsx # Prayer reminder — supports both toast and modal modes
-│   │       └── CountdownTimer.tsx  # Reusable live countdown display
-│   │
-│   ├── contents/
-│   │   └── overlay.tsx           # Content script — injects reminder into active tab
-│   │
-│   ├── data/
-│   │   ├── adhanAudios.ts        # Adhan reciter definitions & audio URLs
-│   │   ├── ayahs.ts              # Curated Quranic verses dataset
-│   │   ├── hadiths.ts            # Curated Hadith dataset
-│   │   ├── defaultSettings.ts    # Default user preferences
-│   │   ├── islamicEvents.ts      # Islamic calendar event definitions
-│   │   ├── popularLocations.ts   # 50+ city coordinates for quick selection
-│   │   ├── prayerNames.ts        # Prayer metadata (Arabic names, display names)
-│   │   └── translations.ts       # i18n strings (EN, BN, AR, HI, UR)
-│   │
-│   ├── hooks/
-│   │   ├── useSettings.ts        # Settings read/write with Plasmo Storage
-│   │   ├── usePrayerTimes.ts     # Prayer time calculation hook
-│   │   └── useHijriDate.ts       # Hijri date conversion hook
-│   │
-│   ├── types/
-│   │   └── index.ts              # Shared TypeScript interfaces & types
-│   │
-│   └── utils/
-│       ├── prayerCalculator.ts   # adhan-js wrapper
-│       ├── alarmScheduler.ts     # Chrome alarms scheduling
-│       ├── locationService.ts    # GPS detection & geocoding
-│       └── cn.ts                 # clsx + tailwind-merge utility
-│
-└── assets/
-    └── banner.png                # README banner
-```
-
----
-
-## 🔧 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | [Plasmo](https://plasmo.com/) — Browser Extension Framework |
-| UI | React 18 + TypeScript |
-| Styling | Tailwind CSS v3 |
-| Prayer Calculation | [adhan-js](https://github.com/batoulapps/adhan-js) |
-| Storage | [@plasmohq/storage](https://docs.plasmo.com/framework/storage) |
-| Icons | [Lucide React](https://lucide.dev/) |
-| Build Target | Chrome Manifest V3 |
-
----
-
-## 🌐 Supported Languages
-
-| Language | Code | Status |
+| Setting | Options | Description |
 |---|---|---|
-| English | `en` | ✅ Full support |
-| বাংলা (Bangla) | `bn` | ✅ Full support |
-| العربية (Arabic) | `ar` | ✅ RTL support |
-| हिन्दी (Hindi) | `hi` | ✅ Full support |
-| اردو (Urdu) | `ur` | ✅ RTL support |
-
----
-
-## 📐 Supported Calculation Methods
-
-| Method | Region |
-|---|---|
-| Muslim World League | Global (Default) |
-| Egyptian General Authority | Egypt, Middle East |
-| U.I.S. Karachi | Pakistan, South Asia |
-| Umm al-Qura, Makkah | Saudi Arabia |
-| Dubai Authority | UAE |
-| Qatar Authority | Qatar |
-| Kuwait Authority | Kuwait |
-| MUIS, Singapore | South-East Asia |
-| Diyanet, Turkey | Turkey |
-| Tehran Geophysics Institute | Iran |
-| ISNA (Islamic Society of North America) | North America |
+| Calculation Method | 8 methods | Prayer time calculation school |
+| Madhab | Hanafi / Standard | Asr time calculation preference |
+| Reminder Offset | 0–30 min | How early before the prayer to notify |
+| Per-Prayer Reminders | Toggle per salah | Enable/disable individual prayer alarms |
+| Adhan Audio | None + 6 reciters | Audio to play when prayer reminder fires |
+| Notification Style | New Tab / Overlay / Both | How prayer reminders are displayed |
+| Language | en / bn / ar / hi / ur | Full UI language |
+| Morning Adhkar Reminder | On/Off | Alarm at Fajr + 30 min |
+| Evening Adhkar Reminder | On/Off | Alarm at Asr time |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions, bug reports, and feature requests are welcome!
+Contributions, bug reports, and suggestions are very welcome!
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feat/your-feature`
-3. Commit your changes: `git commit -m 'feat: add your feature'`
-4. Push to the branch: `git push origin feat/your-feature`
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feat/my-feature`
+3. Commit with conventional commits: `git commit -m "feat: add XYZ"`
+4. Push and open a Pull Request
 
-Please make sure your code follows the project's existing conventions (TypeScript strict mode, Tailwind utility classes, modular components).
+Please ensure your PR includes:
+- A clear description of what changed and why
+- Screenshots for any UI changes
+- No `console.log`, `dd()`, or commented-out code
 
 ---
 
 ## 📄 License
 
-MIT License — see [`LICENSE`](LICENSE) for details.
+MIT © [Ratul Hasan](https://github.com/ratulhasan)
 
 ---
 
 <p align="center">
-  Made with 🤍 for the Muslim Ummah &nbsp;•&nbsp;
-  <strong>NoorTab</strong> — نور تاب
-  <br/>
-  <sub><em>"And We have made the night and the day two signs." — Quran 17:12</em></sub>
+  Built with 💚 for the global Muslim community.<br/>
+  <em>May Allah accept this effort and make it a source of benefit.</em>
+  <br/><br/>
+  <a href="https://www.buymeacoffee.com/ratulhasan">
+    <img src="https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" />
+  </a>
 </p>

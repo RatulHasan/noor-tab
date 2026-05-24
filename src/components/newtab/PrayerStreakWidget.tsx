@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { Flame, Trophy, X } from "lucide-react";
-import { format, subDays } from "date-fns";
+import { format, subDays } from "../../utils/dateUtils";
 import type { PrayerStreakData } from "../../types";
 import { getDayScore } from "../../utils/streakCalculator";
 import { cn } from "../../utils/cn";

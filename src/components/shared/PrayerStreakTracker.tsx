@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import type { DayPrayerRecord, PrayerStreakData, PrayerStatus } from "../../types";
-import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, parseISO, isFuture } from "date-fns";
+import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval, parseISO, isFuture } from "../../utils/dateUtils";
 import { Flame, Trophy, Calendar, Check, AlertCircle, X, ChevronDown, ChevronUp } from "lucide-react";
 import { getDayScore, calculateCurrentStreak, calculateLongestStreak } from "../../utils/streakCalculator";
 import { cn } from "../../utils/cn";

@@ -1,4 +1,4 @@
-import { isFriday, format } from "date-fns";
+import { isFriday, format } from "./dateUtils";
 
 export interface JumuahVirtue {
   hadith: string;
