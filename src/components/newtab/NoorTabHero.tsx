@@ -40,6 +40,7 @@ export default function NoorTabHero({
   const [time, setTime] = useState(() => new Date());
   const [showReminder, setShowReminder] = useState(!!reminderPrayer);
   const [devMockTime] = useStorage<string>("devMockTime", "");
+  const [devMockCoordinates] = useStorage<{ lat: number; lng: number } | null>("devMockCoordinates", null);
 
   const reminderAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isReminderAudioPlaying, setIsReminderAudioPlaying] = useState(false);
@@ -94,8 +95,10 @@ export default function NoorTabHero({
 
   // Compute timezone-adjusted local time for the coordinates
   const getCoordinatesLocalTime = (baseTime: Date) => {
-    if (!settings?.coordinates) return baseTime;
-    const estimatedOffsetHours = Math.round(settings.coordinates.lng / 15);
+    if (devMockTime) return baseTime;
+    const activeCoords = devMockCoordinates || settings?.coordinates;
+    if (!activeCoords) return baseTime;
+    const estimatedOffsetHours = Math.round(activeCoords.lng / 15);
     const utcTime = baseTime.getTime() + (baseTime.getTimezoneOffset() * 60 * 1000);
     return new Date(utcTime + (estimatedOffsetHours * 60 * 60 * 1000));
   };

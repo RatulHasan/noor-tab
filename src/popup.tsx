@@ -263,7 +263,7 @@ export default function Popup() {
                       {/* Dropdown selectors for location */}
                       <div className="rounded-xl border border-stone-200 bg-stone-100/40 p-3 dark:border-stone-800 dark:bg-stone-900/20 space-y-2 text-left">
                         <span className="text-[9px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
-                          Select Country and City
+                          {t("selectCountryCity")}
                         </span>
                         
                         <div className="grid grid-cols-2 gap-2">
@@ -273,13 +273,13 @@ export default function Popup() {
                               onChange={handleOnboardingCountryChange}
                               className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
                             >
-                              <option value="">Country...</option>
+                              <option value="">{t("countryPlaceholder")}</option>
                               {POPULAR_LOCATIONS.map((c) => (
                                 <option key={c.countryName} value={c.countryName}>
                                   {c.countryName}
                                 </option>
                               ))}
-                              <option value="custom">Other (Search)</option>
+                              <option value="custom">{t("otherSearch")}</option>
                             </select>
                           </div>
 
@@ -290,14 +290,14 @@ export default function Popup() {
                               disabled={!onboardingCountryName || onboardingCountryName === "custom"}
                               className="w-full rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 disabled:opacity-50"
                             >
-                              <option value="">City...</option>
+                              <option value="">{t("cityPlaceholder")}</option>
                               {POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName)?.cities.map((city) => (
                                 <option key={city.name} value={city.name}>
                                   {city.name}
                                 </option>
                               ))}
                               {onboardingCountryName && onboardingCountryName !== "custom" && (
-                                <option value="custom">Other (Search)</option>
+                                <option value="custom">{t("otherSearch")}</option>
                               )}
                             </select>
                           </div>
@@ -343,7 +343,7 @@ export default function Popup() {
                         onClick={() => setActiveTab("settings")}
                         className="text-xs font-semibold text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 block w-full text-center"
                       >
-                        Configure Manually in Settings Panel
+                        {t("configureManually")}
                       </button>
 
                       {onboardingError && (
@@ -398,7 +398,7 @@ export default function Popup() {
             )}
           >
             <Sparkles className="h-5 w-5 mb-0.5" />
-            Adhkar
+            {t("adhkar")}
           </button>
           <button
             onClick={() => setActiveTab("quran")}
@@ -410,7 +410,7 @@ export default function Popup() {
             )}
           >
             <BookOpen className="h-5 w-5 mb-0.5" />
-            Quran
+            {t("quran")}
           </button>
           <button
             onClick={() => setActiveTab("qibla")}

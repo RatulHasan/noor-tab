@@ -122,6 +122,12 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "Other (Search)",
     countryPlaceholder: "Country...",
     cityPlaceholder: "City...",
+    adhkar: "Adhkar",
+    quran: "Quran",
+    configureManually: "Configure Manually in Settings",
+    islamicCalendar: "Islamic Calendar",
+    fastingTracker: "Fasting Tracker",
+    quranBookmarkTitle: "Quran Bookmark",
 
     // Adhkar Player Widget translations
     sessionProgress: "Session Progress",
@@ -255,6 +261,12 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "অন্যান্য (অনুসন্ধান)",
     countryPlaceholder: "দেশ...",
     cityPlaceholder: "শহর...",
+    adhkar: "আজকার",
+    quran: "কুরআন",
+    configureManually: "সেটিংসে ম্যানুয়ালি কনফিগার করুন",
+    islamicCalendar: "হিজরি ক্যালেন্ডার",
+    fastingTracker: "রোজা ট্র্যাকার",
+    quranBookmarkTitle: "কুরআন বুকমার্ক",
 
     // Adhkar Player Widget translations
     sessionProgress: "সেশনের অগ্রগতি",
@@ -388,6 +400,12 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "أخرى (بحث)",
     countryPlaceholder: "البلد...",
     cityPlaceholder: "المدينة...",
+    adhkar: "الأذكار",
+    quran: "القرآن",
+    configureManually: "التهيئة يدوياً في لوحة الإعدادات",
+    islamicCalendar: "التقويم الهجري",
+    fastingTracker: "متابع الصيام",
+    quranBookmarkTitle: "علامات القرآن",
 
     // Adhkar Player Widget translations
     sessionProgress: "تقدم الجلسة",
@@ -521,6 +539,12 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "अन्य (खोज)",
     countryPlaceholder: "देश...",
     cityPlaceholder: "शहर...",
+    adhkar: "अज़कार",
+    quran: "क़ुरआन",
+    configureManually: "सेटिंग्स पैनल में मैन्युअल रूप से कॉन्फ़िगर करें",
+    islamicCalendar: "इस्लामिक कैलेंडर",
+    fastingTracker: "रोज़ा ट्रैकर",
+    quranBookmarkTitle: "क़ुरआन बुकमार्क",
 
     // Adhkar Player Widget translations
     sessionProgress: "सत्र की प्रगति",
@@ -654,6 +678,12 @@ export const TRANSLATIONS_DICT = {
     otherSearch: "دوسرا (تلاش)",
     countryPlaceholder: "ملک...",
     cityPlaceholder: "شہر...",
+    adhkar: "اذکار",
+    quran: "قرآن",
+    configureManually: "ترتیبات پینل میں دستی طور پر تشکیل دیں",
+    islamicCalendar: "اسلامی کیلنڈر",
+    fastingTracker: "روزہ ٹریکر",
+    quranBookmarkTitle: "قرآن بک مارک",
 
     // Adhkar Player Widget translations
     sessionProgress: "سیشن کی پیشرفت",

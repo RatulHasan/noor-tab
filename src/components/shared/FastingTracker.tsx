@@ -7,8 +7,14 @@ import { getHijriDateParts, getHijriDateString } from "../../utils/hijriConverte
 import { format, subDays, isSameDay, differenceInSeconds } from "../../utils/dateUtils";
 import { Moon, Sun, Flame, Check, X, ShieldAlert, Award, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 export default function FastingTracker() {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
+
   const { prayers, nextPrayer, isLoading } = usePrayerTimes();
   
   const [fastingData, setFastingData] = useStorage<FastingData>("fastingData", {
@@ -191,7 +197,7 @@ export default function FastingTracker() {
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-sm font-black text-stone-800 dark:text-stone-100">
-                🌙 Fasting Tracker
+                🌙 {t("fastingTracker")}
               </h3>
               <span className="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider block mt-0.5">
                 Sunnah & Custom Fasts Log

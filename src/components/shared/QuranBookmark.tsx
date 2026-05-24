@@ -2,12 +2,18 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { format } from "../../utils/dateUtils";
 import { BookOpen, ChevronDown, ChevronUp, ExternalLink, Save } from "lucide-react";
 import { useState } from "react";
+import { useSettings } from "../../hooks/useSettings";
+import { getTranslation } from "../../data/translations";
 
 import type { QuranBookmark as QuranBookmarkType } from "../../types";
 import { SURAH_LIST, getSurahAyahCount } from "../../utils/quranData";
 import { cn } from "../../utils/cn";
 
 export default function QuranBookmark() {
+  const [settings] = useSettings();
+  const lang = settings?.language || "en";
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
+
   const [bookmark, setBookmark] = useStorage<QuranBookmarkType | null>("quranBookmark", null);
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
@@ -41,7 +47,7 @@ export default function QuranBookmark() {
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 space-y-3">
       {/* Header */}
       <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">
-        Quran Bookmark
+        {t("quranBookmarkTitle")}
       </p>
 
       {/* Current bookmark display */}

@@ -48,6 +48,7 @@ export default function NewTab() {
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [widgetLayout] = useStorage<WidgetConfig[]>("widgetLayout", DEFAULT_WIDGETS);
   const [fastingData] = useStorage<FastingData>("fastingData");
+  const [devMockCityName] = useStorage<string>("devMockCityName", "");
   const isRamadan = fastingData?.isRamadanMode || isTodayRamadan();
   const isFriday = isTodayFriday();
   
@@ -365,7 +366,7 @@ export default function NewTab() {
               prayers={prayers}
               prayerStatuses={prayerStatuses}
               nextPrayer={nextPrayer}
-              cityName={settings.cityName}
+              cityName={devMockCityName || settings.cityName}
               reminderPrayer={reminderPrayer}
             />
           )}
@@ -429,8 +430,19 @@ export default function NewTab() {
           <GlobalPrayerWidget />
 
           {/* Buy Me a Coffee + Customize button */}
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
             <BuyMeCoffee variant="badge" />
+            <span className="text-[11px] text-stone-500 dark:text-stone-400 font-medium text-center">
+              Made with ❤️ for the Muslim Ummah and{" "}
+              <a
+                href="https://github.com/RatulHasan/noor-tab"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+              >
+                GitHub
+              </a>
+            </span>
             <button
               onClick={() => setShowCustomizer(true)}
               className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white/80 dark:border-stone-850 dark:bg-stone-900/80 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 shadow-sm transition-all duration-200"
