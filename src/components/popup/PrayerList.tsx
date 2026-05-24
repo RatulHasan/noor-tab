@@ -1,16 +1,16 @@
 import React from "react";
-import type { PrayerName, PrayerStatus } from "../../types";
+import type { PrayerName, PrayerUIStatus } from "../../types";
 import { Bell, BellOff } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 /**
  * @param {Object} props
- * @param {PrayerStatus[] | null} props.prayerStatuses - Array of prayer statuses.
+ * @param {PrayerUIStatus[] | null} props.prayerStatuses - Array of prayer statuses.
  * @param {boolean} props.isLoading - Whether the component is in a loading state.
  * @param {(name: PrayerName) => void} props.onToggleReminder - Callback when the reminder bell is clicked.
  */
 interface PrayerListProps {
-  prayerStatuses: PrayerStatus[] | null;
+  prayerStatuses: PrayerUIStatus[] | null;
   isLoading: boolean;
   onToggleReminder: (name: PrayerName) => void;
 }

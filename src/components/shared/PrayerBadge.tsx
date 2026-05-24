@@ -1,17 +1,17 @@
 import React from "react";
-import type { PrayerName, PrayerStatus } from "../../types";
+import type { PrayerName, PrayerUIStatus } from "../../types";
 import { PRAYER_METADATA } from "../../data/prayerNames";
 import { cn } from "../../utils/cn";
 
 /**
  * @param {Object} props
  * @param {PrayerName} props.name - The prayer identifier (fajr, dhuhr, etc.)
- * @param {PrayerStatus['state']} props.state - The state of the prayer (passed, next, upcoming)
+ * @param {PrayerUIStatus['state']} props.state - The state of the prayer (passed, next, upcoming)
  * @param {string} [props.className] - Optional custom CSS class name.
  */
 interface PrayerBadgeProps {
   name: PrayerName;
-  state: PrayerStatus["state"];
+  state: PrayerUIStatus["state"];
   className?: string;
 }
 

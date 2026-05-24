@@ -7,17 +7,26 @@ import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
 import IslamicEventCard from "./components/popup/IslamicEventCard";
-import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX } from "lucide-react";
+import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles } from "lucide-react";
 import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
 import type { PrayerName, UserSettings } from "./types";
 import { cn } from "./utils/cn";
 
+// Import new Phase 2 components
+import AdhkarPlayer from "./components/shared/AdhkarPlayer";
+import PrayerStreakTracker from "./components/shared/PrayerStreakTracker";
+import FastingTracker from "./components/shared/FastingTracker";
+import FocusModeToggle from "./components/popup/FocusModeToggle";
+import BackupManager from "./components/popup/BackupManager";
+import BuyMeCoffee from "./components/shared/BuyMeCoffee";
+
+
 // Import CSS style
 import "./style.css";
 
-type Tab = "prayers" | "qibla" | "settings";
+type Tab = "prayers" | "adhkar" | "quran" | "qibla" | "settings";
 
 export default function Popup() {
   const [settings, updateSettings, isLoadingSettings] = useSettings();
@@ -175,6 +184,7 @@ export default function Popup() {
                 <VolumeX className="h-3.5 w-3.5" />
               </button>
             )}
+            <FocusModeToggle />
           </div>
         </header>
       )}
@@ -192,7 +202,26 @@ export default function Popup() {
           <>
             {/* Settings Tab (Always accessible) */}
             {activeTab === "settings" && (
-              <SettingsPanel settings={settings} onSave={handleSaveSettings} />
+              <div className="space-y-4">
+                <SettingsPanel settings={settings} onSave={handleSaveSettings} />
+                <BackupManager />
+                <BuyMeCoffee variant="badge" className="w-full text-center flex justify-center py-2" />
+              </div>
+            )}
+
+            {/* Adhkar Tab */}
+            {activeTab === "adhkar" && (
+              <div className="space-y-4">
+                <AdhkarPlayer />
+              </div>
+            )}
+
+            {/* Quran Tab */}
+            {activeTab === "quran" && (
+              <div className="space-y-4">
+                <PrayerStreakTracker />
+                <FastingTracker />
+              </div>
             )}
 
             {/* Prayers Tab */}
@@ -343,7 +372,7 @@ export default function Popup() {
           <button
             onClick={() => setActiveTab("prayers")}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-semibold transition-colors duration-200",
+              "flex flex-1 flex-col items-center justify-center py-2.5 text-[9px] font-semibold transition-colors duration-200",
               activeTab === "prayers"
                 ? "text-emerald-700 dark:text-emerald-400"
                 : "text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
@@ -353,9 +382,33 @@ export default function Popup() {
             {t("prayers")}
           </button>
           <button
+            onClick={() => setActiveTab("adhkar")}
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center py-2.5 text-[9px] font-semibold transition-colors duration-200",
+              activeTab === "adhkar"
+                ? "text-emerald-700 dark:text-emerald-400"
+                : "text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
+            )}
+          >
+            <Sparkles className="h-5 w-5 mb-0.5" />
+            Adhkar
+          </button>
+          <button
+            onClick={() => setActiveTab("quran")}
+            className={cn(
+              "flex flex-1 flex-col items-center justify-center py-2.5 text-[9px] font-semibold transition-colors duration-200",
+              activeTab === "quran"
+                ? "text-emerald-700 dark:text-emerald-400"
+                : "text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
+            )}
+          >
+            <BookOpen className="h-5 w-5 mb-0.5" />
+            Quran
+          </button>
+          <button
             onClick={() => setActiveTab("qibla")}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-semibold transition-colors duration-200",
+              "flex flex-1 flex-col items-center justify-center py-2.5 text-[9px] font-semibold transition-colors duration-200",
               activeTab === "qibla"
                 ? "text-emerald-700 dark:text-emerald-400"
                 : "text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"
@@ -367,7 +420,7 @@ export default function Popup() {
           <button
             onClick={() => setActiveTab("settings")}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-2.5 text-[10px] font-semibold transition-colors duration-200",
+              "flex flex-1 flex-col items-center justify-center py-2.5 text-[9px] font-semibold transition-colors duration-200",
               activeTab === "settings"
                 ? "text-emerald-700 dark:text-emerald-400"
                 : "text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300"

@@ -4,7 +4,7 @@ import type {
   CalculationMethodKey,
   MadhabKey,
   DailyPrayers,
-  PrayerStatus,
+  PrayerUIStatus,
 } from "../types";
 import { PRAYER_METADATA } from "../data/prayerNames";
 
@@ -74,7 +74,7 @@ export function getPrayerStatuses(
   prayers: DailyPrayers,
   perPrayerReminder: Record<PrayerName, boolean>,
   tomorrowPrayers?: DailyPrayers
-): PrayerStatus[] {
+): PrayerUIStatus[] {
   const nextPrayerInfo = getNextPrayer(prayers, tomorrowPrayers);
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   
@@ -82,7 +82,7 @@ export function getPrayerStatuses(
     const meta = PRAYER_METADATA[name];
     const time = prayers[name];
     
-    let state: PrayerStatus["state"] = "upcoming";
+    let state: PrayerUIStatus["state"] = "upcoming";
     
     // Check if this prayer matches the next prayer name and time
     // (Ensure we correctly match Fajr if next prayer is Fajr tomorrow)

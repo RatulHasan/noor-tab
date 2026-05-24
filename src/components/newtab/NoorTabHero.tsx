@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import type { DailyPrayers, PrayerName, PrayerStatus } from "../../types";
+import type { DailyPrayers, PrayerName, PrayerUIStatus } from "../../types";
 import { useHijriDate } from "../../hooks/useHijriDate";
 import { useSettings } from "../../hooks/useSettings";
 import { getTranslation } from "../../data/translations";
@@ -12,14 +12,14 @@ import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
 /**
  * @param {Object} props
  * @param {DailyPrayers} props.prayers - Computed prayer times.
- * @param {PrayerStatus[]} props.prayerStatuses - Status metadata for each prayer.
+ * @param {PrayerUIStatus[]} props.prayerStatuses - Status metadata for each prayer.
  * @param {{ name: PrayerName, time: Date } | null} props.nextPrayer - The next prayer details.
  * @param {string | null} props.cityName - Detected city name.
  * @param {string | null} props.reminderPrayer - The prayer name passed via URL reminder parameter.
  */
 interface NoorTabHeroProps {
   prayers: DailyPrayers;
-  prayerStatuses: PrayerStatus[];
+  prayerStatuses: PrayerUIStatus[];
   nextPrayer: { name: PrayerName; time: Date } | null;
   cityName: string | null;
   reminderPrayer: string | null;

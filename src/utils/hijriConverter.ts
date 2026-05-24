@@ -72,3 +72,42 @@ export function getHijriArabicDateString(date: Date = new Date()): string {
     
   return `${arabicDigits(parts.day)} ${parts.monthArabicName} ${arabicDigits(parts.year)} هـ`;
 }
+
+export function gregorianToHijri(date: Date): { year: number; month: number; day: number; monthName: string } {
+  const parts = getHijriDateParts(date);
+  return {
+    year: parts.year,
+    month: parts.month,
+    day: parts.day,
+    monthName: parts.monthName,
+  };
+}
+
+export function hijriToGregorian(year: number, month: number, day: number): Date {
+  // Approximate Gregorian year
+  const approxGregYear = Math.floor(622 + (year * 354.367) / 365.2422);
+  let guess = new Date(approxGregYear, month - 1, day);
+
+  for (let i = 0; i < 15; i++) {
+    const parts = getHijriDateParts(guess);
+
+    const yearDiff = year - parts.year;
+    const monthDiff = month - parts.month;
+    const dayDiff = day - parts.day;
+
+    // A Hijri year is ~354.36 days, month is ~29.5 days
+    const totalDiffDays = Math.round(yearDiff * 354.367 + monthDiff * 29.53 + dayDiff);
+
+    if (totalDiffDays === 0) {
+      // Additional safety check: check if it's the exact match
+      const finalParts = getHijriDateParts(guess);
+      if (finalParts.year === year && finalParts.month === month && finalParts.day === day) {
+        return guess;
+      }
+    }
+
+    guess = new Date(guess.getTime() + totalDiffDays * 86400000);
+  }
+  return guess;
+}
+

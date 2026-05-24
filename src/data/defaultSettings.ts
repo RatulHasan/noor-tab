@@ -18,4 +18,11 @@ export const DEFAULT_SETTINGS: UserSettings = {
   language: "en",
   adhanAudio: "none",
   overlayPosition: "bottom",
+  // Phase 2 Settings
+  enableAutoRamadan: true,
+  trackSunnahFasts: true,
+  showFastingCountdown: true,
+  remindMorningAdhkar: true,
+  remindEveningAdhkar: true,
+  worldCities: ["Makkah", "Madinah", "Istanbul"],
 };
