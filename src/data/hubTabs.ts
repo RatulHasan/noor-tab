@@ -1,4 +1,4 @@
-import { BookOpen, BookMarked, HandHeart, Compass, CalendarDays, Calculator } from "lucide-react";
+import { BookOpen, HandHeart, Compass, CalendarDays, Calculator, CheckCircle2 } from "lucide-react";
 import { lazy, type ReactNode, type FC } from "react";
 
 export interface HubTab {
@@ -13,22 +13,13 @@ export interface HubTab {
 
 export const defaultHubTabs: HubTab[] = [
   {
-    id: 'quran',
-    label: 'Quran',
+    id: 'quranHadith',
+    label: 'Quran & Hadith',
     icon: BookOpen,
-    component: lazy(() => import("../components/newtab/hub/tabs/QuranTab")),
+    component: lazy(() => import("../components/newtab/hub/tabs/QuranHadithTab")),
     enabled: true,
     requiresApi: true,
-    apiSource: 'Al-Quran Cloud',
-  },
-  {
-    id: 'hadith',
-    label: 'Hadith',
-    icon: BookMarked,
-    component: lazy(() => import("../components/newtab/hub/tabs/HadithTab")),
-    enabled: true,
-    requiresApi: true,
-    apiSource: 'HadithAPI',
+    apiSource: 'Multiple',
   },
   {
     id: 'dua',
@@ -37,6 +28,14 @@ export const defaultHubTabs: HubTab[] = [
     component: lazy(() => import("../components/newtab/hub/tabs/DuaTab")),
     enabled: true,
     requiresApi: false,  // uses existing local data
+  },
+  {
+    id: 'salah',
+    label: 'How To Pray Salah',
+    icon: CheckCircle2,
+    component: lazy(() => import("../components/newtab/hub/tabs/SalahTab")),
+    enabled: true,
+    requiresApi: false,
   },
   {
     id: 'qibla',

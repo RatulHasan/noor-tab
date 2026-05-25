@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { duas } from "~data/duas";
+import { masnunDuas } from "~data/masnun";
+import { ayats } from "~data/ayats";
+import { surahs } from "~data/surahs";
 import type { Dua, DuaCategory } from "~types";
 import { cn } from "~utils/cn";
 import { Heart, Search, ChevronRight, BookOpen, Star } from "lucide-react";
 import { useSettings } from "~hooks/useSettings";
 import { getTranslation } from "~data/translations";
 
+// Combine all sources
+const allSupplications: Dua[] = [...duas, ...masnunDuas, ...ayats, ...surahs];
+
 const CATEGORY_LABELS: Record<DuaCategory, string> = {
   morning_evening: "cat_morning_evening",
+  masnun: "cat_masnun",
+  ayat: "cat_ayat",
+  surah: "cat_surah",
   travel: "cat_travel",
   eating: "cat_eating",
   sleeping: "cat_sleeping",
@@ -18,6 +27,16 @@ const CATEGORY_LABELS: Record<DuaCategory, string> = {
   forgiveness: "cat_forgiveness",
   family: "cat_family",
   knowledge: "cat_knowledge",
+  rizq: "cat_rizq",
+  tawhid: "cat_tawhid",
+  salah: "cat_salah",
+  mosque: "cat_mosque",
+  daily: "cat_daily",
+  purification: "cat_purification",
+  health: "cat_health",
+  death: "cat_death",
+  nature: "cat_nature",
+  guidance: "cat_guidance",
   general: "cat_general"
 };
 
@@ -39,7 +58,7 @@ export default function DuaLibrary() {
   };
 
   // Filter logic
-  const filteredDuas = duas.filter((dua) => {
+  const filteredDuas = allSupplications.filter((dua) => {
     // 1. Category Filter
     if (activeCategory === "favorites") {
       if (!favorites.includes(dua.id)) return false;

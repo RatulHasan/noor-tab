@@ -81,7 +81,7 @@ export default function NewTab() {
   const [isDragMode, setIsDragMode] = useState(false);
   const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
-  const [activeHubTabId, setActiveHubTabId] = useStorage<string>("activeHubTab", "quran");
+  const [activeHubTabId, setActiveHubTabId] = useStorage<string>("activeHubTab", "quranHadith");
   const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useStorage<boolean>("isBottomPanelCollapsed", true);
 
   // Drag Orchestration

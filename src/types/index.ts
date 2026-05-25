@@ -197,6 +197,9 @@ export type DuaCategory =
   | "death"
   | "nature"
   | "guidance"
+  | "masnun"
+  | "ayat"
+  | "surah"
 
 export interface Dua {
   id: string;
