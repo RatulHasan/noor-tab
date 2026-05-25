@@ -61,10 +61,19 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 • Score tracking and personal-best records
 • Instant feedback with correct answer explanations
 
-📚 SUPPLICATIONS LIBRARY
-• 100+ authentic duas organised by category (Morning, Evening, Travel, Eating, Sleep, Stress, Protection, and more)
+📚 ENHANCED SUPPLICATIONS LIBRARY
+• 150+ authentic duas organised by category (Morning, Evening, Travel, Eating, Sleep, Stress, Protection, and more)
+• Masnun Duas: Verified supplications from the Sunnah for daily actions
+• Quranic Ayats: Powerful verses from the Noble Quran (e.g., Ayatul Kursi)
+• Useful Surahs: Key Surahs for daily recitation (e.g., Al-Ikhlas, Al-Falaq, An-Nas, Al-Mulk)
 • Full Arabic text with transliteration and translation
 • Favourite system to pin frequently used duas
+
+🕋 HOW TO PRAY SALAH
+• Comprehensive step-by-step guide for performing the five daily prayers
+• Visual and textual instructions for every action (Wudu, Takbir, Ruku, Sujud, etc.)
+• Essential Duas & Surahs collection used within Salah
+• Prayer Rakat Table showing Sunnah, Fard, and Witr units for all prayers
 
 📿 DHIKR COUNTER
 • Digital Tasbih counter for SubhanAllah, Alhamdulillah, Allahu Akbar, and custom Dhikr

@@ -57,7 +57,7 @@ export default function Popup() {
   const [onboardingCountry, setOnboardingCountry] = useState("");
   const [isOnboardingSearching, setIsOnboardingSearching] = useState(false);
 
-  const hasCoordinates = settings.coordinates !== null;
+  const hasCoordinates = settings?.coordinates !== null && settings?.coordinates !== undefined;
   const lang = settings?.language || "en";
 
   const handleToggleReminder = async (name: PrayerName) => {
@@ -68,8 +68,12 @@ export default function Popup() {
     await updateSettings({ perPrayerReminder: updated });
     
     // Broadcast setting change to background worker to update chrome alarms
-    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    try {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+      }
+    } catch (e) {
+      console.warn("Failed to broadcast settings change:", e);
     }
   };
 
@@ -77,8 +81,12 @@ export default function Popup() {
     await updateSettings(newSettings);
     
     // Broadcast setting change to background worker to update chrome alarms
-    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    try {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+      }
+    } catch (e) {
+      console.warn("Failed to broadcast settings change:", e);
     }
   };
 

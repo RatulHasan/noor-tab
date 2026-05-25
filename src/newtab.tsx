@@ -181,8 +181,12 @@ export default function NewTab() {
     await updateSettings(newSettings);
     
     // Broadcast setting change to background worker to update alarms
-    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    try {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+      }
+    } catch (e) {
+      console.warn("Failed to broadcast settings change:", e);
     }
   };
 
@@ -292,7 +296,7 @@ export default function NewTab() {
 
   const bgGradient = getBackgroundGradient();
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key);
-  const hasCoordinates = settings.coordinates !== null;
+  const hasCoordinates = settings?.coordinates !== null && settings?.coordinates !== undefined;
 
   const renderWidget = (id: WidgetId) => {
     switch (id) {

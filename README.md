@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, a Qibla compass, and much more, all wrapped in a beautifully designed, distraction-free experience.
+  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, spiritual tools like **How to Pray Salah**, a comprehensive **Dua Library**, and much more, all wrapped in a beautifully designed, distraction-free experience.
 </p>
 
 <br/>
@@ -37,6 +37,19 @@
 - **Global stop control** - a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
 - **Live countdown** to the next prayer with a smooth animated timer
 - **Dynamic background gradients** in the new tab that shift throughout the day - dawn blues, midday greens, sunset ambers, and night indigos
+
+### 🤲 Enhanced Dua Library
+- **150+ Authenticated Supplications** organized by category.
+- **Masnun Duas**: Verified supplications from the Sunnah for daily actions.
+- **Quranic Ayats**: Powerful verses from the Noble Quran (e.g., Ayatul Kursi).
+- **Useful Surahs**: Key Surahs for daily recitation (e.g., Al-Ikhlas, Al-Falaq, An-Nas, Al-Mulk).
+- **Categorized for Life**: Supplications for Morning/Evening, Travel, Stress, Rizq, Health, Forgiveness, and more.
+
+### 🕋 How To Pray Salah
+A comprehensive guide to performing the daily ritual prayers:
+- **Step-by-Step Instructions**: Visual and textual guide for every action in Salah.
+- **Essential Duas & Surahs**: Collection of supplications and verses used within the prayer.
+- **Prayer Rakat Table**: Detailed breakdown of Rakat (Sunnah, Fard, Witr, etc.) for all five daily prayers.
 
 ### 📅 Islamic Calendar
 - **Hijri date** displayed in both English transliteration and Arabic script
@@ -126,9 +139,9 @@ A sophisticated, responsive layout that organizes your Islamic life:
 
 ### 🚀 Quick Access Hub
 Integrated, full-featured Islamic applications accessible directly within your new tab:
-- **📖 Quran Explorer**: Browse all 114 Surahs, read with translation, and search for specific ayahs or keywords.
-- **📚 Hadith Collections**: Access authentic collections (Bukhari, Muslim, etc.) with a simple search and navigation interface.
-- **🤲 Dua Library**: Searchable collection of 100+ supplications for every occasion.
+- **📖 Quran & Hadith Explorer**: Combined tab to browse all 114 Surahs and access authentic Hadith collections with search and navigation.
+- **🤲 Dua Library**: Searchable collection of 150+ supplications (Masnun, Ayats, and Surahs) for every occasion.
+- **🕋 How To Pray Salah**: Full guide with instructions, essential duas, and a rakat table.
 - **🧭 Qibla Tab**: A full-sized, animated Qibla compass with distance-to-Kaaba calculation.
 - **📅 Islamic Calendar**: A complete monthly Hijri calendar with highlighted Islamic events and holidays.
 - **🧮 Zakat Calculator**: Calculate your Zakat obligations with a built-in asset and liability tracker.
@@ -273,7 +286,10 @@ noor-tab/
 │   ├── hooks/
 │   │   ├── useSettings.ts         # Global user settings with Plasmo Storage
 │   │   ├── usePrayerTimes.ts      # Prayer time computation hook
-│   │   └── useHijriDate.ts        # Hijri date formatting hook
+│   │   ├── useHijriDate.ts        # Hijri date formatting hook
+│   │   ├── useQibla.ts            # Device orientation & Qibla hook
+│   │   ├── useLayoutState.ts      # Dashboard widget layout state
+│   │   └── useCountdown.ts        # Reusable countdown timer logic
 │   │
 │   ├── utils/
 │   │   ├── prayerCalculator.ts    # Adhan.js wrapper for prayer time calc
@@ -288,15 +304,20 @@ noor-tab/
 │   │
 │   ├── data/
 │   │   ├── adhanAudios.ts         # Adhan audio option registry
-│   │   ├── adhkarData.ts          # Morning & evening Adhkar content
+│   │   ├── adhkar.ts              # Morning & evening Adhkar content
 │   │   ├── asmaUlHusna.ts         # All 99 names with meanings & benefits
+│   │   ├── ayahs.ts               # Daily Ayah dataset
+│   │   ├── ayats.ts               # Quranic Ayats for Dua Library
 │   │   ├── defaultSettings.ts     # Default UserSettings shape
-│   │   ├── duaData.ts             # Categorised Dua library content
+│   │   ├── duas.ts                # Categorised supplications
+│   │   ├── hadiths.ts             # Daily Hadith dataset
+│   │   ├── hubTabs.ts             # Quick Access Hub tab definitions
 │   │   ├── islamicEvents.ts       # Upcoming Islamic events dataset
+│   │   ├── masnun.ts              # Masnun Duas for Dua Library
 │   │   ├── popularLocations.ts    # 500+ cities with coordinates
 │   │   ├── prayerNames.ts         # Prayer metadata (Arabic, transliteration)
-│   │   ├── quizData.ts            # Islamic quiz questions
-│   │   ├── quranData.ts           # Surah list with metadata
+│   │   ├── quizQuestions.ts       # Islamic quiz questions
+│   │   ├── surahs.ts              # Useful Surahs for Dua Library
 │   │   └── translations.ts        # UI strings in 5 languages
 │   │
 │   └── types/

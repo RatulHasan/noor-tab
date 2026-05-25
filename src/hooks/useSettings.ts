@@ -9,19 +9,21 @@ export function useSettings() {
     (storedVal) => {
       if (!storedVal) return DEFAULT_SETTINGS;
       
-      // Ensure migration safety by merging defaults
-      return {
-        ...DEFAULT_SETTINGS,
-        ...storedVal,
-        perPrayerReminder: {
-          ...DEFAULT_SETTINGS.perPrayerReminder,
-          ...(storedVal.perPrayerReminder || {}),
-        },
-        prayerOffsets: {
-          ...DEFAULT_SETTINGS.prayerOffsets,
-          ...(storedVal.prayerOffsets || {}),
-        },
-      };
+      // Ensure migration safety by merging defaults carefully
+      const merged = { ...DEFAULT_SETTINGS };
+      
+      // Only overwrite if property exists in storedVal and is not undefined
+      Object.keys(DEFAULT_SETTINGS).forEach(key => {
+        if (storedVal[key] !== undefined) {
+          if (typeof DEFAULT_SETTINGS[key] === 'object' && DEFAULT_SETTINGS[key] !== null && !Array.isArray(DEFAULT_SETTINGS[key])) {
+             merged[key] = { ...DEFAULT_SETTINGS[key], ...storedVal[key] };
+          } else {
+             merged[key] = storedVal[key];
+          }
+        }
+      });
+
+      return merged as UserSettings;
     }
   );
 
@@ -54,9 +56,10 @@ export function useSettings() {
   }, [settings?.theme]);
 
   const updateSettings = async (newSettings: Partial<UserSettings>) => {
-    if (!settings) return;
-    const merged = { ...settings, ...newSettings };
-    await setSettings(merged);
+    await setSettings((prev) => {
+      const current = prev || settings || DEFAULT_SETTINGS;
+      return { ...current, ...newSettings };
+    });
   };
 
   // Return loading state if settings is not loaded yet
