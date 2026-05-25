@@ -6,6 +6,8 @@ import {
 } from '@dnd-kit/sortable';
 import type { PanelId, PanelItem } from '~types';
 import { cn } from '~utils/cn';
+import { getTranslation } from '~data/translations';
+import { useSettings } from '~hooks/useSettings';
 
 interface DroppablePanelProps {
   panelId: PanelId;
@@ -18,6 +20,9 @@ export function DroppablePanel({
   panelId, items, children, className
 }: DroppablePanelProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `panel-${panelId}` });
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
 
   return (
     <SortableContext
@@ -41,7 +46,7 @@ export function DroppablePanel({
             rounded-xl h-24 flex items-center justify-center
             text-emerald-400 text-sm font-medium animate-pulse
           ">
-            Drop here
+            {t("dropHere")}
           </div>
         )}
       </div>

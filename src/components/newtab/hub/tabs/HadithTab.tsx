@@ -3,8 +3,14 @@ import { getHadithBooks, getHadith, getHadiths, type HadithBook, type Hadith } f
 import { HADITHS as LOCAL_HADITHS } from "~data/hadiths";
 import { BookMarked, ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
 import { cn } from "~utils/cn";
+import { getTranslation } from "~data/translations";
+import { useSettings } from "~hooks/useSettings";
 
 export default function HadithTab() {
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
+
   const [books, setBooks] = useState<HadithBook[]>([]);
   const [selectedBookId, setSelectedBookId] = useState("bukhari");
   const [hadithNumber, setHadithNumber] = useState(1);
@@ -49,10 +55,10 @@ export default function HadithTab() {
         <div>
           <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
             <BookMarked className="w-6 h-6 text-emerald-600" />
-            Hadith Explorer
+            {t("hadithExplorer")}
           </h2>
           <p className="text-stone-500 dark:text-stone-400 mt-1">
-            Browse through authentic hadith collections
+            {t("hadithExplorerSub")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -75,7 +81,7 @@ export default function HadithTab() {
                 onChange={(e) => setHadithNumber(parseInt(e.target.value) || 1)}
                 className="w-24 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
              />
-             <span className="absolute -top-6 left-0 text-[10px] font-bold text-stone-400 uppercase">Number</span>
+             <span className="absolute -top-6 left-0 text-[10px] font-bold text-stone-400 uppercase">{t("number")}</span>
           </div>
         </div>
       </div>
@@ -87,7 +93,7 @@ export default function HadithTab() {
         </div>
         <div className="relative z-10">
           <span className="inline-block px-2 py-0.5 bg-emerald-700 text-white text-[10px] font-bold rounded uppercase tracking-widest mb-4">
-            Today's Hadith
+            {t("todaysHadith")}
           </span>
           <p className="font-amiri text-2xl text-right text-emerald-900 dark:text-emerald-100 leading-loose mb-4" dir="rtl">
             {dailyHadith.text}
@@ -106,7 +112,7 @@ export default function HadithTab() {
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-stone-400">
              <Loader2 className="w-8 h-8 animate-spin mb-2" />
-             <p className="text-sm">Fetching from collection...</p>
+             <p className="text-sm">{t("fetchingFromCollection")}</p>
           </div>
         ) : currentHadith ? (
           <div className="flex-1 p-8 space-y-8">
@@ -129,7 +135,7 @@ export default function HadithTab() {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-stone-400">
              <Search className="w-12 h-12 opacity-20 mb-4" />
-             <p className="text-sm">Hadith not found in this collection.</p>
+             <p className="text-sm">{t("hadithNotFound")}</p>
           </div>
         )}
 
@@ -139,13 +145,13 @@ export default function HadithTab() {
             disabled={hadithNumber <= 1}
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-stone-600 hover:text-stone-900 disabled:opacity-30 transition-colors"
            >
-             <ChevronLeft className="w-4 h-4" /> Prev
+             <ChevronLeft className="w-4 h-4" /> {t("prev")}
            </button>
            <button 
             onClick={handleNext}
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-stone-600 hover:text-stone-900 transition-colors"
            >
-             Next <ChevronRight className="w-4 h-4" />
+             {t("next")} <ChevronRight className="w-4 h-4" />
            </button>
         </div>
       </div>

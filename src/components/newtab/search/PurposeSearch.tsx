@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 interface PurposeSearchProps {
   onTabChange?: (tabId: string, query?: string) => void;
@@ -9,6 +10,8 @@ interface PurposeSearchProps {
 export default function PurposeSearch({ onTabChange }: PurposeSearchProps) {
   const [query, setQuery] = useState("");
   const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const searchEngines = {
@@ -75,7 +78,7 @@ export default function PurposeSearch({ onTabChange }: PurposeSearchProps) {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search with purpose..."
+        placeholder={t("searchWithPurpose")}
         className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pl-12 pr-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-stone-800 dark:text-stone-100 placeholder-stone-400"
       />
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">

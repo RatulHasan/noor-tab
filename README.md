@@ -65,7 +65,7 @@
 
 ---
 
-## 🚀 Extended Features (Phase 2)
+## 🚀 Phase 2 Features
 
 ### 📿 Adhkar Player
 A full **morning & evening Adhkar companion** built into both the new tab and the popup:
@@ -112,29 +112,45 @@ A world-clock-style table showing prayer times for multiple cities simultaneousl
 - Live prayer time calculations using each city's coordinates and the Umm al-Qura method
 - Persistent city selections via storage - survives page refreshes
 
-### 🧠 Islamic Quiz
-A gamified knowledge tool to deepen Islamic understanding:
-- 50+ curated multiple-choice questions covering Fiqh, Seerah, Quranic topics, and Islamic history
-- Timed questions with difficulty levels (Easy / Medium / Hard)
-- Score tracking and personal-best records persisted across sessions
-- Instant feedback with correct answer explanations after each question
+---
 
-### 📚 Dua Library
-A searchable library of authentic supplications:
-- 100+ duas organised by category (Morning, Evening, Eating, Travelling, Sleep, etc.)
-- Full Arabic text with transliteration and translation for each dua
-- **Favourite system** - star any dua to pin it to a personal quick-access list
-- Copy to clipboard in one tap
+## 💎 Phase 3: Modern Dashboard & Islamic Apps
+
+### 🏗️ 3-Column Modern Dashboard
+A sophisticated, responsive layout that organizes your Islamic life:
+- **Left Panel**: Fixed area for Prayer Times, Streak tracking, and location info.
+- **Center Panel**: Dynamic "Hero" section with daily Ayah, Clock, Purpose Search, and the Quick Access Hub.
+- **Right Panel**: Qibla compass and utility widgets like 99 Names and Islamic Calendar.
+- **Bottom Activity Bar**: A collapsible "Daily Activities" zone for Dhikr, Quiz, and more.
+- **Full Responsive Support**: Seamlessly transitions between 3-column (XL), 2-column (LG/MD), and single-column (SM) views with mobile drawers.
+
+### 🚀 Quick Access Hub
+Integrated, full-featured Islamic applications accessible directly within your new tab:
+- **📖 Quran Explorer**: Browse all 114 Surahs, read with translation, and search for specific ayahs or keywords.
+- **📚 Hadith Collections**: Access authentic collections (Bukhari, Muslim, etc.) with a simple search and navigation interface.
+- **🤲 Dua Library**: Searchable collection of 100+ supplications for every occasion.
+- **🧭 Qibla Tab**: A full-sized, animated Qibla compass with distance-to-Kaaba calculation.
+- **📅 Islamic Calendar**: A complete monthly Hijri calendar with highlighted Islamic events and holidays.
+- **🧮 Zakat Calculator**: Calculate your Zakat obligations with a built-in asset and liability tracker.
+
+### 🔍 Purpose Search Bar
+A powerful search tool designed for the modern Muslim:
+- **Standard Search**: Use Google, DuckDuckGo, Bing, or Ecosia as your default engine.
+- **Islamic Prefixes**: Jump directly to specific tabs by typing `quran:`, `hadith:`, or `dua:` followed by your query.
+- **Keyboard Shortcut**: Press `/` to focus the search bar instantly.
+
+### 🎨 Drag & Drop Customization
+Total control over your dashboard layout:
+- **Inter-panel Draggability**: Move widgets between Left, Right, Center, and Bottom panels.
+- **Persistence**: Your custom layout is saved automatically and restored on every new tab.
+- **Locked Essentials**: Core items like Prayer Times and the Hero section remain anchored for stability.
+
+### 🌙 Glowing "Daily Activities"
+The bottom dashboard area now features a subtle emerald glow to gently draw attention to daily spiritual goals like Dhikr and the Islamic Quiz.
 
 ### ☕ Jumuah Banner
-- Every Friday the new tab displays a special Jumu'ah greeting banner with an emerald accent
-- Subtle background gradient shift distinguishes Friday from other days
-
-### 🎨 Customisable Dashboard
-A drag-and-drop-style widget manager:
-- Toggle any of the 10+ widgets on or off
-- Reorder widgets by dragging them to preferred positions
-- Changes persist immediately via Plasmo storage
+- Every Friday the new tab displays a special Jumu'ah greeting banner with an emerald accent.
+- Subtle background gradient shifts distinguish Friday from other days.
 
 ---
 
@@ -206,16 +222,25 @@ noor-tab/
 │   │
 │   ├── components/
 │   │   ├── newtab/
-│   │   │   ├── NoorTabHero.tsx        # Clock, Hijri date, prayer bar, Adhan banner
-│   │   │   ├── AsmaUlHusna.tsx        # 99 Names of Allah widget + modal
-│   │   │   ├── GlobalPrayerWidget.tsx # World prayer times table
-│   │   │   ├── PrayerStreakWidget.tsx # Streak summary card for new tab
-│   │   │   ├── JumuahBanner.tsx       # Friday Jumu'ah greeting
-│   │   │   ├── WidgetCustomizer.tsx   # Widget toggle & reorder drawer
-│   │   │   ├── AyahDisplay.tsx        # Quran Ayah of the day
-│   │   │   ├── HadithOfDay.tsx        # Hadith of the day card
-│   │   │   ├── DhikrCounter.tsx       # Digital Tasbih counter
-│   │   │   └── IslamicCalendar.tsx    # Hijri calendar card
+│   │   │   ├── layout/            # 3-Column Dashboard architecture
+│   │   │   │   ├── LeftPanel.tsx
+│   │   │   │   ├── CenterPanel.tsx
+│   │   │   │   ├── RightPanel.tsx
+│   │   │   │   ├── HeroSection.tsx
+│   │   │   │   └── DragProvider.tsx
+│   │   │   ├── hub/               # Islamic Apps Hub
+│   │   │   │   ├── QuickAccessHub.tsx
+│   │   │   │   └── tabs/          # Quran, Hadith, Zakat, etc.
+│   │   │   ├── search/            # Purpose Search implementation
+│   │   │   ├── AsmaUlHusna.tsx
+│   │   │   ├── GlobalPrayerWidget.tsx
+│   │   │   ├── PrayerStreakWidget.tsx
+│   │   │   ├── JumuahBanner.tsx
+│   │   │   ├── WidgetCustomizer.tsx
+│   │   │   ├── AyahDisplay.tsx
+│   │   │   ├── HadithOfDay.tsx
+│   │   │   ├── DhikrCounter.tsx
+│   │   │   └── IslamicCalendar.tsx
 │   │   │
 │   │   ├── popup/
 │   │   │   ├── HijriDate.tsx          # Compact Hijri date badge
@@ -237,6 +262,13 @@ noor-tab/
 │   │       ├── AsmaCard.tsx           # Individual Asma name card
 │   │       ├── CountdownTimer.tsx     # Reusable countdown display
 │   │       └── BuyMeCoffee.tsx        # Support button (badge & floating variants)
+│   │
+│   ├── services/
+│   │   ├── api/                   # Unified API layer with caching
+│   │   │   ├── quranApi.ts
+│   │   │   ├── hadithApi.ts
+│   │   │   └── apiCache.ts
+│   │   └── zakat/                 # Zakat calculation logic
 │   │
 │   ├── hooks/
 │   │   ├── useSettings.ts         # Global user settings with Plasmo Storage

@@ -8,17 +8,17 @@ import { useSettings } from "~hooks/useSettings";
 import { getTranslation } from "~data/translations";
 
 const CATEGORY_LABELS: Record<DuaCategory, string> = {
-  morning_evening: "Morning & Evening",
-  travel: "Travel",
-  eating: "Eating & Drinking",
-  sleeping: "Sleeping & Waking",
-  stress: "Stress & Anxiety",
-  gratitude: "Gratitude & Blessings",
-  protection: "Protection",
-  forgiveness: "Forgiveness",
-  family: "Family & Loved Ones",
-  knowledge: "Knowledge & Wisdom",
-  general: "General & Essential"
+  morning_evening: "cat_morning_evening",
+  travel: "cat_travel",
+  eating: "cat_eating",
+  sleeping: "cat_sleeping",
+  stress: "cat_stress",
+  gratitude: "cat_gratitude",
+  protection: "cat_protection",
+  forgiveness: "cat_forgiveness",
+  family: "cat_family",
+  knowledge: "cat_knowledge",
+  general: "cat_general"
 };
 
 export default function DuaLibrary() {
@@ -53,7 +53,7 @@ export default function DuaLibrary() {
       const matchTitle = dua.title.toLowerCase().includes(query);
       const matchTranslation = dua.translation.toLowerCase().includes(query);
       const matchTransliteration = dua.transliteration.toLowerCase().includes(query);
-      const matchCategory = CATEGORY_LABELS[dua.category].toLowerCase().includes(query);
+      const matchCategory = t(CATEGORY_LABELS[dua.category] as any).toLowerCase().includes(query);
       return matchTitle || matchTranslation || matchTransliteration || matchCategory;
     }
 
@@ -74,7 +74,7 @@ export default function DuaLibrary() {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-stone-400" />
           <input
             type="text"
-            placeholder="Search supplications by keyword..."
+            placeholder={t("searchDuaPlaceholder")}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -98,7 +98,7 @@ export default function DuaLibrary() {
                 : "bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400"
             )}
           >
-            All Duas
+            {t("allDuas")}
           </button>
           <button
             onClick={() => {
@@ -113,7 +113,7 @@ export default function DuaLibrary() {
             )}
           >
             <Heart className={cn("w-3 h-3", activeCategory === "favorites" ? "fill-current" : "")} />
-            Favorites ({favorites.length})
+            {t("favoritesTitle")} ({favorites.length})
           </button>
           {categories.map((cat) => (
             <button
@@ -129,7 +129,7 @@ export default function DuaLibrary() {
                   : "bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400"
               )}
             >
-              {CATEGORY_LABELS[cat]}
+              {t(CATEGORY_LABELS[cat] as any)}
             </button>
           ))}
         </div>
@@ -140,7 +140,7 @@ export default function DuaLibrary() {
         {filteredDuas.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-stone-400 space-y-2">
             <BookOpen className="w-8 h-8 opacity-40" />
-            <p className="text-xs">No supplications found matching criteria.</p>
+            <p className="text-xs">{t("noDuasFound")}</p>
           </div>
         ) : (
           filteredDuas.slice(0, visibleCount).map((dua) => {
@@ -156,7 +156,7 @@ export default function DuaLibrary() {
                       {dua.title}
                     </h4>
                     <span className="text-[9px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider block mt-0.5">
-                      {CATEGORY_LABELS[dua.category]}
+                      {t(CATEGORY_LABELS[dua.category] as any)}
                     </span>
                   </div>
                   <button
@@ -197,7 +197,7 @@ export default function DuaLibrary() {
           onClick={() => setVisibleCount((prev) => prev + 10)}
           className="py-2 text-xs font-bold text-center text-emerald-700 hover:text-emerald-600 transition-colors border border-stone-200/60 dark:border-stone-800/80 rounded-lg hover:bg-stone-50/50 dark:hover:bg-stone-900/40"
         >
-          Show More Duas (+10)
+          {t("showMoreDuas")}
         </button>
       )}
     </div>

@@ -3,6 +3,8 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { defaultHubTabs, type HubTab } from "~data/hubTabs";
 import { cn } from "~utils/cn";
 import { Loader2 } from "lucide-react";
+import { getTranslation } from "~data/translations";
+import { useSettings } from "~hooks/useSettings";
 
 interface QuickAccessHubProps {
   activeTabId?: string;
@@ -10,6 +12,10 @@ interface QuickAccessHubProps {
 }
 
 export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange }: QuickAccessHubProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
+  
   const [internalTabId, setInternalTabId] = useStorage<string>("activeHubTab", "quran");
   
   // Use external tab ID if provided, otherwise use internal storage state
@@ -53,7 +59,7 @@ export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange
               )}
             >
               <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-stone-400")} />
-              {tab.label}
+              {t(tab.id as any)}
             </button>
           );
         })}
@@ -64,7 +70,7 @@ export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange
         <Suspense fallback={
           <div className="flex flex-col items-center justify-center h-full p-20 text-stone-400">
             <Loader2 className="w-8 h-8 animate-spin mb-2" />
-            <p className="text-sm font-medium">Preparing {activeTab.label}...</p>
+            <p className="text-sm font-medium">{t("preparing")} {t(activeTab.id as any)}...</p>
           </div>
         }>
           <activeTab.component key={activeTab.id} />

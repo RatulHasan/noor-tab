@@ -4,6 +4,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Lock } from 'lucide-react';
 import type { PanelItem } from '~types';
 import { cn } from '~utils/cn';
+import { getTranslation } from '~data/translations';
+import { useSettings } from '~hooks/useSettings';
 
 interface SortableWidgetProps {
   item: PanelItem;
@@ -12,6 +14,10 @@ interface SortableWidgetProps {
 }
 
 export function SortableWidget({ item, children, isDragMode }: SortableWidgetProps) {
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
+
   const {
     attributes,
     listeners,
@@ -55,7 +61,7 @@ export function SortableWidget({ item, children, isDragMode }: SortableWidgetPro
             text-stone-400 hover:text-emerald-600 hover:scale-110
           "
           {...listeners}
-          aria-label="Drag to reorder"
+          aria-label={t("dragToReorder")}
         >
           <GripVertical size={16} />
         </button>

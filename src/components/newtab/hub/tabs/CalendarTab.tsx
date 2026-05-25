@@ -3,8 +3,13 @@ import { getHijriDateParts, hijriToGregorian, getHijriDateString } from "~utils/
 import { ISLAMIC_EVENTS } from "~data/islamicEvents";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "~utils/cn";
+import { getTranslation } from "~data/translations";
+import { useSettings } from "~hooks/useSettings";
 
 export default function CalendarTab() {
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
   const todayParts = useMemo(() => getHijriDateParts(new Date()), []);
   const [viewDate, setViewDate] = useState({ month: todayParts.month, year: todayParts.year });
 
@@ -88,10 +93,10 @@ export default function CalendarTab() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-            Islamic Calendar
+            {t("islamicCalendar")}
           </h2>
           <p className="text-stone-500 dark:text-stone-400">
-            {monthName} {year} AH
+            {monthName} {year} {t("hijriYearSuffix")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -99,7 +104,7 @@ export default function CalendarTab() {
             <ChevronLeft className="w-5 h-5 text-stone-600" />
           </button>
           <button onClick={() => setViewDate({ month: todayParts.month, year: todayParts.year })} className="px-4 py-2 text-sm font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg hover:bg-emerald-100 transition-colors">
-            Today
+            {t("today")}
           </button>
           <button onClick={handleNextMonth} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors">
             <ChevronRight className="w-5 h-5 text-stone-600" />
@@ -111,7 +116,7 @@ export default function CalendarTab() {
         {/* Calendar Grid */}
         <div className="lg:col-span-2">
           <div className="grid grid-cols-7 gap-px bg-stone-200 dark:bg-stone-800 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden shadow-sm">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            {[t('sun'), t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat')].map(day => (
               <div key={day} className="bg-stone-50 dark:bg-stone-900 py-3 text-center text-[10px] font-bold text-stone-400 uppercase tracking-widest">
                 {day}
               </div>
@@ -161,7 +166,7 @@ export default function CalendarTab() {
           <div className="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm">
             <h3 className="font-bold text-stone-800 dark:text-stone-100 mb-4 flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-emerald-600" />
-              Upcoming Events
+              {t("islamicEvents")}
             </h3>
             <div className="space-y-4">
               {upcomingEvents.map((event, i) => {
@@ -171,13 +176,13 @@ export default function CalendarTab() {
                 return (
                   <div key={i} className="flex gap-3 group">
                     <div className="w-10 h-10 shrink-0 rounded-xl bg-stone-50 dark:bg-stone-800 flex flex-col items-center justify-center border border-stone-100 dark:border-stone-700 group-hover:border-emerald-200 transition-colors">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase">{event.date.toLocaleDateString('en-US', { month: 'short' })}</span>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase">{event.date.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'short' })}</span>
                       <span className="text-sm font-black text-stone-700 dark:text-stone-200 leading-none">{event.date.getDate()}</span>
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-stone-800 dark:text-stone-100">{event.name}</h4>
                       <p className="text-[10px] text-emerald-600 font-medium mt-0.5">
-                        {diffDays === 0 ? 'Today' : diffDays === 1 ? 'Tomorrow' : `In ${diffDays} days`}
+                        {diffDays === 0 ? t('today') : diffDays === 1 ? t('tomorrow') : `${t('inDays')} ${diffDays} ${t('daysText')}`}
                       </p>
                     </div>
                   </div>

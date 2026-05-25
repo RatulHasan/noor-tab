@@ -4,8 +4,14 @@ import { useStorage } from "@plasmohq/storage/hook";
 import type { QuranBookmark } from "~types";
 import { BookOpen, Search, ChevronRight, Loader2, Bookmark, ArrowRight } from "lucide-react";
 import { cn } from "~utils/cn";
+import { getTranslation } from "~data/translations";
+import { useSettings } from "~hooks/useSettings";
 
 export default function QuranTab() {
+  const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
+
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [selectedSurah, setSelectedSurah] = useState<SurahContent | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,10 +76,10 @@ export default function QuranTab() {
         <div>
           <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-emerald-600" />
-            Quran Explorer
+            {t("quranExplorer")}
           </h2>
           <p className="text-stone-500 dark:text-stone-400 mt-1">
-            Read, study and search the Noble Quran
+            {t("quranExplorerSub")}
           </p>
         </div>
         
@@ -83,7 +89,7 @@ export default function QuranTab() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search surah, ayah or keyword..."
+            placeholder={t("searchQuranPlaceholder")}
             className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
           />
         </form>
@@ -97,7 +103,7 @@ export default function QuranTab() {
               <Bookmark className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Continue Reading</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{t("continueReading")}</p>
               <h4 className="font-bold">{bookmark.surahName} • Ayah {bookmark.ayah}</h4>
             </div>
           </div>
@@ -105,7 +111,7 @@ export default function QuranTab() {
             onClick={() => handleSurahSelect(bookmark.surah)}
             className="bg-white text-emerald-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-emerald-50 transition-colors"
           >
-            Open Surah <ArrowRight className="w-4 h-4" />
+            {t("openSurah")} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -114,7 +120,7 @@ export default function QuranTab() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Surah List Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <h3 className="font-bold text-stone-800 dark:text-stone-100 text-sm px-2">Surahs</h3>
+          <h3 className="font-bold text-stone-800 dark:text-stone-100 text-sm px-2">{t("surahs")}</h3>
           <div className="max-h-[600px] overflow-y-auto space-y-1 pr-2 custom-scrollbar">
             {isListLoading ? (
               Array.from({ length: 10 }).map((_, i) => (
@@ -135,7 +141,7 @@ export default function QuranTab() {
                   <span className="text-[10px] font-bold text-stone-400 w-5">{surah.number}</span>
                   <div>
                     <h4 className="text-sm font-bold text-stone-800 dark:text-stone-200">{surah.englishName}</h4>
-                    <p className="text-[10px] text-stone-500">{surah.revelationType} • {surah.numberOfAyahs} Ayahs</p>
+                    <p className="text-[10px] text-stone-500">{surah.revelationType} • {surah.numberOfAyahs} {t("ayahsCount")}</p>
                   </div>
                 </div>
                 <span className="font-amiri text-lg text-emerald-700 dark:text-emerald-400">{surah.name}</span>
@@ -150,7 +156,7 @@ export default function QuranTab() {
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-stone-400">
                 <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                <p>Loading verses...</p>
+                <p>{t("loadingVerses")}</p>
               </div>
             ) : selectedSurah ? (
               <div className="flex-1 flex flex-col">
@@ -187,14 +193,14 @@ export default function QuranTab() {
                       onClick={() => setVisibleAyahs(prev => prev + 10)}
                       className="w-full py-4 border-2 border-dashed border-stone-100 dark:border-stone-800 rounded-2xl text-stone-400 font-bold hover:border-emerald-200 hover:text-emerald-600 transition-all"
                     >
-                      Load More Ayahs
+                      {t("loadMoreAyahs")}
                     </button>
                   )}
                 </div>
               </div>
             ) : searchResults.length > 0 ? (
               <div className="flex-1 p-8 space-y-8">
-                <h3 className="font-bold text-stone-400 text-xs uppercase tracking-widest">Search Results for "{searchQuery}"</h3>
+                <h3 className="font-bold text-stone-400 text-xs uppercase tracking-widest">{t("searchResultsFor")} "{searchQuery}"</h3>
                 {searchResults.map((result, i) => (
                   <div key={i} className="p-6 rounded-2xl border border-stone-100 dark:border-stone-800 hover:border-emerald-200 transition-all space-y-4">
                     <div className="flex justify-between items-center">
@@ -203,7 +209,7 @@ export default function QuranTab() {
                         onClick={() => handleSurahSelect(result.surah.number)}
                         className="text-xs font-bold text-stone-400 hover:text-emerald-600 flex items-center gap-1"
                        >
-                         View Surah <ChevronRight className="w-3 h-3" />
+                         {t("viewSurah")} <ChevronRight className="w-3 h-3" />
                        </button>
                     </div>
                     <p className="font-amiri text-2xl text-right" dir="rtl">{result.ayah.text}</p>
@@ -213,8 +219,8 @@ export default function QuranTab() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-stone-400 text-center">
                 <BookOpen className="w-16 h-16 opacity-10 mb-6" />
-                <h3 className="text-lg font-bold text-stone-300 dark:text-stone-700">Select a Surah to begin reading</h3>
-                <p className="max-w-xs mt-2 text-sm">Use the search bar to find specific verses or browse the full list of 114 Surahs.</p>
+                <h3 className="text-lg font-bold text-stone-300 dark:text-stone-700">{t("selectSurahToBegin")}</h3>
+                <p className="max-w-xs mt-2 text-sm">{t("quranSearchSub")}</p>
               </div>
             )}
           </div>

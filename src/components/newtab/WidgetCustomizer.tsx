@@ -189,10 +189,10 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
         <div className="flex justify-between items-center pb-2 border-b border-stone-100 dark:border-stone-800">
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-400">
-              Customize Dashboard
+              {t("customizeDashboard")}
             </h3>
             <span className="text-[9px] text-stone-400 font-bold block mt-0.5">
-              Active widgets: {widgetItems.filter((w) => w.visible).length}
+              {t("activeWidgets")}: {widgetItems.filter((w) => w.visible).length}
             </span>
           </div>
           <button
@@ -207,7 +207,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
         {showWarning && (
           <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50/50 p-2.5 dark:border-amber-900/40 dark:bg-amber-950/20 text-[10px] text-amber-700 dark:text-amber-400 font-semibold leading-relaxed animate-in fade-in zoom-in-95 duration-200">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
-            <span>Maximum 6 widgets visible at once. Hide another to enable this one.</span>
+            <span>{t("max6Widgets")}</span>
           </div>
         )}
 
@@ -230,6 +230,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
                     label={item.widgetId ? t(WIDGET_TRANSLATION_KEYS[item.widgetId]) : item.id}
                     onToggle={handleToggleVisibility}
                     onPanelChange={handlePanelChange}
+                    t={t}
                   />
                 ))}
               </div>
@@ -243,7 +244,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
           className="flex items-center justify-center gap-1.5 py-2 border border-stone-200/60 dark:border-stone-800 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-200"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset Layout to Defaults</span>
+          <span>{t("resetLayoutToDefaults")}</span>
         </button>
 
         {/* ── Developer Testing Tools (dev mode only) ─────────────────────── */}
@@ -398,9 +399,10 @@ interface SortableItemProps {
   label: string;
   onToggle: (id: string, panel: PanelId) => void;
   onPanelChange: (id: string, sourcePanel: PanelId, targetPanel: PanelId) => void;
+  t: (key: any) => string;
 }
 
-function SortableItem({ item, label, onToggle, onPanelChange }: SortableItemProps) {
+function SortableItem({ item, label, onToggle, onPanelChange, t }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -446,10 +448,10 @@ function SortableItem({ item, label, onToggle, onPanelChange }: SortableItemProp
           onChange={(e) => onPanelChange(item.id, item.panel, e.target.value as any)}
           className="text-[10px] bg-stone-50 dark:bg-stone-800 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500/30 text-stone-500 dark:text-stone-400 font-bold uppercase"
         >
-          <option value="left">Left</option>
-          <option value="center">Center</option>
-          <option value="right">Right</option>
-          <option value="bottom">Bottom</option>
+          <option value="left">{t("left" as any)}</option>
+          <option value="center">{t("center" as any)}</option>
+          <option value="right">{t("right" as any)}</option>
+          <option value="bottom">{t("bottom" as any)}</option>
         </select>
 
         <button

@@ -7,7 +7,7 @@ import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
 import { getTranslation } from "./data/translations";
-import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check, ChevronDown, Sparkles, RotateCcw, Eye } from "lucide-react";
 import { detectLocation, geocodeLocation } from "./utils/locationService";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
 import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem } from "./types";
@@ -39,7 +39,6 @@ import RightPanel from "./components/newtab/layout/RightPanel";
 import BannerZone from "./components/newtab/layout/BannerZone";
 import BottomWidgetRow from "./components/newtab/layout/BottomWidgetRow";
 import { DragProvider } from "./components/newtab/layout/DragProvider";
-import { CustomizeFAB } from "./components/newtab/layout/CustomizeFAB";
 import { MobilePanelDrawer } from "./components/newtab/layout/MobilePanelDrawer";
 import { PrayerTimesCard } from "./components/newtab/layout/PrayerTimesCard";
 import { QiblaCard } from "./components/newtab/layout/QiblaCard";
@@ -83,6 +82,7 @@ export default function NewTab() {
   const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
   const [activeHubTabId, setActiveHubTabId] = useStorage<string>("activeHubTab", "quran");
+  const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useStorage<boolean>("isBottomPanelCollapsed", true);
 
   // Drag Orchestration
   const findPanel = (id: string): PanelId | null => {
@@ -193,7 +193,7 @@ export default function NewTab() {
       const loc = await detectLocation();
       await handleSaveSettings({
         coordinates: { lat: loc.lat, lng: loc.lng },
-        cityName: loc.cityName || "Detected Location",
+        cityName: loc.cityName || t("detectedLocation"),
       });
     } catch (err: any) {
       console.error(err);
@@ -215,11 +215,11 @@ export default function NewTab() {
           cityName: result.cityName,
         });
       } else {
-        setOnboardingError("Location not found. Please try a different query or enter coordinates.");
+        setOnboardingError(t("locationNotFound"));
       }
     } catch (err) {
       console.error(err);
-      setOnboardingError("Search failed. Check your internet connection.");
+      setOnboardingError(t("searchFailed"));
     } finally {
       setIsOnboardingSearching(false);
     }
@@ -514,7 +514,7 @@ export default function NewTab() {
           <MobilePanelDrawer
             isOpen={isLeftDrawerOpen}
             onClose={() => setIsLeftDrawerOpen(false)}
-            title="Prayer Times & Widgets"
+            title={t("prayerTimesAndWidgets")}
             side="left"
           >
             <LeftPanel 
@@ -527,7 +527,7 @@ export default function NewTab() {
           <MobilePanelDrawer
             isOpen={isRightDrawerOpen}
             onClose={() => setIsRightDrawerOpen(false)}
-            title="Qibla & Widgets"
+            title={t("qiblaAndWidgets")}
             side="right"
           >
             <RightPanel 
@@ -586,40 +586,91 @@ export default function NewTab() {
           </div>
 
           {layoutState.panels.bottom.some(i => i.visible) && (
-            <div className="px-6 pb-6 overflow-x-auto">
-               <BottomWidgetRow 
-                items={layoutState.panels.bottom} 
-                isDragMode={isDragMode && breakpoint !== 'sm'} 
-                renderPanelItem={renderPanelItem} 
-               />
+            <div className="px-6 pb-6 overflow-hidden">
+               <button 
+                 onClick={() => setIsBottomPanelCollapsed(!isBottomPanelCollapsed)}
+                 className="flex items-center gap-2 mb-3 transition-all group px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 shadow-sm shadow-emerald-200/50 dark:shadow-none"
+               >
+                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400 animate-pulse">
+                   {t("dailyActivities")}
+                 </span>
+                 {isBottomPanelCollapsed ? <ChevronRight size={14} className="text-emerald-600" /> : <ChevronDown size={14} className="text-emerald-600" />}
+               </button>
+               
+               {isBottomPanelCollapsed === false && (
+                 <div className="overflow-x-auto pb-2">
+                    <BottomWidgetRow 
+                     items={layoutState.panels.bottom} 
+                     isDragMode={isDragMode && breakpoint !== 'sm'} 
+                     renderPanelItem={renderPanelItem} 
+                    />
+                 </div>
+               )}
             </div>
           )}
 
           {/* Floating Action Bar / Footer */}
           <div className="px-6 py-3 bg-white/50 dark:bg-stone-900/50 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
-             <div className="flex items-center gap-6">
-                <BuyMeCoffee variant="badge" />
-                <span className="hidden md:inline text-[10px] text-stone-500 font-bold uppercase tracking-widest">
-                  NoorTab &bull; Light of your browser
-                </span>
-             </div>
-             <button
-              onClick={() => setShowCustomizer(true)}
-              className="flex items-center gap-2 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-4 py-2 text-xs font-bold shadow-lg hover:opacity-90 transition-all active:scale-95"
-            >
-              <Settings2 className="h-4 w-4" />
-              {t("customizeDashboard")}
-            </button>
+             {isDragMode ? (
+                <div className="flex-1 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                     <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                       <Sparkles size={14} className="animate-pulse" />
+                       {t("editMode")}
+                     </span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setShowCustomizer(true)}
+                        className="flex items-center gap-2 px-4 py-1.5 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-200/50 dark:hover:bg-stone-800 rounded-lg transition-colors"
+                      >
+                        <Eye size={14} />
+                        {t("showHide")}
+                      </button>
+                      <button
+                        onClick={resetLayout}
+                        className="flex items-center gap-2 px-4 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors"
+                      >
+                        <RotateCcw size={14} />
+                        {t("reset")}
+                      </button>
+                      <button
+                        onClick={() => setIsDragMode(false)}
+                        className="flex items-center gap-2 px-6 py-1.5 text-xs font-bold bg-emerald-700 text-white hover:bg-emerald-600 rounded-lg transition-all shadow-md active:scale-95"
+                      >
+                        <Check size={14} />
+                        {t("done")}
+                      </button>
+                   </div>
+                </div>
+             ) : (
+                <>
+                   <div className="flex items-center gap-6">
+                      <BuyMeCoffee variant="badge" />
+                      <button
+                        onClick={() => setShowCustomizer(true)}
+                        className="flex items-center gap-2 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 px-3 py-1.5 text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 transition-all active:scale-95"
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                        {t("customizeDashboard")}
+                      </button>
+                      <span className="hidden md:inline text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                        {t("noorTabSlogan")}
+                      </span>
+                   </div>
+                   
+                   <button
+                    onClick={() => setIsDragMode(true)}
+                    className="group flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black bg-emerald-700 text-white hover:bg-emerald-600 shadow-md hover:shadow-emerald-500/20 active:scale-95 transition-all"
+                  >
+                    <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
+                    {t("dragAndCustomize")}
+                  </button>
+                </>
+             )}
           </div>
         </div>
       )}
-
-      <CustomizeFAB
-        isDragMode={isDragMode}
-        onToggle={() => setIsDragMode(!isDragMode)}
-        onReset={resetLayout}
-        onShowWidgets={() => setShowCustomizer(true)}
-      />
 
       <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
     </div>

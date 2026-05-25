@@ -4,9 +4,12 @@ import { useSettings } from "~hooks/useSettings";
 import { calculateDistanceToKaaba } from "~utils/qiblaCalculator";
 import { MapPin, Navigation, Info } from "lucide-react";
 import { cn } from "~utils/cn";
+import { getTranslation } from "~data/translations";
 
 export default function QiblaTab() {
   const [settings] = useSettings();
+  const lang = settings?.language || 'en';
+  const t = (key: any) => getTranslation(lang, key);
   const coords = settings?.coordinates;
   const { 
     staticBearing, 
@@ -24,10 +27,10 @@ export default function QiblaTab() {
     <div className="p-8 flex flex-col items-center max-w-4xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100 flex items-center justify-center gap-2">
-          Qibla Direction
+          {t("qiblaDirection")}
         </h2>
         <p className="text-stone-500 dark:text-stone-400 mt-1">
-          {settings?.cityName || "Current Location"} • {staticCardinal} ({staticBearing}°)
+          {settings?.cityName || t("detectedLocation")} • {staticCardinal} ({staticBearing}°)
         </p>
       </div>
 
@@ -111,7 +114,7 @@ export default function QiblaTab() {
           <div className="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm">
             <h3 className="font-bold text-stone-800 dark:text-stone-100 mb-4 flex items-center gap-2">
               <Navigation className="w-4 h-4 text-emerald-600" />
-              Distance to Makkah
+              {t("distanceToMakkah")}
             </h3>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-stone-800 dark:text-stone-100">
@@ -124,22 +127,22 @@ export default function QiblaTab() {
               className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-xl hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-sm font-semibold"
             >
               <MapPin className="w-4 h-4" />
-              View on Google Maps
+              {t("viewOnGoogleMaps")}
             </button>
           </div>
 
           <div className="bg-emerald-50/50 dark:bg-emerald-950/20 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
             <h3 className="font-bold text-emerald-900 dark:text-emerald-100 mb-2 flex items-center gap-2">
               <Info className="w-4 h-4" />
-              How to use
+              {t("howToUse")}
             </h3>
             <ul className="text-xs text-emerald-800/70 dark:text-emerald-400/70 space-y-2 list-disc pl-4">
-              <li>Place your device flat on a level surface.</li>
-              <li>Ensure you are away from large metal objects or electronic devices.</li>
-              <li>The gold needle tip points towards the Kaaba in Makkah.</li>
+              <li>{t("qiblaStep1")}</li>
+              <li>{t("qiblaStep2")}</li>
+              <li>{t("qiblaStep3")}</li>
               {isCompassSupported && deviceHeading === null && (
                 <li className="font-bold text-emerald-700 dark:text-emerald-300">
-                  <button onClick={requestCompassPermission} className="underline">Enable live compass</button> for real-time rotation.
+                  <button onClick={requestCompassPermission} className="underline">{t("enableLiveCompass")}</button> for real-time rotation.
                 </li>
               )}
             </ul>

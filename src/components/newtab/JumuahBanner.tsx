@@ -67,7 +67,7 @@ export default function JumuahBanner() {
           </div>
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-500 block">
-              Jumu&apos;ah Mubarak
+              {t("jumuahMubarak")}
             </span>
             <span className="text-sm font-bold text-emerald-800 dark:text-emerald-300">
               {t("blessedFriday")}
@@ -85,8 +85,8 @@ export default function JumuahBanner() {
             يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ فَاسْعَوْا إِلَىٰ ذِكْرِ اللَّهِ
           </p>
           <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed italic">
-            "O you who have believed, when the call to prayer is made on the day of Jumu&apos;ah, then proceed to the remembrance of Allah"
-            <span className="not-italic font-semibold text-stone-400 dark:text-stone-500 ml-1">- Al-Jumu&apos;ah 62:9</span>
+            {t("jumuahAyah")}
+            <span className="not-italic font-semibold text-stone-400 dark:text-stone-500 ml-1">{t("jumuahAyahRef")}</span>
           </p>
         </div>
 
