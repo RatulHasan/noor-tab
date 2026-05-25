@@ -21,6 +21,10 @@ async function getSettings(): Promise<UserSettings> {
       ...DEFAULT_SETTINGS.perPrayerReminder,
       ...(stored.perPrayerReminder || {}),
     },
+    prayerOffsets: {
+      ...DEFAULT_SETTINGS.prayerOffsets,
+      ...(stored.prayerOffsets || {}),
+    },
   };
 }
 
@@ -38,7 +42,9 @@ async function refreshAlarms() {
       lat,
       lng,
       settings.method,
-      settings.madhab
+      settings.madhab,
+      new Date(),
+      settings.prayerOffsets
     );
 
     await scheduleAllPrayerAlarms(

@@ -8,7 +8,7 @@ import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
 import IslamicEventCard from "./components/popup/IslamicEventCard";
-import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles, Check } from "lucide-react";
+import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles, Check, Pencil, Minus, Plus } from "lucide-react";
 import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
@@ -42,6 +42,7 @@ export default function Popup() {
   const [adhanIsPlaying] = useStorage<boolean>("adhanIsPlaying", false);
 
   const [activeTab, setActiveTab] = useState<Tab>("prayers");
+  const [isEditingOffsets, setIsEditingOffsets] = useState(false);
   
   // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
@@ -79,6 +80,16 @@ export default function Popup() {
     if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
     }
+  };
+
+  const handleOffsetChange = async (name: PrayerName, delta: number) => {
+    const current = settings.prayerOffsets?.[name] || 0;
+    await handleSaveSettings({
+      prayerOffsets: {
+        ...settings.prayerOffsets,
+        [name]: current + delta
+      }
+    });
   };
 
   const handleStopAllAdhan = () => {
@@ -371,10 +382,25 @@ export default function Popup() {
                 ) : (
                   <div className="space-y-4">
                     <NextPrayer nextPrayer={nextPrayer} isLoading={isLoadingPrayers} />
+                    <div className="flex items-center justify-between px-1">
+                       <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("prayerTimes")}</h3>
+                       <button
+                         onClick={() => setIsEditingOffsets(!isEditingOffsets)}
+                         className={cn(
+                           "p-1.5 rounded-lg transition-all active:scale-95",
+                           isEditingOffsets ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20" : "text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                         )}
+                       >
+                         {isEditingOffsets ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                       </button>
+                    </div>
                     <PrayerList
                       prayerStatuses={prayerStatuses}
                       isLoading={isLoadingPrayers}
                       onToggleReminder={handleToggleReminder}
+                      isEditing={isEditingOffsets}
+                      offsets={settings.prayerOffsets}
+                      onOffsetChange={handleOffsetChange}
                     />
                     <IslamicEventCard />
                   </div>

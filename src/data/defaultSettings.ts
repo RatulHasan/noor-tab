@@ -27,6 +27,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
   remindMorningAdhkar: true,
   remindEveningAdhkar: true,
   worldCities: ["Makkah", "Madinah", "Istanbul"],
+  prayerOffsets: {
+    fajr: 0,
+    sunrise: 0,
+    dhuhr: 0,
+    asr: 0,
+    maghrib: 0,
+    isha: 0,
+  },
 };
 
 export const defaultLayoutState: LayoutState = {

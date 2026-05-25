@@ -1,4 +1,4 @@
-import type { Dua } from "../types";
+import type { Dua } from "~types";
 
 export const duas: Dua[] = [
   // ── Morning & Evening (5) ──

@@ -586,7 +586,7 @@ export default function NewTab() {
           </div>
 
           {layoutState.panels.bottom.some(i => i.visible) && (
-            <div className="px-6 pb-6 overflow-hidden">
+            <div className="px-6 pb-6 overflow-hidden flex flex-col items-center">
                <button 
                  onClick={() => setIsBottomPanelCollapsed(!isBottomPanelCollapsed)}
                  className="flex items-center gap-2 mb-3 transition-all group px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 shadow-sm shadow-emerald-200/50 dark:shadow-none"
@@ -598,7 +598,7 @@ export default function NewTab() {
                </button>
                
                {isBottomPanelCollapsed === false && (
-                 <div className="overflow-x-auto pb-2">
+                 <div className="overflow-x-auto pb-2 w-full">
                     <BottomWidgetRow 
                      items={layoutState.panels.bottom} 
                      isDragMode={isDragMode && breakpoint !== 'sm'} 

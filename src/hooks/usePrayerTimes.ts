@@ -60,9 +60,10 @@ export function usePrayerTimes() {
       activeCoordinates.lng,
       settings.method,
       settings.madhab,
-      targetDate
+      targetDate,
+      settings.prayerOffsets
     );
-  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings]);
+  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings, settings.prayerOffsets]);
 
   const tomorrowPrayers = useMemo(() => {
     if (!activeCoordinates || isLoadingSettings || !targetDate) return null;
@@ -73,9 +74,10 @@ export function usePrayerTimes() {
       activeCoordinates.lng,
       settings.method,
       settings.madhab,
-      tomorrowDate
+      tomorrowDate,
+      settings.prayerOffsets
     );
-  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings]);
+  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings, settings.prayerOffsets]);
 
   const nextPrayer = useMemo(() => {
     if (!prayers || !tomorrowPrayers) return null;

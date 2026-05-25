@@ -27,7 +27,8 @@ export function calculatePrayerTimes(
   lng: number,
   methodKey: CalculationMethodKey,
   madhabKey: MadhabKey,
-  date: Date = new Date()
+  date: Date = new Date(),
+  offsets?: Record<string, number>
 ): DailyPrayers {
   const coordinates = new Coordinates(lat, lng);
   const methodFn = METHOD_MAP[methodKey] || CalculationMethod.MuslimWorldLeague;
@@ -37,7 +38,7 @@ export function calculatePrayerTimes(
   
   const prayerTimes = new PrayerTimes(coordinates, date, params);
   
-  return {
+  const prayers = {
     fajr: prayerTimes.fajr,
     sunrise: prayerTimes.sunrise,
     dhuhr: prayerTimes.dhuhr,
@@ -45,6 +46,16 @@ export function calculatePrayerTimes(
     maghrib: prayerTimes.maghrib,
     isha: prayerTimes.isha,
   };
+
+  if (offsets) {
+    (Object.keys(offsets) as PrayerName[]).forEach((name) => {
+      if (prayers[name] && offsets[name] !== 0) {
+        prayers[name] = new Date(prayers[name].getTime() + offsets[name] * 60000);
+      }
+    });
+  }
+
+  return prayers;
 }
 
 export function getNextPrayer(

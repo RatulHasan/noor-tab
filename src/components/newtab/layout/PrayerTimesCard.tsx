@@ -1,16 +1,19 @@
-import React from "react";
-import { MapPin, Bell, BellOff, Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { MapPin, Bell, BellOff, Loader2, Pencil, Check, Plus, Minus } from "lucide-react";
 import type { PrayerName } from "~types";
 import { useSettings } from "~hooks/useSettings";
 import { usePrayerTimes } from "~hooks/usePrayerTimes";
 import { useCountdown } from "~hooks/useCountdown";
 import { getHijriDateString } from "~utils/hijriConverter";
+import { getTranslation } from "~data/translations";
 import { cn } from "~utils/cn";
 
 export function PrayerTimesCard() {
   const [settings, updateSettings] = useSettings();
   const { prayerStatuses, nextPrayer, isLoading, isMocked } = usePrayerTimes();
   const countdown = useCountdown(nextPrayer?.time || null);
+  const [isEditing, setIsEditing] = useState(false);
+  const t = (key: any) => getTranslation(settings.language, key);
 
   const hijriDate = getHijriDateString(new Date());
   const gregorianDate = new Date().toLocaleDateString('en-US', { 
@@ -26,6 +29,16 @@ export function PrayerTimesCard() {
       perPrayerReminder: {
         ...settings.perPrayerReminder,
         [name]: !current
+      }
+    });
+  };
+
+  const handleOffsetChange = async (name: PrayerName, delta: number) => {
+    const current = settings.prayerOffsets?.[name] || 0;
+    await updateSettings({
+      prayerOffsets: {
+        ...settings.prayerOffsets,
+        [name]: current + delta
       }
     });
   };
@@ -55,9 +68,21 @@ export function PrayerTimesCard() {
       <div className="p-5 border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-950/20">
         <div className="flex items-center justify-between mb-3">
            <h3 className="font-black text-stone-800 dark:text-stone-100 uppercase tracking-widest text-xs">
-             {isMocked ? "Global Prayer Times" : "Prayer Times"}
+             {isMocked ? t("globalPrayerTimes") : t("prayerTimes")}
            </h3>
-           <Bell className="w-4 h-4 text-emerald-600" />
+           <div className="flex items-center gap-2">
+             <button 
+               onClick={() => setIsEditing(!isEditing)}
+               className={cn(
+                 "p-1.5 rounded-lg transition-all active:scale-95",
+                 isEditing ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20" : "text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+               )}
+               title={isEditing ? "Done" : "Edit Prayer Times"}
+             >
+               {isEditing ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+             </button>
+             <Bell className="w-4 h-4 text-emerald-600" />
+           </div>
         </div>
         <button 
           onClick={() => chrome.runtime.sendMessage({ type: "OPEN_POPUP_SETTINGS" })}
@@ -105,15 +130,35 @@ export function PrayerTimesCard() {
                  )}>
                    {prayer.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                  </span>
-                 <button 
-                  onClick={() => handleToggleReminder(prayer.name)}
-                  className={cn(
-                    "p-1 rounded-lg transition-colors",
-                    prayer.reminderEnabled ? "text-emerald-600 opacity-100" : "text-stone-300 opacity-40 hover:opacity-100"
-                  )}
-                 >
-                   {prayer.reminderEnabled ? <Bell className="w-3 h-3 fill-current" /> : <BellOff className="w-3 h-3" />}
-                 </button>
+                 {isEditing ? (
+                   <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5 border border-stone-200 dark:border-stone-700">
+                      <button 
+                        onClick={() => handleOffsetChange(prayer.name, -1)}
+                        className="p-1 hover:bg-white dark:hover:bg-stone-700 rounded-md text-stone-500 transition-colors"
+                      >
+                        <Minus className="w-2.5 h-2.5" />
+                      </button>
+                      <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 min-w-[28px] text-center">
+                        {(settings.prayerOffsets?.[prayer.name] || 0) > 0 ? `+${settings.prayerOffsets?.[prayer.name]}` : settings.prayerOffsets?.[prayer.name] || 0}
+                      </span>
+                      <button 
+                        onClick={() => handleOffsetChange(prayer.name, 1)}
+                        className="p-1 hover:bg-white dark:hover:bg-stone-700 rounded-md text-stone-500 transition-colors"
+                      >
+                        <Plus className="w-2.5 h-2.5" />
+                      </button>
+                   </div>
+                 ) : (
+                   <button 
+                    onClick={() => handleToggleReminder(prayer.name)}
+                    className={cn(
+                      "p-1 rounded-lg transition-colors",
+                      prayer.reminderEnabled ? "text-emerald-600 opacity-100" : "text-stone-300 opacity-40 hover:opacity-100"
+                    )}
+                   >
+                     {prayer.reminderEnabled ? <Bell className="w-3 h-3 fill-current" /> : <BellOff className="w-3 h-3" />}
+                   </button>
+                 )}
               </div>
             </div>
           );

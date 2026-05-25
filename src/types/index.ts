@@ -43,6 +43,7 @@ export interface UserSettings {
   remindMorningAdhkar: boolean;
   remindEveningAdhkar: boolean;
   worldCities: string[];
+  prayerOffsets: Record<PrayerName, number>;
 }
 
 export type DailyPrayers = Record<PrayerName, Date>;
@@ -175,9 +176,27 @@ export interface AsmaName {
 
 // ── Dua Library ────────────────────────────────────────────
 export type DuaCategory =
-  | 'morning_evening' | 'travel' | 'eating' | 'sleeping'
-  | 'stress' | 'gratitude' | 'protection' | 'forgiveness'
-  | 'family' | 'knowledge' | 'general';
+  | "morning_evening"
+  | "travel"
+  | "eating"
+  | "sleeping"
+  | "stress"
+  | "gratitude"
+  | "protection"
+  | "forgiveness"
+  | "family"
+  | "knowledge"
+  | "general"
+  | "rizq"
+  | "tawhid"
+  | "salah"
+  | "mosque"
+  | "daily"
+  | "purification"
+  | "health"
+  | "death"
+  | "nature"
+  | "guidance"
 
 export interface Dua {
   id: string;

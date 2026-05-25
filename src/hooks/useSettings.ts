@@ -17,6 +17,10 @@ export function useSettings() {
           ...DEFAULT_SETTINGS.perPrayerReminder,
           ...(storedVal.perPrayerReminder || {}),
         },
+        prayerOffsets: {
+          ...DEFAULT_SETTINGS.prayerOffsets,
+          ...(storedVal.prayerOffsets || {}),
+        },
       };
     }
   );
