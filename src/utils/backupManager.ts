@@ -9,7 +9,7 @@ import { Storage } from "@plasmohq/storage";
 async function gatherAllData(): Promise<NoorTabBackup> {
   const storage = new Storage();
   
-  const [settings, prayerStreak, fastingData, quranBookmark, dhikrGoals, adhkarProgress, duaFavorites, quizRecord, widgetLayout] = await Promise.all([
+  const [settings, prayerStreak, fastingData, quranBookmark, dhikrGoals, adhkarProgress, duaFavorites, quizRecord, widgetLayout, layoutState] = await Promise.all([
     storage.get("noortab-user-settings"),
     storage.get("prayerStreak"),
     storage.get("fastingData"),
@@ -19,6 +19,7 @@ async function gatherAllData(): Promise<NoorTabBackup> {
     storage.get("duaFavorites"),
     storage.get("quizRecord"),
     storage.get("widgetLayout"),
+    storage.get("noorTabLayoutState"),
   ]);
 
   return {
@@ -56,7 +57,8 @@ async function gatherAllData(): Promise<NoorTabBackup> {
       totalCorrect: 0,
       totalAnswered: 0
     }) as any,
-    widgetLayout: (widgetLayout || []) as any
+    widgetLayout: (widgetLayout || []) as any,
+    layoutState: (layoutState || null) as any
   };
 }
 
@@ -249,7 +251,8 @@ export async function importBackup(
       storage.set("adhkarProgress", backup.adhkarProgress),
       storage.set("duaFavorites", backup.duaFavorites),
       storage.set("quizRecord", backup.quizRecord),
-      storage.set("widgetLayout", backup.widgetLayout)
+      storage.set("widgetLayout", backup.widgetLayout),
+      storage.set("noorTabLayoutState", backup.layoutState)
     ]);
   } else {
     // ── MERGE MODE ──

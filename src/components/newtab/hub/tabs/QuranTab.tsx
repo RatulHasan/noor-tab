@@ -12,10 +12,15 @@ export default function QuranTab() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [visibleAyahs, setVisibleAyahs] = useState(10);
+  const [isListLoading, setIsListLoading] = useState(true);
   const [bookmark, setBookmark] = useStorage<QuranBookmark | null>("quranBookmark", null);
 
   useEffect(() => {
-    getSurahList().then(setSurahs);
+    setIsListLoading(true);
+    getSurahList().then(data => {
+      setSurahs(data);
+      setIsListLoading(false);
+    });
   }, []);
 
   const handleSurahSelect = async (num: number) => {
@@ -39,12 +44,16 @@ export default function QuranTab() {
   };
 
   const handleSaveBookmark = (ayah: { number: number, text: string, translation: string }, surahName: string, surahNum: number) => {
-    setBookmark({
-      surah: surahNum,
-      ayah: ayah.number,
-      surahName: surahName,
-      savedAt: new Date().toISOString(),
-    });
+    if (bookmark?.surah === surahNum && bookmark?.ayah === ayah.number) {
+      setBookmark(null);
+    } else {
+      setBookmark({
+        surah: surahNum,
+        ayah: ayah.number,
+        surahName: surahName,
+        savedAt: new Date().toISOString(),
+      });
+    }
   };
 
   const filteredSurahs = useMemo(() => {
@@ -107,7 +116,11 @@ export default function QuranTab() {
         <div className="lg:col-span-1 space-y-4">
           <h3 className="font-bold text-stone-800 dark:text-stone-100 text-sm px-2">Surahs</h3>
           <div className="max-h-[600px] overflow-y-auto space-y-1 pr-2 custom-scrollbar">
-            {filteredSurahs.map(surah => (
+            {isListLoading ? (
+              Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="h-16 w-full bg-stone-50 dark:bg-stone-800/50 animate-pulse rounded-xl" />
+              ))
+            ) : filteredSurahs.map(surah => (
               <button
                 key={surah.number}
                 onClick={() => handleSurahSelect(surah.number)}
@@ -157,7 +170,7 @@ export default function QuranTab() {
                           className="opacity-0 group-hover:opacity-100 p-2 text-stone-400 hover:text-emerald-600 transition-all"
                           title="Bookmark this position"
                         >
-                          <Bookmark className={cn("w-4 h-4", bookmark?.surah === selectedSurah.number && bookmark?.ayah === (i+1) ? "fill-current text-emerald-600" : "")} />
+                          <Bookmark className={cn("w-4 h-4", bookmark?.surah === selectedSurah.number && bookmark?.ayah === ayah.number ? "fill-current text-emerald-600" : "")} />
                         </button>
                       </div>
                       <p className="font-amiri text-3xl text-right leading-loose text-stone-800 dark:text-stone-100" dir="rtl">

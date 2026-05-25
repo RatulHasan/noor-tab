@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import {
   DndContext,
@@ -14,31 +14,16 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
-  arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { WidgetConfig, WidgetId } from "~types";
-import { GripVertical, Eye, EyeOff, X, RotateCcw, AlertTriangle } from "lucide-react";
+import type { WidgetId, PanelItem, PanelId } from "~types";
+import { GripVertical, Eye, EyeOff, X, RotateCcw, AlertTriangle, Lock } from "lucide-react";
 import { cn } from "~utils/cn";
 import { POPULAR_LOCATIONS } from "~data/popularLocations";
 import { useSettings } from "~hooks/useSettings";
 import { getTranslation } from "~data/translations";
 import type { TranslationKey } from "~data/translations";
-
-export const DEFAULT_WIDGETS: WidgetConfig[] = [
-  { id: "prayerStreak", visible: true, order: 1, panel: "left" },
-  { id: "fastingTracker", visible: true, order: 2, panel: "left" },
-  { id: "adhkar", visible: false, order: 3, panel: "left" },
-  { id: "asmaName", visible: true, order: 1, panel: "right" },
-  { id: "islamicCalendar", visible: true, order: 2, panel: "right" },
-  { id: "globalPrayer", visible: false, order: 3, panel: "right" },
-  { id: "dhikr", visible: true, order: 1, panel: "bottom" },
-  { id: "hadith", visible: true, order: 2, panel: "bottom" },
-  { id: "quiz", visible: false, order: 3, panel: "bottom" },
-  { id: "quranBookmark", visible: false, order: 4, panel: "bottom" },
-  { id: "duaLibrary", visible: false, order: 5, panel: "bottom" },
-  { id: "ayah", visible: false, order: 6, panel: "bottom" },
-];
+import { useLayoutState } from "~hooks/useLayoutState";
 
 export const WIDGET_TRANSLATION_KEYS: Record<WidgetId, TranslationKey> = {
   ayah: "dailyAyah",
@@ -61,24 +46,34 @@ interface WidgetCustomizerProps {
 }
 
 export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerProps) {
-  const [widgets, setWidgets] = useStorage<WidgetConfig[]>("widgetLayout", DEFAULT_WIDGETS);
+  const { layoutState, toggleVisibility, moveBetweenPanels, resetLayout, reorderWithinPanel } = useLayoutState();
   const [showWarning, setShowWarning] = useState(false);
   const [settings] = useSettings();
   const lang = settings?.language || "en";
   const t = (key: TranslationKey) => getTranslation(lang, key);
 
-  // ── Developer mock storage (shared across the whole extension) ─────────────
+  const widgetItems = useMemo(() => {
+    const items: PanelItem[] = [];
+    Object.values(layoutState.panels).forEach(panel => {
+        items.push(...panel.filter(i => i.type === 'widget'));
+    });
+    return items.sort((a, b) => {
+        // Sort by panel first, then by order
+        const panelOrder = { left: 0, center: 1, right: 2, bottom: 3 };
+        if (a.panel !== b.panel) return panelOrder[a.panel] - panelOrder[b.panel];
+        return a.order - b.order;
+    });
+  }, [layoutState.panels]);
+
   const [devMockTime, setDevMockTime] = useStorage<string>("devMockTime", "");
   const [devMockCoordinates, setDevMockCoordinates] = useStorage<{ lat: number; lng: number } | null>("devMockCoordinates", null);
   const [devMockCityName, setDevMockCityName] = useStorage<string>("devMockCityName", "");
 
-  // Local-only dropdown state for the location simulator (no need to persist)
   const [devSimCountry, setDevSimCountry] = useState("");
   const [devSimCity, setDevSimCity] = useState("");
 
   const isDev = process.env.PLASMO_PUBLIC_DEV_MODE === "true";
 
-  // Setup sensors for dnd-kit
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -88,39 +83,41 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
 
   if (!isOpen) return null;
 
-  // ── Handlers ────────────────────────────────────────────────────────────────
+  const handleToggleVisibility = (id: string, panel: PanelId) => {
+    const item = layoutState.panels[panel].find(i => i.id === id);
+    const wasVisible = item?.visible;
 
-  const handleToggleVisibility = (id: WidgetId) => {
-    const target = widgets.find((w) => w.id === id);
-    if (!target) return;
-    setShowWarning(false);
-    const updated = widgets.map((w) =>
-      w.id === id ? { ...w, visible: !w.visible } : w
-    );
-    setWidgets(updated);
+    toggleVisibility(id, panel);
+
+    // If we are hiding global prayer times, also clear developer mocks
+    // because users often use them together and expect "hiding" the global feature 
+    // to restore their "default" (local) prayer times.
+    if (id === 'widget-globalPrayer' && wasVisible) {
+      handleResetAllMocks();
+    }
   };
 
-  const handlePanelChange = (id: WidgetId, panel: 'left' | 'center' | 'right' | 'bottom') => {
-    const updated = widgets.map((w) =>
-      w.id === id ? { ...w, panel } : w
-    );
-    setWidgets(updated);
+  const handlePanelChange = (id: string, sourcePanel: PanelId, targetPanel: PanelId) => {
+    if (sourcePanel === targetPanel) return;
+    const targetItems = layoutState.panels[targetPanel];
+    moveBetweenPanels(id, sourcePanel, targetPanel, targetItems.length);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = widgets.findIndex((w) => w.id === active.id);
-      const newIndex = widgets.findIndex((w) => w.id === over.id);
-      const reordered = arrayMove(widgets, oldIndex, newIndex);
-      const updated = reordered.map((w, index) => ({ ...w, order: index }));
-      setWidgets(updated);
+      const activeItem = widgetItems.find(i => i.id === active.id);
+      const overItem = widgetItems.find(i => i.id === over.id);
+      
+      if (activeItem && overItem) {
+          if (activeItem.panel === overItem.panel) {
+              reorderWithinPanel(activeItem.panel, activeItem.id, overItem.id);
+          } else {
+              const overIndex = layoutState.panels[overItem.panel].findIndex(i => i.id === overItem.id);
+              moveBetweenPanels(activeItem.id, activeItem.panel, overItem.panel, overIndex);
+          }
+      }
     }
-  };
-
-  const handleReset = () => {
-    setShowWarning(false);
-    setWidgets(DEFAULT_WIDGETS);
   };
 
   /** Clear every developer mock value back to its real-world defaults. */
@@ -195,7 +192,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
               Customize Dashboard
             </h3>
             <span className="text-[9px] text-stone-400 font-bold block mt-0.5">
-              Active widgets: {widgets.filter((w) => w.visible).length}
+              Active widgets: {widgetItems.filter((w) => w.visible).length}
             </span>
           </div>
           <button
@@ -222,15 +219,15 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={widgets.map((w) => w.id)}
+              items={widgetItems.map((w) => w.id)}
               strategy={verticalListSortingStrategy}
             >
               <div className="space-y-2">
-                {widgets.map((widget) => (
+                {widgetItems.map((item) => (
                   <SortableItem
-                    key={widget.id}
-                    widget={widget}
-                    label={t(WIDGET_TRANSLATION_KEYS[widget.id])}
+                    key={item.id}
+                    item={item}
+                    label={item.widgetId ? t(WIDGET_TRANSLATION_KEYS[item.widgetId]) : item.id}
                     onToggle={handleToggleVisibility}
                     onPanelChange={handlePanelChange}
                   />
@@ -242,7 +239,7 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
 
         {/* Reset layout */}
         <button
-          onClick={handleReset}
+          onClick={resetLayout}
           className="flex items-center justify-center gap-1.5 py-2 border border-stone-200/60 dark:border-stone-800 rounded-xl text-xs font-bold text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition-all duration-200"
         >
           <RotateCcw className="w-3.5 h-3.5" />
@@ -397,13 +394,13 @@ export default function WidgetCustomizer({ isOpen, onClose }: WidgetCustomizerPr
 // ── SortableItem ─────────────────────────────────────────────────────────────
 
 interface SortableItemProps {
-  widget: WidgetConfig;
+  item: PanelItem;
   label: string;
-  onToggle: (id: WidgetId) => void;
-  onPanelChange: (id: WidgetId, panel: 'left' | 'center' | 'right' | 'bottom') => void;
+  onToggle: (id: string, panel: PanelId) => void;
+  onPanelChange: (id: string, sourcePanel: PanelId, targetPanel: PanelId) => void;
 }
 
-function SortableItem({ widget, label, onToggle, onPanelChange }: SortableItemProps) {
+function SortableItem({ item, label, onToggle, onPanelChange }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -411,7 +408,7 @@ function SortableItem({ widget, label, onToggle, onPanelChange }: SortableItemPr
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: widget.id });
+  } = useSortable({ id: item.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -445,8 +442,8 @@ function SortableItem({ widget, label, onToggle, onPanelChange }: SortableItemPr
 
       <div className="flex items-center gap-2">
         <select
-          value={widget.panel}
-          onChange={(e) => onPanelChange(widget.id, e.target.value as any)}
+          value={item.panel}
+          onChange={(e) => onPanelChange(item.id, item.panel, e.target.value as any)}
           className="text-[10px] bg-stone-50 dark:bg-stone-800 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500/30 text-stone-500 dark:text-stone-400 font-bold uppercase"
         >
           <option value="left">Left</option>
@@ -456,15 +453,15 @@ function SortableItem({ widget, label, onToggle, onPanelChange }: SortableItemPr
         </select>
 
         <button
-          onClick={() => onToggle(widget.id)}
+          onClick={() => onToggle(item.id, item.panel)}
           className={cn(
             "p-1.5 rounded-lg border transition-all duration-200",
-            widget.visible
+            item.visible
               ? "border-emerald-200/60 bg-emerald-50/20 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-950/40 dark:bg-emerald-950/20 dark:text-emerald-400"
               : "border-stone-200 bg-white text-stone-400 hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
           )}
         >
-          {widget.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+          {item.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
         </button>
       </div>
     </div>

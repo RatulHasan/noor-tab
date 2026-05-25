@@ -10,20 +10,28 @@ interface QuickAccessHubProps {
 }
 
 export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange }: QuickAccessHubProps) {
-  const [activeTabId, setActiveTabId] = useStorage<string>("activeHubTab", "quran");
+  const [internalTabId, setInternalTabId] = useStorage<string>("activeHubTab", "quran");
   
-  // Use external tab ID if provided (e.g. from search)
+  // Use external tab ID if provided, otherwise use internal storage state
+  // If both are loading, default to "quran" to avoid flickering/stuck loaders
+  const activeTabId = externalTabId || internalTabId || "quran";
+  const setActiveTabId = onTabChange || setInternalTabId;
+  
+  // Sync internal storage if external tab changes (e.g. from search)
   useEffect(() => {
-    if (externalTabId) {
-      setActiveTabId(externalTabId);
+    if (externalTabId && externalTabId !== internalTabId) {
+      setInternalTabId(externalTabId);
     }
-  }, [externalTabId]);
+  }, [externalTabId, internalTabId]);
 
   const activeTab = defaultHubTabs.find(t => t.id === activeTabId) || defaultHubTabs[0];
 
   const handleTabClick = (id: string) => {
-    setActiveTabId(id);
-    onTabChange?.(id);
+    if (onTabChange) {
+      onTabChange(id);
+    } else {
+      setInternalTabId(id);
+    }
   };
 
   return (
@@ -59,7 +67,7 @@ export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange
             <p className="text-sm font-medium">Preparing {activeTab.label}...</p>
           </div>
         }>
-          <activeTab.component />
+          <activeTab.component key={activeTab.id} />
         </Suspense>
       </div>
     </div>

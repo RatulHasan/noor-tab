@@ -8,7 +8,7 @@ import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
 import IslamicEventCard from "./components/popup/IslamicEventCard";
-import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles } from "lucide-react";
+import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles, Check } from "lucide-react";
 import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
@@ -130,30 +130,32 @@ export default function Popup() {
     const val = e.target.value;
     setOnboardingCountryName(val);
     setOnboardingCityName("");
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === val);
-      if (country && country.cities.length > 0) {
-        const firstCity = country.cities[0];
-        setOnboardingCityName(firstCity.name);
-        handleSaveSettings({
-          coordinates: { lat: firstCity.lat, lng: firstCity.lng },
-          cityName: firstCity.name,
-        });
-      }
-    }
+    setOnboardingError("");
   };
 
   const handleOnboardingCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setOnboardingCityName(val);
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
-      const city = country?.cities.find(ct => ct.name === val);
-      if (city) {
-        handleSaveSettings({
+    setOnboardingError("");
+  };
+
+  const handleConfirmOnboarding = async () => {
+    if (!onboardingCountryName || !onboardingCityName || onboardingCountryName === "custom" || onboardingCityName === "custom") return;
+    
+    const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
+    const city = country?.cities.find(ct => ct.name === onboardingCityName);
+    
+    if (city) {
+      setIsOnboardingSearching(true);
+      try {
+        await handleSaveSettings({
           coordinates: { lat: city.lat, lng: city.lng },
           cityName: city.name,
         });
+      } catch (err) {
+        setOnboardingError(t("errorSaving"));
+      } finally {
+        setIsOnboardingSearching(false);
       }
     }
   };
@@ -338,6 +340,21 @@ export default function Popup() {
                           </div>
                         )}
                       </div>
+
+                      {onboardingCountryName && onboardingCityName && onboardingCountryName !== "custom" && onboardingCityName !== "custom" && (
+                        <button
+                          onClick={handleConfirmOnboarding}
+                          disabled={isOnboardingSearching}
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-600 transition-all duration-200"
+                        >
+                          {isOnboardingSearching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                          {t("saveSettings")}
+                        </button>
+                      )}
 
                       <button
                         onClick={() => setActiveTab("settings")}

@@ -247,6 +247,38 @@ export interface NoorTabBackup {
   duaFavorites: string[];   // dua IDs
   quizRecord: QuizRecord;
   widgetLayout: WidgetConfig[];
+  layoutState?: LayoutState;
+}
+
+// ── Panel Layout ───────────────────────────────────────────
+
+export type PanelId = 'left' | 'center' | 'right' | 'bottom';
+
+export type BreakpointId = 'xl' | 'lg' | 'md' | 'sm';
+
+export interface PanelItem {
+  id: string;           // unique: 'widget-prayerStreak', 'hub-quran', 'fixed-prayerTimes'
+  type: 'widget' | 'hub' | 'fixed';
+  widgetId?: WidgetId;  // if type === 'widget'
+  hubTabId?: string;    // if type === 'hub'
+  visible: boolean;
+  order: number;        // sort order within panel
+  panel: PanelId;
+  locked?: boolean;     // if true: cannot be dragged (e.g. Prayer Times in left, Ayah in center)
+}
+
+export interface PanelLayout {
+  left: PanelItem[];
+  center: PanelItem[];
+  right: PanelItem[];
+  bottom: PanelItem[];
+}
+
+export interface LayoutState {
+  panels: PanelLayout;
+  activeBreakpoint: BreakpointId;
+  lastModified: string; // ISO timestamp
+  version: '1.0';
 }
 
 export type BackupVersion = '1.0';

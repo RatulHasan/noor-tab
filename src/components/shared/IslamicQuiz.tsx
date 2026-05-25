@@ -18,7 +18,7 @@ export default function IslamicQuiz() {
   });
 
   const [settings] = useSettings();
-  const [questionOffset, setQuestionOffset] = useState(0);
+  const [questionOffset, setQuestionOffset] = useStorage<number>("quizQuestionOffset", 0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
 
@@ -35,6 +35,8 @@ export default function IslamicQuiz() {
     setSelectedIndex(null);
     setAnswered(false);
   }, [questionOffset]);
+
+  if (questionOffset === undefined) return null;
 
   // Sync state if already answered today
   const hasAnsweredToday = quizRecord.date === today && quizRecord.questionId === quizQuestions[seed % quizQuestions.length].id;
@@ -123,7 +125,7 @@ export default function IslamicQuiz() {
             } else if (wasChosen) {
               optionStyle = "bg-rose-600 text-white border-rose-700 dark:bg-rose-700 shadow-sm";
             } else {
-              optionStyle = "opacity-50 border-stone-200 dark:border-stone-800 bg-stone-50/30 text-stone-400 dark:text-stone-500 cursor-not-allowed";
+              optionStyle = "border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30 text-stone-600 dark:text-stone-400 cursor-not-allowed";
             }
           }
 

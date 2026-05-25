@@ -76,7 +76,7 @@ export async function getSurah(number: number): Promise<SurahContent | null> {
         name: arabicEd.name,
         englishName: arabicEd.englishName,
         ayahs: arabicEd.ayahs.map((ayah: any, index: number) => ({
-          number: ayah.number,
+          number: ayah.numberInSurah,
           text: ayah.text,
           translation: englishEd.ayahs[index].text,
         })),

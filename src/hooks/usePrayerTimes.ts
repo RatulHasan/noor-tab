@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { useSettings } from "./useSettings";
 import {
@@ -36,6 +36,64 @@ export function usePrayerTimes() {
     return () => clearTimeout(timeoutId);
   }, [date]);
 
+  const activeCoordinates = useMemo(() => devMockCoordinates || settings.coordinates, [devMockCoordinates, settings.coordinates]);
+  
+  const baseDate = useMemo(() => {
+    if (devMockTime) {
+      const d = new Date();
+      const [h, m] = devMockTime.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+      return d;
+    }
+    return date;
+  }, [devMockTime, date]);
+
+  const targetDate = useMemo(() => {
+    if (!activeCoordinates) return baseDate;
+    return getCoordinatesLocalDate(activeCoordinates, baseDate);
+  }, [activeCoordinates, baseDate]);
+
+  const prayers = useMemo(() => {
+    if (!activeCoordinates || isLoadingSettings) return null;
+    return calculatePrayerTimes(
+      activeCoordinates.lat,
+      activeCoordinates.lng,
+      settings.method,
+      settings.madhab,
+      targetDate
+    );
+  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings]);
+
+  const tomorrowPrayers = useMemo(() => {
+    if (!activeCoordinates || isLoadingSettings || !targetDate) return null;
+    const tomorrowDate = new Date(targetDate);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    return calculatePrayerTimes(
+      activeCoordinates.lat,
+      activeCoordinates.lng,
+      settings.method,
+      settings.madhab,
+      tomorrowDate
+    );
+  }, [activeCoordinates, settings.method, settings.madhab, targetDate, isLoadingSettings]);
+
+  const nextPrayer = useMemo(() => {
+    if (!prayers || !tomorrowPrayers) return null;
+    return getNextPrayer(prayers, tomorrowPrayers, baseDate);
+  }, [prayers, tomorrowPrayers, baseDate]);
+
+  const prayerStatuses = useMemo(() => {
+    if (!prayers || !tomorrowPrayers) return null;
+    return getPrayerStatuses(
+      prayers,
+      settings.perPrayerReminder,
+      tomorrowPrayers,
+      baseDate
+    );
+  }, [prayers, settings.perPrayerReminder, tomorrowPrayers, baseDate]);
+
+  const isMocked = !!devMockCoordinates;
+
   if (isLoadingSettings || !settings.coordinates) {
     return {
       prayers: null,
@@ -44,51 +102,9 @@ export function usePrayerTimes() {
       tomorrowPrayers: null,
       isLoading: isLoadingSettings,
       settings,
+      isMocked,
     };
   }
-
-  // Allow dev tools to override coordinates for global location simulation
-  const activeCoordinates = devMockCoordinates || settings.coordinates;
-  const { lat, lng } = activeCoordinates;
-  
-  const baseDate = (() => {
-    if (devMockTime) {
-      const d = new Date();
-      const [h, m] = devMockTime.split(":").map(Number);
-      d.setHours(h, m, 0, 0);
-      return d;
-    }
-    return date;
-  })();
-
-  const targetDate = getCoordinatesLocalDate(activeCoordinates, baseDate);
-
-  const prayers = calculatePrayerTimes(
-    lat,
-    lng,
-    settings.method,
-    settings.madhab,
-    targetDate
-  );
-
-  // Compute tomorrow's prayers to resolve correct wrapping for the "next" prayer after Isha
-  const tomorrowDate = new Date(targetDate);
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrowPrayers = calculatePrayerTimes(
-    lat,
-    lng,
-    settings.method,
-    settings.madhab,
-    tomorrowDate
-  );
-
-  const nextPrayer = getNextPrayer(prayers, tomorrowPrayers, baseDate);
-  const prayerStatuses = getPrayerStatuses(
-    prayers,
-    settings.perPrayerReminder,
-    tomorrowPrayers,
-    baseDate
-  );
 
   return {
     prayers,
@@ -97,5 +113,6 @@ export function usePrayerTimes() {
     tomorrowPrayers,
     isLoading: false,
     settings,
+    isMocked,
   };
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSettings } from "./hooks/useSettings";
 import { usePrayerTimes } from "./hooks/usePrayerTimes";
 import NoorTabHero from "./components/newtab/NoorTabHero";
@@ -7,18 +7,21 @@ import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
 import { getTranslation } from "./data/translations";
-import { MapPin, Loader2, Search, Settings2 } from "lucide-react";
+import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { detectLocation, geocodeLocation } from "./utils/locationService";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
-import type { UserSettings, WidgetConfig, WidgetId, FastingData } from "./types";
+import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem } from "./types";
 import { useStorage } from "@plasmohq/storage/hook";
+
+// Import DnD Kit
+import { type DragEndEvent, type DragOverEvent } from "@dnd-kit/core";
 
 // Import Phase 2 widgets and components
 import PrayerStreakWidget from "./components/newtab/PrayerStreakWidget";
 import AsmaUlHusna from "./components/newtab/AsmaUlHusna";
 import GlobalPrayerWidget from "./components/newtab/GlobalPrayerWidget";
 import JumuahBanner from "./components/newtab/JumuahBanner";
-import WidgetCustomizer, { DEFAULT_WIDGETS } from "./components/newtab/WidgetCustomizer";
+import WidgetCustomizer from "./components/newtab/WidgetCustomizer";
 import AdhkarPlayer from "./components/shared/AdhkarPlayer";
 import FastingTracker from "./components/shared/FastingTracker";
 import QuranBookmark from "./components/shared/QuranBookmark";
@@ -35,6 +38,18 @@ import CenterPanel from "./components/newtab/layout/CenterPanel";
 import RightPanel from "./components/newtab/layout/RightPanel";
 import BannerZone from "./components/newtab/layout/BannerZone";
 import BottomWidgetRow from "./components/newtab/layout/BottomWidgetRow";
+import { DragProvider } from "./components/newtab/layout/DragProvider";
+import { CustomizeFAB } from "./components/newtab/layout/CustomizeFAB";
+import { MobilePanelDrawer } from "./components/newtab/layout/MobilePanelDrawer";
+import { PrayerTimesCard } from "./components/newtab/layout/PrayerTimesCard";
+import { QiblaCard } from "./components/newtab/layout/QiblaCard";
+import { HeroSection } from "./components/newtab/layout/HeroSection";
+import PurposeSearch from "./components/newtab/search/PurposeSearch";
+import QuickAccessHub from "./components/newtab/hub/QuickAccessHub";
+
+// Import hooks
+import { useLayoutState } from "./hooks/useLayoutState";
+import { useBreakpoint } from "./hooks/useBreakpoint";
 
 // Import helpers
 import { isTodayFriday } from "./utils/jumuahHelper";
@@ -56,11 +71,61 @@ export default function NewTab() {
 
   const [showCustomizer, setShowCustomizer] = useState(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  const [widgetLayout] = useStorage<WidgetConfig[]>("widgetLayout", DEFAULT_WIDGETS);
   const [fastingData] = useStorage<FastingData>("fastingData");
   const [devMockCityName] = useStorage<string>("devMockCityName", "");
   const isRamadan = fastingData?.isRamadanMode || isTodayRamadan();
   const isFriday = isTodayFriday();
+  
+  // Layout and Responsive hooks
+  const { layoutState, reorderWithinPanel, moveBetweenPanels, resetLayout } = useLayoutState();
+  const breakpoint = useBreakpoint();
+  const [isDragMode, setIsDragMode] = useState(false);
+  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
+  const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
+  const [activeHubTabId, setActiveHubTabId] = useStorage<string>("activeHubTab", "quran");
+
+  // Drag Orchestration
+  const findPanel = (id: string): PanelId | null => {
+    for (const [panelId, items] of Object.entries(layoutState.panels)) {
+      if (items.find(i => i.id === id)) return panelId as PanelId;
+    }
+    return null;
+  };
+
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const sourcePanel = findPanel(active.id as string);
+    const targetPanel = over.id.toString().startsWith('panel-')
+      ? over.id.toString().replace('panel-', '') as PanelId
+      : findPanel(over.id as string);
+
+    if (!sourcePanel || !targetPanel || sourcePanel === targetPanel) return;
+  }, [layoutState.panels]);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const sourcePanel = findPanel(active.id as string);
+    const overIsPanel = over.id.toString().startsWith('panel-');
+    const targetPanel = overIsPanel
+      ? over.id.toString().replace('panel-', '') as PanelId
+      : findPanel(over.id as string);
+
+    if (!sourcePanel || !targetPanel) return;
+
+    if (sourcePanel === targetPanel) {
+      reorderWithinPanel(sourcePanel, active.id as string, over.id as string);
+    } else {
+      const targetItems = layoutState.panels[targetPanel];
+      const overIndex = overIsPanel
+        ? targetItems.length 
+        : targetItems.findIndex(i => i.id === over.id);
+      moveBetweenPanels(active.id as string, sourcePanel, targetPanel, overIndex);
+    }
+  }, [layoutState.panels, reorderWithinPanel, moveBetweenPanels]);
   
   // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
@@ -164,30 +229,32 @@ export default function NewTab() {
     const val = e.target.value;
     setOnboardingCountryName(val);
     setOnboardingCityName("");
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === val);
-      if (country && country.cities.length > 0) {
-        const firstCity = country.cities[0];
-        setOnboardingCityName(firstCity.name);
-        handleSaveSettings({
-          coordinates: { lat: firstCity.lat, lng: firstCity.lng },
-          cityName: firstCity.name,
-        });
-      }
-    }
+    setOnboardingError("");
   };
 
   const handleOnboardingCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setOnboardingCityName(val);
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
-      const city = country?.cities.find(ct => ct.name === val);
-      if (city) {
-        handleSaveSettings({
+    setOnboardingError("");
+  };
+
+  const handleConfirmOnboarding = async () => {
+    if (!onboardingCountryName || !onboardingCityName || onboardingCountryName === "custom" || onboardingCityName === "custom") return;
+    
+    const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
+    const city = country?.cities.find(ct => ct.name === onboardingCityName);
+    
+    if (city) {
+      setIsOnboardingSearching(true);
+      try {
+        await handleSaveSettings({
           coordinates: { lat: city.lat, lng: city.lng },
           cityName: city.name,
         });
+      } catch (err) {
+        setOnboardingError(t("errorSaving"));
+      } finally {
+        setIsOnboardingSearching(false);
       }
     }
   };
@@ -258,11 +325,37 @@ export default function NewTab() {
     }
   };
 
-  const visibleWidgets = widgetLayout.filter(w => w.visible).sort((a, b) => a.order - b.order);
-  const leftWidgets = visibleWidgets.filter(w => w.panel === 'left');
-  const centerWidgets = visibleWidgets.filter(w => w.panel === 'center');
-  const rightWidgets = visibleWidgets.filter(w => w.panel === 'right');
-  const bottomWidgets = visibleWidgets.filter(w => w.panel === 'bottom');
+  const handleHubTabChange = useCallback((id: string) => {
+    setActiveHubTabId(id);
+  }, [setActiveHubTabId]);
+
+  const renderPanelItem = useCallback((item: PanelItem) => {
+    if (item.type === 'fixed') {
+      switch (item.id) {
+        case 'fixed-prayerTimes': return <PrayerTimesCard />;
+        case 'fixed-ayah': return <HeroSection />;
+        case 'fixed-search': return (
+          <div className="px-4">
+            <PurposeSearch onTabChange={handleHubTabChange} />
+          </div>
+        );
+        case 'fixed-hub': return (
+          <div className="flex-1 px-4 pb-8">
+            <QuickAccessHub activeTabId={activeHubTabId} onTabChange={handleHubTabChange} />
+          </div>
+        );
+        case 'fixed-qibla': return <QiblaCard />;
+        default: return null;
+      }
+    }
+
+    if (item.type === 'widget' && item.widgetId) {
+      return renderWidget(item.widgetId);
+    }
+
+    return null;
+  }, [activeHubTabId, handleHubTabChange]);
+
 
   if (isLoadingSettings) {
     return (
@@ -276,9 +369,14 @@ export default function NewTab() {
   }
 
   return (
-    <div className={`h-screen flex flex-col bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 font-sans transition-all duration-1000 relative overflow-hidden`}>
-      {/* Pattern background overlay */}
-      <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
+    <DragProvider 
+      onDragEnd={handleDragEnd} 
+      onDragOver={handleDragOver}
+      panels={layoutState.panels}
+    >
+      <div className={`h-screen flex flex-col bg-gradient-to-br ${bgGradient} text-stone-800 dark:text-stone-100 font-sans transition-all duration-1000 relative overflow-hidden`}>
+        {/* Pattern background overlay */}
+        <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
 
       {!hasCoordinates ? (
         /* Full-screen Onboarding */
@@ -389,6 +487,21 @@ export default function NewTab() {
               )}
             </div>
 
+            {onboardingCountryName && onboardingCityName && onboardingCountryName !== "custom" && onboardingCityName !== "custom" && (
+              <button
+                onClick={handleConfirmOnboarding}
+                disabled={isOnboardingSearching}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-3.5 text-sm font-bold text-white shadow-md hover:bg-emerald-600 transition-all duration-200"
+              >
+                {isOnboardingSearching ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Check className="h-5 w-5" />
+                )}
+                {t("saveSettings")}
+              </button>
+            )}
+
             {onboardingError && (
               <p className="text-xs text-rose-500 font-medium leading-normal">{onboardingError}</p>
             )}
@@ -397,21 +510,88 @@ export default function NewTab() {
       ) : (
         /* Full App 3-Column Dashboard */
         <div className="flex-1 flex flex-col h-full relative z-10">
+          {/* Mobile Drawers (md/sm breakpoints) */}
+          <MobilePanelDrawer
+            isOpen={isLeftDrawerOpen}
+            onClose={() => setIsLeftDrawerOpen(false)}
+            title="Prayer Times & Widgets"
+            side="left"
+          >
+            <LeftPanel 
+              items={layoutState.panels.left} 
+              isDragMode={isDragMode && breakpoint === 'xl'} 
+              renderPanelItem={renderPanelItem} 
+            />
+          </MobilePanelDrawer>
+
+          <MobilePanelDrawer
+            isOpen={isRightDrawerOpen}
+            onClose={() => setIsRightDrawerOpen(false)}
+            title="Qibla & Widgets"
+            side="right"
+          >
+            <RightPanel 
+              items={layoutState.panels.right} 
+              isDragMode={isDragMode && breakpoint === 'xl'} 
+              renderPanelItem={renderPanelItem} 
+            />
+          </MobilePanelDrawer>
+
           <BannerZone 
             reminder={reminderPrayer}
             isJumuah={isFriday}
             isRamadan={isRamadan}
           />
 
-          <div className="flex flex-1 gap-4 p-6 overflow-hidden">
-             <LeftPanel widgets={leftWidgets} renderWidget={renderWidget} />
-             <CenterPanel widgets={centerWidgets} renderWidget={renderWidget} />
-             <RightPanel widgets={rightWidgets} renderWidget={renderWidget} />
+          <div className="flex flex-1 gap-4 p-6 overflow-hidden relative">
+             {/* Mobile Drawer Toggles */}
+             {breakpoint === 'md' && (
+                <>
+                  <button 
+                    onClick={() => setIsLeftDrawerOpen(true)}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-stone-900/80 p-2 rounded-r-2xl border-y border-r border-stone-200 dark:border-stone-800 text-emerald-700 shadow-md hover:pl-4 transition-all"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                  <button 
+                    onClick={() => setIsRightDrawerOpen(true)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-stone-900/80 p-2 rounded-l-2xl border-y border-l border-stone-200 dark:border-stone-800 text-emerald-700 shadow-md hover:pr-4 transition-all"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                </>
+             )}
+
+             <LeftPanel 
+                items={layoutState.panels.left} 
+                isDragMode={isDragMode && breakpoint !== 'sm'}
+                renderPanelItem={renderPanelItem}
+                collapsed={breakpoint === 'lg'}
+                hidden={breakpoint === 'md' || breakpoint === 'sm'}
+             />
+
+             <CenterPanel 
+                items={layoutState.panels.center} 
+                isDragMode={isDragMode && breakpoint !== 'sm'} 
+                renderPanelItem={renderPanelItem} 
+             />
+
+             <RightPanel 
+                items={layoutState.panels.right} 
+                isDragMode={isDragMode && breakpoint !== 'sm'}
+                renderPanelItem={renderPanelItem}
+                collapsed={breakpoint === 'lg'}
+                hidden={breakpoint === 'md' || breakpoint === 'sm'}
+             />
           </div>
 
-          {bottomWidgets.length > 0 && (
+          {layoutState.panels.bottom.some(i => i.visible) && (
             <div className="px-6 pb-6 overflow-x-auto">
-               <BottomWidgetRow widgets={bottomWidgets} renderWidget={renderWidget} />
+               <BottomWidgetRow 
+                items={layoutState.panels.bottom} 
+                isDragMode={isDragMode && breakpoint !== 'sm'} 
+                renderPanelItem={renderPanelItem} 
+               />
             </div>
           )}
 
@@ -423,7 +603,6 @@ export default function NewTab() {
                   NoorTab &bull; Light of your browser
                 </span>
              </div>
-             
              <button
               onClick={() => setShowCustomizer(true)}
               className="flex items-center gap-2 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-4 py-2 text-xs font-bold shadow-lg hover:opacity-90 transition-all active:scale-95"
@@ -435,7 +614,15 @@ export default function NewTab() {
         </div>
       )}
 
+      <CustomizeFAB
+        isDragMode={isDragMode}
+        onToggle={() => setIsDragMode(!isDragMode)}
+        onReset={resetLayout}
+        onShowWidgets={() => setShowCustomizer(true)}
+      />
+
       <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
     </div>
+    </DragProvider>
   );
 }
