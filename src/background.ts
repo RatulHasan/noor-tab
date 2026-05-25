@@ -29,7 +29,6 @@ async function refreshAlarms() {
   try {
     const settings = await getSettings();
     if (!settings.coordinates) {
-      console.log("No coordinates set. Skipping alarm scheduling.");
       await clearAllAlarms();
       return;
     }
@@ -70,7 +69,6 @@ async function refreshAlarms() {
       }
     }
 
-    console.log("Alarms successfully rescheduled.");
   } catch (error) {
     console.error("Error refreshing alarms:", error);
   }
@@ -78,28 +76,22 @@ async function refreshAlarms() {
 
 // Runtime listeners
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("NoorTab Extension installed. Initializing alarms...");
   await refreshAlarms();
 });
 
 // Alarm firing listener
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  console.log(`Alarm fired: ${alarm.name}`);
-
   if (alarm.name === "prayer-midnight-reset") {
-    console.log("Midnight reached. Recalculating times...");
     await refreshAlarms();
     return;
   }
 
   if (alarm.name === "adhkar-morning-reset") {
-    console.log("Morning adhkar reminder time!");
     await refreshAlarms(); // Reschedule for tomorrow
     return;
   }
 
   if (alarm.name === "adhkar-evening-reset") {
-    console.log("Evening adhkar reminder time!");
     await refreshAlarms();
     return;
   }
@@ -110,7 +102,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (focusMode?.enabled && focusMode?.snoozedUntil) {
       const snoozedUntil = new Date(focusMode.snoozedUntil);
       if (snoozedUntil > new Date()) {
-        console.log(`Focus Mode active. Skipping prayer alarm: ${alarm.name}`);
         return;
       } else {
         // Snooze expired, disable focus mode
@@ -144,9 +135,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             // If message sending failed (e.g. no content script loaded on system pages),
             // fallback to opening new tab so the reminder is not missed
             if (chrome.runtime.lastError) {
-              console.log(
-                "Overlay message failed (e.g., active tab is system page). Falling back to new tab."
-              );
               chrome.tabs.create({ url });
             }
           });
@@ -162,7 +150,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // Listen for settings update messages from Popup / New Tab
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "SETTINGS_CHANGED") {
-    console.log("Settings changed message received. Refreshing alarms...");
     refreshAlarms().then(() => sendResponse({ success: true }));
     return true; // Keep channel open for async response
   }
@@ -208,7 +195,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "MARK_PRAYER") {
     // Storage update handled by component directly via @plasmohq/storage
     // Background just logs for debugging
-    console.log("Prayer marked:", message.prayer, message.status, "for", message.date);
     sendResponse({ success: true });
     return true;
   }

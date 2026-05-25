@@ -58,7 +58,6 @@ const OverlayCSUI = () => {
             setIsOverlayAudioPlaying(true);
             
             audio.play().catch((err) => {
-              console.log("Autoplay of Adhan blocked by browser autoplay policies on this active web tab:", err);
               setIsOverlayAudioPlaying(false);
             });
 

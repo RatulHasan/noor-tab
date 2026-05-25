@@ -34,7 +34,6 @@ export async function scheduleAllPrayerAlarms(
     // Only schedule if the alarm time is in the future
     if (triggerTime > now) {
       chrome.alarms.create(`prayer-${name}`, { when: triggerTime });
-      console.log(`Scheduled alarm for ${name} at ${new Date(triggerTime).toString()}`);
     }
   }
 }
@@ -56,7 +55,6 @@ export function scheduleMidnightReset(): void {
   );
   
   chrome.alarms.create("prayer-midnight-reset", { when: midnight.getTime() });
-  console.log(`Scheduled midnight reset at ${midnight.toString()}`);
 }
 export async function clearAllAlarms(): Promise<void> {
   if (typeof chrome === "undefined" || !chrome.alarms) return;
