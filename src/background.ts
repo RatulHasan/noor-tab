@@ -103,7 +103,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 
   // Check Focus Mode - skip prayer notifications if snoozed
-  if (alarm.name.startsWith("prayer-")) {
+  if (alarm.name.startsWith("prayer-reminder-") || alarm.name.startsWith("prayer-time-")) {
     const focusMode = await storage.get<FocusMode>("focusMode");
     if (focusMode?.enabled && focusMode?.snoozedUntil) {
       const snoozedUntil = new Date(focusMode.snoozedUntil);
@@ -116,8 +116,46 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     }
   }
 
-  if (alarm.name.startsWith("prayer-")) {
-    const prayerName = alarm.name.replace("prayer-", "");
+  // Handle prayer time alarms (actual prayer time - for adhan)
+  if (alarm.name.startsWith("prayer-time-")) {
+    const prayerName = alarm.name.replace("prayer-time-", "");
+    const settings = await getSettings();
+
+    // Only play adhan/show notification if adhan audio is configured
+    const configuredAdhan = settings.adhanAudio || "none";
+    if (configuredAdhan !== "none") {
+      const url = chrome.runtime.getURL(`newtab.html?reminder=${prayerName}&adhanOnly=true`);
+
+      // For prayer-time alarms, prefer newtab to play adhan
+      if (settings.notificationStyle === "newtab" || settings.notificationStyle === "both") {
+        chrome.tabs.create({ url });
+      }
+
+      // Also try overlay for prayer-time
+      if (settings.notificationStyle === "overlay" || settings.notificationStyle === "both") {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const activeTab = tabs[0];
+          if (activeTab && activeTab.id) {
+            chrome.tabs.sendMessage(activeTab.id, {
+              type: "SHOW_PRAYER_OVERLAY",
+              prayer: prayerName,
+              minutes: 0, // 0 means it's prayer time
+              isPrayerTime: true,
+            }, (response) => {
+              if (chrome.runtime.lastError) {
+                chrome.tabs.create({ url });
+              }
+            });
+          }
+        });
+      }
+    }
+    return;
+  }
+
+  // Handle prayer reminder alarms (before prayer time)
+  if (alarm.name.startsWith("prayer-reminder-")) {
+    const prayerName = alarm.name.replace("prayer-reminder-", "");
     const settings = await getSettings();
 
     const url = chrome.runtime.getURL(`newtab.html?reminder=${prayerName}`);
@@ -150,6 +188,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         }
       });
     }
+    return;
   }
 });
 

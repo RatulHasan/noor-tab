@@ -128,6 +128,7 @@ export default function NoorTabHero({
       setShowReminder(true);
 
       const configuredAdhan = settings.adhanAudio || "none";
+      // Always play adhan for prayer time notifications (both reminder and actual prayer time)
       if (configuredAdhan !== "none") {
         const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === configuredAdhan);
         if (option && option.url) {

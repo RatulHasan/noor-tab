@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSettings } from "./hooks/useSettings";
 import { usePrayerTimes } from "./hooks/usePrayerTimes";
 import NoorTabHero from "./components/newtab/NoorTabHero";
@@ -7,11 +7,12 @@ import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
 import { getTranslation } from "./data/translations";
-import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check, ChevronDown, Sparkles, RotateCcw, Eye } from "lucide-react";
+import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check, ChevronDown, Sparkles, RotateCcw, Eye, Upload, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import { detectLocation, geocodeLocation } from "./utils/locationService";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
-import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem } from "./types";
+import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem, NoorTabBackup } from "./types";
 import { useStorage } from "@plasmohq/storage/hook";
+import { parseBackupFile, validateBackup, importBackup, getBackupSummary } from "./utils/backupManager";
 
 // Import DnD Kit
 import { type DragEndEvent, type DragOverEvent } from "@dnd-kit/core";
@@ -22,6 +23,7 @@ import AsmaUlHusna from "./components/newtab/AsmaUlHusna";
 import GlobalPrayerWidget from "./components/newtab/GlobalPrayerWidget";
 import JumuahBanner from "./components/newtab/JumuahBanner";
 import WidgetCustomizer from "./components/newtab/WidgetCustomizer";
+import SettingsDrawer from "./components/newtab/SettingsDrawer";
 import AdhkarPlayer from "./components/shared/AdhkarPlayer";
 import FastingTracker from "./components/shared/FastingTracker";
 import QuranBookmark from "./components/shared/QuranBookmark";
@@ -69,6 +71,7 @@ export default function NewTab() {
   const [reminderPrayer, setReminderPrayer] = useState<string | null>(null);
 
   const [showCustomizer, setShowCustomizer] = useState(false);
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [fastingData] = useStorage<FastingData>("fastingData");
   const [devMockCityName] = useStorage<string>("devMockCityName", "");
@@ -140,6 +143,13 @@ export default function NewTab() {
   const [onboardingCountry, setOnboardingCountry] = useState("");
   const [isOnboardingSearching, setIsOnboardingSearching] = useState(false);
 
+  // Import backup states
+  const [validatedBackup, setValidatedBackup] = useState<NoorTabBackup | null>(null);
+  const [importValidationError, setImportValidationError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const lang = settings?.language || "en";
 
   // Parse "?reminder=" parameter from the URL query
@@ -149,33 +159,59 @@ export default function NewTab() {
       const reminder = params.get("reminder");
       if (reminder) {
         setReminderPrayer(reminder);
-        
-        // Auto-play Adhan if configured
-        const configuredAdhan = settings.adhanAudio || "none";
-        if (configuredAdhan !== "none") {
-          const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === configuredAdhan);
-          if (option && option.url) {
-            const audio = new Audio(option.url);
-            audioRef.current = audio;
-            audio.play().catch((err) => console.error("Adhan autoplay blocked:", err));
-            
-            const globalStorage = new Storage();
-            globalStorage.set("adhanIsPlaying", true).catch(() => {});
-            
-            audio.onended = () => {
-                globalStorage.set("adhanIsPlaying", false).catch(() => {});
-            };
-          }
-        }
       }
     }
+  }, []);
+
+  // Auto-play Adhan when reminderPrayer is set and settings are loaded
+  useEffect(() => {
+    if (reminderPrayer && settings?.adhanAudio && settings.adhanAudio !== "none") {
+      const configuredAdhan = settings.adhanAudio;
+      const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === configuredAdhan);
+      if (option && option.url) {
+        const audio = new Audio(option.url);
+        audioRef.current = audio;
+        audio.play().catch((err) => console.error("Adhan autoplay blocked:", err));
+
+        const globalStorage = new Storage();
+        globalStorage.set("adhanIsPlaying", true).catch(() => {});
+
+        audio.onended = () => {
+          globalStorage.set("adhanIsPlaying", false).catch(() => {});
+        };
+      }
+    }
+
     return () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
-        }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+        const globalStorage = new Storage();
+        globalStorage.set("adhanIsPlaying", false).catch(() => {});
+      }
     };
-  }, [settings.adhanAudio]);
+  }, [reminderPrayer, settings?.adhanAudio]);
+
+  // Listen for STOP_ALL_ADHAN messages from popup
+  useEffect(() => {
+    const handleMessage = (message: any) => {
+      if (message.type === "STOP_ALL_ADHAN_INTERNAL" && audioRef.current) {
+        audioRef.current.pause();
+        const globalStorage = new Storage();
+        globalStorage.set("adhanIsPlaying", false).catch(() => {});
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+
+    return () => {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleMessage);
+      }
+    };
+  }, []);
 
   const handleSaveSettings = async (newSettings: Partial<UserSettings>) => {
     await updateSettings(newSettings);
@@ -214,9 +250,14 @@ export default function NewTab() {
     try {
       const result = await geocodeLocation(onboardingCity, onboardingCountry);
       if (result) {
+        // Set Hanafi madhab for South Asian countries
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey", "Sri Lanka", "Nepal", "Maldives", "Bhutan", "Myanmar"];
+        const madhab = hanafiCountries.some(c => onboardingCountry.toLowerCase().includes(c.toLowerCase())) ? "hanafi" : settings.madhab;
+
         await handleSaveSettings({
           coordinates: { lat: result.lat, lng: result.lng },
           cityName: result.cityName,
+          madhab,
         });
       } else {
         setOnboardingError(t("locationNotFound"));
@@ -244,22 +285,69 @@ export default function NewTab() {
 
   const handleConfirmOnboarding = async () => {
     if (!onboardingCountryName || !onboardingCityName || onboardingCountryName === "custom" || onboardingCityName === "custom") return;
-    
+
     const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
     const city = country?.cities.find(ct => ct.name === onboardingCityName);
-    
+
     if (city) {
       setIsOnboardingSearching(true);
       try {
+        // Countries that follow Hanafi madhab
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey"];
+        const madhab = hanafiCountries.includes(onboardingCountryName) ? "hanafi" : settings.madhab;
+
         await handleSaveSettings({
           coordinates: { lat: city.lat, lng: city.lng },
           cityName: city.name,
+          madhab,
         });
       } catch (err) {
         setOnboardingError(t("errorSaving"));
       } finally {
         setIsOnboardingSearching(false);
       }
+    }
+  };
+
+  // Import backup handlers
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportValidationError(null);
+    setValidatedBackup(null);
+    try {
+      const parsed = await parseBackupFile(file);
+      const result = validateBackup(parsed);
+      if (!result.valid || !result.backup) {
+        setImportValidationError(result.error || "Invalid backup.");
+      } else {
+        setValidatedBackup(result.backup);
+      }
+    } catch (e: any) {
+      setImportValidationError(e.message || "Could not read file.");
+    }
+    // Reset input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleImport = async () => {
+    if (!validatedBackup) return;
+    setIsImporting(true);
+    setImportValidationError(null);
+    try {
+      // Use "replace" mode for onboarding import
+      console.log("[NoorTab] Starting backup import...", validatedBackup);
+      await importBackup(validatedBackup, "replace");
+      console.log("[NoorTab] Import successful, reloading page...");
+      setImportSuccess(true);
+      // Wait longer before reload to ensure data is persisted
+      setTimeout(() => window.location.reload(), 3000);
+    } catch (e: any) {
+      console.error("[NoorTab] Import failed:", e);
+      setImportValidationError(e.message || "Import failed.");
+      setImportSuccess(false);
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -510,6 +598,85 @@ export default function NewTab() {
               <p className="text-xs text-rose-500 font-medium leading-normal">{onboardingError}</p>
             )}
           </div>
+
+          {/* Import Backup Section */}
+          <div className="w-full max-w-md mx-auto relative z-10 px-6">
+            <div className="text-center py-4">
+              <p className="text-xs text-stone-400 dark:text-stone-500 font-medium mb-3">
+                — {t("or").toUpperCase()} —
+              </p>
+              <div className="rounded-2xl border border-dashed border-stone-300 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900/30 p-4 space-y-3">
+                <div className="flex items-center justify-center gap-2 text-stone-600 dark:text-stone-400">
+                  <Upload className="h-4 w-4" />
+                  <span className="text-xs font-semibold">Restore from Backup</span>
+                </div>
+                <p className="text-[10px] text-stone-500 dark:text-stone-500 leading-relaxed text-center">
+                  Import your previous NoorTab backup to restore all settings, prayer history, and preferences.
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+                {!validatedBackup ? (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImporting || importSuccess}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-stone-200 dark:bg-stone-800 py-2 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isImporting ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="h-3.5 w-3.5" />
+                    )}
+                    {isImporting ? "Importing..." : "Select Backup File"}
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="rounded-lg border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-3 space-y-2">
+                      <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                        ✓ Valid Backup Found
+                      </p>
+                      <div className="text-[9px] text-stone-600 dark:text-stone-400 space-y-0.5">
+                        <p>Exported: {new Date(validatedBackup.exportedAt).toLocaleDateString()}</p>
+                        <p>Location: {validatedBackup.settings?.cityName || "Unknown"}</p>
+                        <p>Days of prayer history: {Object.keys(validatedBackup.prayerStreak?.records || {}).length}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleImport}
+                        disabled={isImporting || importSuccess}
+                        className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 py-2 text-xs font-bold text-white hover:bg-emerald-600 disabled:opacity-60 transition-colors"
+                      >
+                        {isImporting ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : importSuccess ? (
+                          <>
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Restored!
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="h-3.5 w-3.5" />
+                            Restore Backup
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {importValidationError && (
+                  <p className="text-[10px] text-rose-500 font-medium flex items-center justify-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {importValidationError}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         /* Full App 3-Column Dashboard */
@@ -649,7 +816,7 @@ export default function NewTab() {
                 </div>
              ) : (
                 <>
-                   <div className="flex items-center gap-6">
+                   <div className="flex items-center gap-3">
                       <BuyMeCoffee variant="badge" />
                       <button
                         onClick={() => setShowCustomizer(true)}
@@ -657,6 +824,14 @@ export default function NewTab() {
                       >
                         <Settings2 className="h-3.5 w-3.5" />
                         {t("customizeDashboard")}
+                      </button>
+                      <button
+                        onClick={() => setShowSettingsDrawer(true)}
+                        className="flex items-center gap-2 rounded-lg border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 px-3 py-1.5 text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 transition-all active:scale-95"
+                        title={t("settings")}
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                        {t("settings")}
                       </button>
                       <span className="hidden md:inline text-[10px] text-stone-500 font-bold uppercase tracking-widest">
                         {t("noorTabSlogan")}
@@ -677,6 +852,7 @@ export default function NewTab() {
       )}
 
       <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
+      <SettingsDrawer isOpen={showSettingsDrawer} onClose={() => setShowSettingsDrawer(false)} />
     </div>
     </DragProvider>
   );

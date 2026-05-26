@@ -83,6 +83,36 @@ export default function IslamicQuiz() {
     }
   };
 
+  const getTranslatedDifficulty = (diff: QuizQuestion["difficulty"]) => {
+    switch (diff) {
+      case "easy":
+        return t("difficultyEasy");
+      case "medium":
+        return t("difficultyMedium");
+      case "hard":
+        return t("difficultyHard");
+      default:
+        return diff;
+    }
+  };
+
+  const getTranslatedCategory = (category: string) => {
+    switch (category) {
+      case "quran":
+        return t("categoryQuran");
+      case "seerah":
+        return t("categorySeerah");
+      case "fiqh":
+        return t("categoryFiqh");
+      case "history":
+        return t("categoryHistory");
+      case "general":
+        return t("categoryGeneral");
+      default:
+        return category;
+    }
+  };
+
   return (
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 border border-stone-200/50 dark:border-stone-800/60 flex flex-col space-y-4 font-sans select-none">
       <div className="flex justify-between items-center">
@@ -91,12 +121,12 @@ export default function IslamicQuiz() {
             {questionOffset === 0 ? t("dailyIslamicQuiz") : t("islamicQuizPractice")}
           </p>
           <span className="text-[9px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider block mt-0.5">
-            {t("category")}: {question.category}
+            {t("category")}: {getTranslatedCategory(question.category)}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className={cn("text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider", getDifficultyColor(question.difficulty))}>
-            {question.difficulty}
+            {getTranslatedDifficulty(question.difficulty)}
           </span>
         </div>
       </div>

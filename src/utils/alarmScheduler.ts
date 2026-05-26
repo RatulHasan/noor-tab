@@ -2,12 +2,12 @@ import type { DailyPrayers, PrayerName } from "../types";
 
 export async function clearAllPrayerAlarms(): Promise<void> {
   if (typeof chrome === "undefined" || !chrome.alarms) return;
-  
+
   const alarms = await chrome.alarms.getAll();
   const prayerAlarms = alarms.filter(
-    (alarm) => alarm.name.startsWith("prayer-") && alarm.name !== "prayer-midnight-reset"
+    (alarm) => (alarm.name.startsWith("prayer-reminder-") || alarm.name.startsWith("prayer-time-")) && alarm.name !== "prayer-midnight-reset"
   );
-  
+
   for (const alarm of prayerAlarms) {
     await chrome.alarms.clear(alarm.name);
   }
@@ -29,11 +29,16 @@ export async function scheduleAllPrayerAlarms(
     if (!perPrayerReminder[name]) continue;
 
     const prayerTime = new Date(prayers[name]).getTime();
-    const triggerTime = prayerTime - reminderMinutes * 60 * 1000;
+    const reminderTime = prayerTime - reminderMinutes * 60 * 1000;
 
-    // Only schedule if the alarm time is in the future
-    if (triggerTime > now) {
-      chrome.alarms.create(`prayer-${name}`, { when: triggerTime });
+    // Schedule reminder alarm (before prayer time)
+    if (reminderTime > now) {
+      chrome.alarms.create(`prayer-reminder-${name}`, { when: reminderTime });
+    }
+
+    // Schedule actual prayer time alarm (for adhan/notification at 100% elapsed)
+    if (prayerTime > now) {
+      chrome.alarms.create(`prayer-time-${name}`, { when: prayerTime });
     }
   }
 }

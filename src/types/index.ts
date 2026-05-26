@@ -270,6 +270,22 @@ export interface NoorTabBackup {
   quizRecord: QuizRecord;
   widgetLayout: WidgetConfig[];
   layoutState?: LayoutState;
+  // Additional user data
+  focusMode?: FocusMode;
+  zakatHistory?: ZakatCalculation[];
+  quizQuestionOffset?: number;
+}
+
+// Zakat calculation type for backup
+export interface ZakatCalculation {
+  totalAssets: number;
+  totalLiabilities: number;
+  netAssets: number;
+  nisabThreshold: number;
+  isEligible: boolean;
+  zakatDue: number;
+  currency: string;
+  savedAt: string;
 }
 
 // ── Panel Layout ───────────────────────────────────────────

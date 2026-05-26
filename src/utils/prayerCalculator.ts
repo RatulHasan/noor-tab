@@ -8,6 +8,30 @@ import type {
 } from "../types";
 import { PRAYER_METADATA } from "../data/prayerNames";
 
+/**
+ * Get the timezone offset in hours for a given longitude.
+ * This is an approximation - actual timezones may vary due to political boundaries.
+ */
+export function getTimezoneOffsetForLongitude(lng: number): number {
+  return Math.round(lng / 15);
+}
+
+/**
+ * Adjust a Date from one timezone to another based on longitude offsets.
+ * This is used to convert prayer times calculated in UTC to the target location's timezone.
+ */
+export function adjustDateToTimezone(date: Date, targetLng: number): Date {
+  const targetOffsetHours = getTimezoneOffsetForLongitude(targetLng);
+  const browserOffsetMinutes = date.getTimezoneOffset(); // in minutes, inverted sign
+  const targetOffsetMinutes = targetOffsetHours * 60;
+
+  // Calculate the difference between browser timezone and target timezone
+  const offsetDiffMinutes = targetOffsetMinutes + browserOffsetMinutes;
+
+  // Create new Date adjusted by the difference
+  return new Date(date.getTime() + offsetDiffMinutes * 60 * 1000);
+}
+
 const METHOD_MAP: Record<CalculationMethodKey, () => any> = {
   muslimWorldLeague: CalculationMethod.MuslimWorldLeague,
   egyptian: CalculationMethod.Egyptian,
@@ -33,11 +57,13 @@ export function calculatePrayerTimes(
   const coordinates = new Coordinates(lat, lng);
   const methodFn = METHOD_MAP[methodKey] || CalculationMethod.MuslimWorldLeague;
   const params = methodFn();
-  
+
   params.madhab = madhabKey === "hanafi" ? Madhab.Hanafi : Madhab.Shafi;
-  
+
+  // Calculate prayer times - the adhan library uses the date's timezone internally
+  // The calculation is based on the day of year and coordinates, not the timezone
   const prayerTimes = new PrayerTimes(coordinates, date, params);
-  
+
   const prayers = {
     fajr: prayerTimes.fajr,
     sunrise: prayerTimes.sunrise,
@@ -47,15 +73,39 @@ export function calculatePrayerTimes(
     isha: prayerTimes.isha,
   };
 
-  if (offsets) {
-    (Object.keys(offsets) as PrayerName[]).forEach((name) => {
-      if (prayers[name] && offsets[name] !== 0) {
-        prayers[name] = new Date(prayers[name].getTime() + offsets[name] * 60000);
+  // Adjust prayer times to target timezone if browser timezone differs from location
+  // This ensures prayer times display correctly for the selected location
+  const targetLng = lng;
+  const browserOffsetMinutes = date.getTimezoneOffset(); // Browser's UTC offset (inverted sign)
+  const targetOffsetHours = getTimezoneOffsetForLongitude(targetLng);
+  const targetOffsetMinutes = targetOffsetHours * 60;
+
+  // If browser timezone doesn't match target timezone, adjust prayer times
+  const offsetDiffMinutes = targetOffsetMinutes + browserOffsetMinutes;
+  const needsAdjustment = Math.abs(offsetDiffMinutes) > 30; // More than 30 min difference
+
+  const adjustedPrayers = { ...prayers };
+
+  if (needsAdjustment) {
+    // Adjust each prayer time to target timezone
+    (Object.keys(adjustedPrayers) as PrayerName[]).forEach((name) => {
+      const prayerDate = adjustedPrayers[name];
+      if (prayerDate) {
+        adjustedPrayers[name] = new Date(prayerDate.getTime() + offsetDiffMinutes * 60 * 1000);
       }
     });
   }
 
-  return prayers;
+  // Apply manual offsets (user adjustments)
+  if (offsets) {
+    (Object.keys(offsets) as PrayerName[]).forEach((name) => {
+      if (adjustedPrayers[name] && offsets[name] !== 0) {
+        adjustedPrayers[name] = new Date(adjustedPrayers[name].getTime() + offsets[name] * 60000);
+      }
+    });
+  }
+
+  return adjustedPrayers;
 }
 
 export function getNextPrayer(

@@ -115,6 +115,8 @@ export default function Popup() {
         coordinates: { lat: loc.lat, lng: loc.lng },
         cityName: loc.cityName || "Detected Location",
       });
+      // Note: For auto-detected location, we can't determine the country reliably
+      // User can manually change madhab in settings if needed
     } catch (err: any) {
       console.error(err);
       setOnboardingError(err.message);
@@ -130,9 +132,14 @@ export default function Popup() {
     try {
       const result = await geocodeLocation(onboardingCity, onboardingCountry);
       if (result) {
+        // Set Hanafi madhab for South Asian countries
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey", "Sri Lanka", "Nepal", "Maldives", "Bhutan", "Myanmar"];
+        const madhab = hanafiCountries.some(c => onboardingCountry.toLowerCase().includes(c.toLowerCase())) ? "hanafi" : settings.madhab;
+
         await handleSaveSettings({
           coordinates: { lat: result.lat, lng: result.lng },
           cityName: result.cityName,
+          madhab,
         });
       } else {
         setOnboardingError("Location not found. Please try a different query or enter coordinates in settings.");
@@ -160,16 +167,21 @@ export default function Popup() {
 
   const handleConfirmOnboarding = async () => {
     if (!onboardingCountryName || !onboardingCityName || onboardingCountryName === "custom" || onboardingCityName === "custom") return;
-    
+
     const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
     const city = country?.cities.find(ct => ct.name === onboardingCityName);
-    
+
     if (city) {
       setIsOnboardingSearching(true);
       try {
+        // Countries that follow Hanafi madhab
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey"];
+        const madhab = hanafiCountries.includes(onboardingCountryName) ? "hanafi" : settings.madhab;
+
         await handleSaveSettings({
           coordinates: { lat: city.lat, lng: city.lng },
           cityName: city.name,
+          madhab,
         });
       } catch (err) {
         setOnboardingError(t("errorSaving"));

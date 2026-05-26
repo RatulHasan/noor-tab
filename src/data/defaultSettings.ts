@@ -54,16 +54,16 @@ export const defaultLayoutState: LayoutState = {
       { id: 'fixed-hub',           type: 'fixed',  visible: true,  order: 2, panel: 'center', locked: true  },
     ],
     right: [
-      { id: 'fixed-qibla',         type: 'fixed',  visible: true,  order: 0, panel: 'right',  locked: true  },
-      { id: 'widget-asmaName',     type: 'widget', widgetId: 'asmaName',        visible: true,  order: 1, panel: 'right' },
-      { id: 'widget-islamicCal',   type: 'widget', widgetId: 'islamicCalendar', visible: true,  order: 2, panel: 'right' },
-      { id: 'widget-globalPrayer', type: 'widget', widgetId: 'globalPrayer',    visible: false, order: 3, panel: 'right' },
+      { id: 'widget-asmaName',   type: 'widget', widgetId: 'asmaName',        visible: true,  order: 1, panel: 'right' },
+      { id: 'widget-islamicCal', type: 'widget', widgetId: 'islamicCalendar', visible: true,  order: 2, panel: 'right' },
+      { id: 'fixed-qibla',       type: 'fixed',  visible: true,  order: 0, panel: 'right',  locked: true  },
     ],
     bottom: [
       { id: 'widget-dhikr',        type: 'widget', widgetId: 'dhikr',          visible: true,  order: 0, panel: 'bottom' },
       { id: 'widget-hadith',       type: 'widget', widgetId: 'hadith',         visible: true,  order: 1, panel: 'bottom' },
       { id: 'widget-quiz',         type: 'widget', widgetId: 'quiz',           visible: false, order: 2, panel: 'bottom' },
       { id: 'widget-quranBkmk',    type: 'widget', widgetId: 'quranBookmark',  visible: false, order: 3, panel: 'bottom' },
+      { id: 'widget-globalPrayer', type: 'widget', widgetId: 'globalPrayer',    visible: false, order: 4, panel: 'bottom' },
     ],
   },
 };

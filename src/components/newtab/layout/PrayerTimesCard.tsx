@@ -107,21 +107,29 @@ export function PrayerTimesCard() {
           const isPassed = prayer.state === "passed";
           
           return (
-            <div 
+            <div
               key={prayer.name}
               className={cn(
                 "flex items-center justify-between px-3 py-2.5 rounded-2xl transition-all",
                 isNext ? "bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-600" : "hover:bg-stone-50 dark:hover:bg-stone-800/50"
               )}
             >
-              <div className="flex items-center gap-3">
-                <span className={cn(
-                  "text-xs font-bold capitalize",
-                  isNext ? "text-emerald-800 dark:text-emerald-300" : isPassed ? "text-stone-400" : "text-stone-600 dark:text-stone-400"
-                )}>
-                  {prayer.name}
-                </span>
-                {isNext && <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />}
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-3">
+                  <span className={cn(
+                    "text-xs font-bold capitalize",
+                    isNext ? "text-emerald-800 dark:text-emerald-300" : isPassed ? "text-stone-400" : "text-stone-600 dark:text-stone-400"
+                  )}>
+                    {prayer.name}
+                  </span>
+                  {isNext && <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />}
+                </div>
+                {/* Show alarm time below prayer name if reminder enabled */}
+                {prayer.reminderEnabled && settings.reminderMinutes > 0 && (
+                  <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400">
+                    🔔 {new Date(prayer.time.getTime() - settings.reminderMinutes * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-3">
                  <span className={cn(
@@ -172,12 +180,19 @@ export function PrayerTimesCard() {
              <span className="text-sm font-mono font-black text-emerald-700 dark:text-emerald-400">{countdown?.formatted}</span>
           </div>
           <div className="h-1.5 w-full bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
-             <div 
+             <div
               className="h-full bg-emerald-600 transition-all duration-1000"
               style={{ width: `${progress}%` }}
              />
           </div>
-          <p className="text-right text-[9px] font-bold text-stone-400 mt-1">{Math.round(progress)}% elapsed</p>
+          <div className="flex justify-between items-center mt-1">
+            <p className="text-left text-[9px] font-bold text-stone-400">{Math.round(progress)}% elapsed</p>
+            {settings.reminderMinutes > 0 && settings.perPrayerReminder?.[nextPrayer.name] && (
+              <p className="text-right text-[9px] font-bold text-amber-600 dark:text-amber-400">
+                🔔 {t("alarm")}: {new Date(nextPrayer.time.getTime() - settings.reminderMinutes * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
