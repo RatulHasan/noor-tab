@@ -215,13 +215,21 @@ export interface Dua {
 // ── Islamic Quiz ────────────────────────────────────────────
 export type QuizCategory = 'quran' | 'history' | 'fiqh' | 'seerah' | 'general';
 
+export type QuizTranslation = {
+  en: string;
+  bn?: string;
+  ar?: string;
+  hi?: string;
+  ur?: string;
+};
+
 export interface QuizQuestion {
   id: string;
   category: QuizCategory;
-  question: string;
-  options: string[];
+  question: QuizTranslation;
+  options: QuizTranslation[];
   correctIndex: number;
-  explanation: string;
+  explanation: QuizTranslation;
   difficulty: 'easy' | 'medium' | 'hard';
 }
 

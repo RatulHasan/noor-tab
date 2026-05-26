@@ -337,11 +337,47 @@ export default function NewTab() {
     try {
       // Use "replace" mode for onboarding import
       console.log("[NoorTab] Starting backup import...", validatedBackup);
+
+      // Verify backup has coordinates
+      if (!validatedBackup.settings?.coordinates) {
+        throw new Error("Backup file does not contain location coordinates. Please use a backup exported from NoorTab.");
+      }
+
       await importBackup(validatedBackup, "replace");
-      console.log("[NoorTab] Import successful, reloading page...");
+      console.log("[NoorTab] Import successful!");
+
+      // Verify settings were saved using both native and Plasmo storage
+      let savedSettings: any;
+
+      // Try native Chrome storage first
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+        savedSettings = await new Promise<any>((resolve) => {
+          chrome.storage.local.get("noortab-user-settings", (result) => {
+            resolve(result["noortab-user-settings"]);
+          });
+        });
+        console.log("[NoorTab] Native storage verification:", savedSettings);
+      }
+
+      // Also verify with Plasmo storage
+      const storage = new Storage();
+      const plasmoSettings = await storage.get("noortab-user-settings");
+      console.log("[NoorTab] Plasmo storage verification:", plasmoSettings);
+
+      const verifiedSettings = savedSettings || plasmoSettings;
+
+      if (!verifiedSettings || !verifiedSettings.coordinates) {
+        console.error("[NoorTab] Verification failed - native:", savedSettings, "plasmo:", plasmoSettings);
+        throw new Error("Import verification failed: Settings were not saved properly. Please try again.");
+      }
+
       setImportSuccess(true);
-      // Wait longer before reload to ensure data is persisted
-      setTimeout(() => window.location.reload(), 3000);
+
+      // Force reload the page to refresh all contexts
+      setTimeout(() => {
+        console.log("[NoorTab] Reloading page...");
+        window.location.reload();
+      }, 1500);
     } catch (e: any) {
       console.error("[NoorTab] Import failed:", e);
       setImportValidationError(e.message || "Import failed.");

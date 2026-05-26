@@ -2,11 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { format } from "~utils/dateUtils";
 import { quizQuestions } from "~data/quizQuestions";
-import type { QuizQuestion, QuizRecord } from "~types";
+import type { QuizQuestion, QuizRecord, QuizTranslation } from "~types";
 import { cn } from "~utils/cn";
 import { HelpCircle, Award, CheckCircle2, AlertCircle } from "lucide-react";
 import { useSettings } from "~hooks/useSettings";
 import { getTranslation } from "~data/translations";
+
+// Helper to get translated text from QuizTranslation object
+function getTranslatedText(translation: QuizTranslation | string, lang: string): string {
+  if (typeof translation === "string") {
+    return translation;
+  }
+  return translation[lang] || translation.en || "";
+}
 
 export default function IslamicQuiz() {
   const [quizRecord, setQuizRecord] = useStorage<QuizRecord>("quizRecord", {
@@ -134,7 +142,7 @@ export default function IslamicQuiz() {
       {/* Question Text */}
       <div className="text-sm font-semibold text-stone-800 dark:text-stone-100 flex gap-2">
         <HelpCircle className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">{question.question}</p>
+        <p className="leading-relaxed">{getTranslatedText(question.question, lang)}</p>
       </div>
 
       {/* Options */}
@@ -169,7 +177,7 @@ export default function IslamicQuiz() {
                 optionStyle
               )}
             >
-              {option}
+              {getTranslatedText(option, lang)}
             </button>
           );
         })}
@@ -193,7 +201,7 @@ export default function IslamicQuiz() {
               )}
             </div>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
-              {question.explanation}
+              {getTranslatedText(question.explanation, lang)}
             </p>
           </div>
 

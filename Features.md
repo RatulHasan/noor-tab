@@ -1,18 +1,19 @@
 NoorTab transforms every new browser tab into a serene Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, a Qibla compass, and a full suite of spiritual tools, all in a beautifully designed, distraction-free experience.
 
 🕌 PRAYER TIMES & ADHAN REMINDERS
-• Accurate prayer times using industry-standard algorithms (Muslim World League, ISNA, Egyptian, Umm al-Qura, and 7 more methods)
+• Accurate prayer times using industry-standard algorithms (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
 • Hanafi and standard Asr madhab support
 • Per-prayer reminders - enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha individually
 • Configurable reminder offset (0–30 minutes before each prayer)
-• High-quality Adhan audio - choose from 6 curated recordings that play automatically at prayer time
+• Prayer time adjustment - manually fine-tune each prayer time by +/- minutes
+• High-quality Adhan audio - choose from curated recordings that play automatically at prayer time
 • Live countdown timer to the next prayer
 • Dynamic background gradients that shift throughout the day - dawn blues, midday greens, sunset ambers, and night indigos
 
 📅 ISLAMIC CALENDAR & EVENTS
 • Hijri date displayed in English transliteration and Arabic script
 • Automatic Islamic event cards (Ramadan, Eid, Muharram, Mawlid, and more) with days-remaining countdown
-• Special Jumu'ah (Friday) greeting banner with Surah Al-Kahf reminders
+• Special Jumu'ah (Friday) greeting banner
 
 🧭 QIBLA COMPASS
 • Geolocation-aware Qibla direction calculated from your coordinates to Makkah
@@ -31,7 +32,7 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 
 🏅 PRAYER STREAK TRACKER
 • 7-day streak display with visual heatmap
-• Monthly calendar view to log each prayer as On Time, Late, or Missed
+• Monthly calendar view to log each prayer as Prayed, Missed, or Excused
 • Current streak counter and longest streak badge
 • Build a consistent daily Salah habit
 
@@ -44,7 +45,7 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 📖 QURAN BOOKMARK
 • Save your current Surah and Ayah position
 • Browse all 114 Surahs by name, number, and revelation type
-• Add notes to your bookmarks and pick up exactly where you left off
+• Multiple bookmarks supported - pick up exactly where you left off
 
 🔤 ASMA UL-HUSNA - 99 NAMES OF ALLAH
 • Name of the Day card - a different name highlighted every day
@@ -57,7 +58,9 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 • Live calculations using each city's coordinates
 
 🧠 ISLAMIC QUIZ
-• 50+ curated multiple-choice questions covering Fiqh, Seerah, Quran, and Islamic history
+• 100 curated multiple-choice questions covering Quran, Fiqh, Seerah, Islamic History, and General Knowledge
+• Questions organized into 5 categories with 20 questions each
+• Full multilingual support - all 100 questions translated in Bengali, Arabic, Hindi, and Urdu
 • Score tracking and personal-best records
 • Instant feedback with correct answer explanations
 
@@ -85,18 +88,26 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 • Active snooze indicator with live remaining time countdown
 
 💾 BACKUP & RESTORE
-• Export all personal data (settings, streaks, fasting log, bookmarks, quiz records, and more) as JSON
-• Import from any previously exported file
+• Export all personal data (settings, streaks, fasting log, bookmarks, quiz records, widget layout, and more) as JSON
+• Import from any previously exported file with validation
 • Seamless migration between devices or browsers
+• Fixed quota issues for reliable backup on first attempt
 
 🌐 MULTI-LANGUAGE SUPPORT
 • Full UI localisation in English, Bengali (বাংলা), Arabic (العربية), Hindi (हिन्दी), and Urdu (اردو)
-• All labels, navigation tabs, card titles, and widget names translate dynamically
+• All labels, navigation tabs, card titles, and quiz questions translate dynamically
+• Clock, date, and number formatting adapts to selected locale
 
-🎨 CUSTOMISABLE DASHBOARD
-• Drag-and-drop widget manager - toggle any of 11 widgets on or off
-• Reorder widgets to your preferred layout
-• Changes persist instantly
+🎨 CUSTOMISABLE 3-COLUMN DASHBOARD
+• Modern responsive layout (3-column XL, 2-column LG/MD, single-column SM)
+• Drag-and-drop widget manager - toggle and reorder widgets to your preference
+• 11+ available widgets including Prayer Times, Streak Tracker, Dhikr Counter, Quiz, and more
+• Changes persist automatically
+
+🔍 PURPOSE SEARCH BAR
+• Unified search with Google, DuckDuckGo, Bing, or Ecosia
+• Islamic prefixes: `quran:`, `hadith:`, `dua:` for direct access to specific tabs
+• Keyboard shortcut: Press `/` to focus search instantly
 
 📍 100% PRIVATE & OFFLINE-CAPABLE
 • No accounts, no tracking, no data sent to any server

@@ -7,24 +7,36 @@ import { Storage } from "@plasmohq/storage";
 
 /**
  * Batch write multiple keys to storage to avoid quota errors.
- * Chrome storage has a MAX_WRITE_OPERATIONS_PER_HOUR quota, so batching is essential.
- * We write keys sequentially with a small delay to avoid hitting quota limits.
+ * Chrome storage has a MAX_WRITE_OPERATIONS_PER_HOUR quota.
+ * IMPORTANT: We use chrome.storage.local.set() with an object containing all keys,
+ * which counts as just ONE write operation instead of N operations.
  */
 async function batchStorageWrite(
   storage: Storage,
   items: Record<string, any>
 ): Promise<void> {
-  const entries = Object.entries(items);
-  console.log("[NoorTab] batchStorageWrite: Writing", entries.length, "keys");
+  const keys = Object.keys(items);
+  console.log("[NoorTab] batchStorageWrite: Writing", keys.length, "keys in SINGLE operation");
 
-  // Write keys sequentially with a small delay between each
-  // This prevents hitting the MAX_WRITE_OPERATIONS_PER_HOUR quota
-  for (const [key, value] of entries) {
-    console.log("[NoorTab] Writing key:", key);
-    await storage.set(key, value);
-    // Small delay to avoid quota issues (100ms between writes)
-    if (entries[entries.length - 1][0] !== key) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+  // CRITICAL: Use native chrome.storage.local.set() with an object.
+  // This counts as exactly ONE write operation, regardless of how many keys.
+  // Using storage.set(key, value) in a loop would count as N operations.
+  if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+    await new Promise<void>((resolve, reject) => {
+      chrome.storage.local.set(items, () => {
+        if (chrome.runtime.lastError) {
+          console.error("[NoorTab] Chrome storage error:", chrome.runtime.lastError);
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
+    });
+  } else {
+    // Fallback for non-Chrome environments (development/testing)
+    // This will use multiple operations, but shouldn't hit quota in normal use
+    for (const [key, value] of Object.entries(items)) {
+      await storage.set(key, value);
     }
   }
 
@@ -732,8 +744,20 @@ export async function importBackup(
     await batchStorageWrite(storage, allData);
 
     // Verify the settings were actually saved by reading them back
-    const savedSettings = await storage.get("noortab-user-settings");
+    // Use native Chrome storage for verification to ensure we get the latest data
+    let savedSettings: any;
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+      savedSettings = await new Promise<any>((resolve) => {
+        chrome.storage.local.get("noortab-user-settings", (result) => {
+          resolve(result["noortab-user-settings"]);
+        });
+      });
+    } else {
+      savedSettings = await storage.get("noortab-user-settings");
+    }
+
     if (!savedSettings || !savedSettings.coordinates) {
+      console.error("[NoorTab] Verification failed - savedSettings:", savedSettings);
       throw new Error("Import verification failed: Settings were not saved properly. Please try again.");
     }
   } else {

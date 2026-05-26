@@ -33,6 +33,7 @@
 - **Madhab support** for Hanafi and standard Asr calculation
 - **Per-prayer reminders** - individually enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha notifications
 - **Configurable reminder offset** - be notified 0–30 minutes before each prayer
+- **Prayer time adjustment** - manually fine-tune each prayer time by +/- minutes for accuracy
 - **Adhan audio playback** - choose from a curated selection of high-quality Adhan recordings; audio plays automatically when the prayer reminder fires
 - **Global stop control** - a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
 - **Live countdown** to the next prayer with a smooth animated timer
@@ -145,6 +146,7 @@ Integrated, full-featured Islamic applications accessible directly within your n
 - **🧭 Qibla Tab**: A full-sized, animated Qibla compass with distance-to-Kaaba calculation.
 - **📅 Islamic Calendar**: A complete monthly Hijri calendar with highlighted Islamic events and holidays.
 - **🧮 Zakat Calculator**: Calculate your Zakat obligations with a built-in asset and liability tracker.
+- **🧠 Islamic Quiz**: 100 multiple-choice questions across Quran, Fiqh, Seerah, History, and General Knowledge - fully translated in 4 languages.
 
 ### 🔍 Purpose Search Bar
 A powerful search tool designed for the modern Muslim:
@@ -186,15 +188,15 @@ Export and restore all your personal data in one click:
 
 ## 🌐 Multi-Language Support
 Full UI localisation for:
-| Language | Code |
-|---|---|
-| English | `en` |
-| Bengali | `bn` |
-| Arabic | `ar` |
-| Hindi | `hi` |
-| Urdu | `ur` |
+| Language | Code | Coverage |
+|---|---|---|
+| English | `en` | Full UI + Quiz |
+| Bengali | `bn` | Full UI + Quiz |
+| Arabic | `ar` | Full UI + Quiz |
+| Hindi | `hi` | Full UI + Quiz |
+| Urdu | `ur` | Full UI + Quiz |
 
-Clock, date, and number formatting adapts to the selected locale using native `Intl` APIs.
+All 100 Islamic Quiz questions are fully translated in Bengali, Arabic, Hindi, and Urdu. Clock, date, and number formatting adapts to the selected locale using native `Intl` APIs.
 
 ---
 
@@ -316,7 +318,11 @@ noor-tab/
 │   │   ├── masnun.ts              # Masnun Duas for Dua Library
 │   │   ├── popularLocations.ts    # 500+ cities with coordinates
 │   │   ├── prayerNames.ts         # Prayer metadata (Arabic, transliteration)
-│   │   ├── quizQuestions.ts       # Islamic quiz questions
+│   │   ├── quizQuestions.ts       # 100 Islamic quiz questions (English)
+│   │   ├── quizTranslations.ts    # Bengali translations for all quiz questions
+│   │   ├── quizTranslationsAr.ts  # Arabic translations for all quiz questions
+│   │   ├── quizTranslationsHi.ts  # Hindi translations for all quiz questions
+│   │   ├── quizTranslationsUr.ts  # Urdu translations for all quiz questions
 │   │   ├── surahs.ts              # Useful Surahs for Dua Library
 │   │   └── translations.ts        # UI strings in 5 languages
 │   │
