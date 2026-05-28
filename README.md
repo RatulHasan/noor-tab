@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/ratulhasan/noor-tab/releases">
-    <img src="https://img.shields.io/badge/version-1.0.0-emerald?style=for-the-badge&logo=google-chrome&logoColor=white&color=064e3b" alt="Version" />
+    <img src="https://img.shields.io/badge/version-1.0.1-emerald?style=for-the-badge&logo=google-chrome&logoColor=white&color=064e3b" alt="Version" />
   </a>
   <a href="https://www.typescriptlang.org/">
     <img src="https://img.shields.io/badge/TypeScript-Ready-blue?style=for-the-badge&logo=typescript&logoColor=white&color=1d4ed8" alt="TypeScript" />
