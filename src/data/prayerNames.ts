@@ -16,6 +16,13 @@ export const PRAYER_METADATA: Record<PrayerName, PrayerMetadata> = {
     displayName: "Fajr",
     description: "Dawn prayer, performed before sunrise.",
   },
+  sunrise: {
+    name: "sunrise",
+    arabicName: "الشروق",
+    transliteration: "Sunrise",
+    displayName: "Sunrise",
+    description: "The time when the sun rises.",
+  },
   dhuhr: {
     name: "dhuhr",
     arabicName: "الظهر",

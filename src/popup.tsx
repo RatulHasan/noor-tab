@@ -8,7 +8,7 @@ import PrayerList from "./components/popup/PrayerList";
 import QiblaCompass from "./components/popup/QiblaCompass";
 import SettingsPanel from "./components/popup/SettingsPanel";
 import IslamicEventCard from "./components/popup/IslamicEventCard";
-import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles } from "lucide-react";
+import { Clock, Compass, Settings, MapPin, Loader2, Search, VolumeX, BookOpen, Sparkles, Check, Pencil, Minus, Plus } from "lucide-react";
 import { detectLocation, geocodeLocation, getCoordinatesLocalDate } from "./utils/locationService";
 import { getTranslation } from "./data/translations";
 import { POPULAR_LOCATIONS } from "./data/popularLocations";
@@ -42,6 +42,7 @@ export default function Popup() {
   const [adhanIsPlaying] = useStorage<boolean>("adhanIsPlaying", false);
 
   const [activeTab, setActiveTab] = useState<Tab>("prayers");
+  const [isEditingOffsets, setIsEditingOffsets] = useState(false);
   
   // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
@@ -56,7 +57,7 @@ export default function Popup() {
   const [onboardingCountry, setOnboardingCountry] = useState("");
   const [isOnboardingSearching, setIsOnboardingSearching] = useState(false);
 
-  const hasCoordinates = settings.coordinates !== null;
+  const hasCoordinates = settings?.coordinates !== null && settings?.coordinates !== undefined;
   const lang = settings?.language || "en";
 
   const handleToggleReminder = async (name: PrayerName) => {
@@ -67,8 +68,12 @@ export default function Popup() {
     await updateSettings({ perPrayerReminder: updated });
     
     // Broadcast setting change to background worker to update chrome alarms
-    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    try {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+      }
+    } catch (e) {
+      console.warn("Failed to broadcast settings change:", e);
     }
   };
 
@@ -76,9 +81,23 @@ export default function Popup() {
     await updateSettings(newSettings);
     
     // Broadcast setting change to background worker to update chrome alarms
-    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
-      chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+    try {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({ type: "SETTINGS_CHANGED" });
+      }
+    } catch (e) {
+      console.warn("Failed to broadcast settings change:", e);
     }
+  };
+
+  const handleOffsetChange = async (name: PrayerName, delta: number) => {
+    const current = settings.prayerOffsets?.[name] || 0;
+    await handleSaveSettings({
+      prayerOffsets: {
+        ...settings.prayerOffsets,
+        [name]: current + delta
+      }
+    });
   };
 
   const handleStopAllAdhan = () => {
@@ -96,6 +115,8 @@ export default function Popup() {
         coordinates: { lat: loc.lat, lng: loc.lng },
         cityName: loc.cityName || "Detected Location",
       });
+      // Note: For auto-detected location, we can't determine the country reliably
+      // User can manually change madhab in settings if needed
     } catch (err: any) {
       console.error(err);
       setOnboardingError(err.message);
@@ -111,9 +132,14 @@ export default function Popup() {
     try {
       const result = await geocodeLocation(onboardingCity, onboardingCountry);
       if (result) {
+        // Set Hanafi madhab for South Asian countries
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey", "Sri Lanka", "Nepal", "Maldives", "Bhutan", "Myanmar"];
+        const madhab = hanafiCountries.some(c => onboardingCountry.toLowerCase().includes(c.toLowerCase())) ? "hanafi" : settings.madhab;
+
         await handleSaveSettings({
           coordinates: { lat: result.lat, lng: result.lng },
           cityName: result.cityName,
+          madhab,
         });
       } else {
         setOnboardingError("Location not found. Please try a different query or enter coordinates in settings.");
@@ -130,30 +156,37 @@ export default function Popup() {
     const val = e.target.value;
     setOnboardingCountryName(val);
     setOnboardingCityName("");
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === val);
-      if (country && country.cities.length > 0) {
-        const firstCity = country.cities[0];
-        setOnboardingCityName(firstCity.name);
-        handleSaveSettings({
-          coordinates: { lat: firstCity.lat, lng: firstCity.lng },
-          cityName: firstCity.name,
-        });
-      }
-    }
+    setOnboardingError("");
   };
 
   const handleOnboardingCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setOnboardingCityName(val);
-    if (val !== "custom" && val !== "") {
-      const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
-      const city = country?.cities.find(ct => ct.name === val);
-      if (city) {
-        handleSaveSettings({
+    setOnboardingError("");
+  };
+
+  const handleConfirmOnboarding = async () => {
+    if (!onboardingCountryName || !onboardingCityName || onboardingCountryName === "custom" || onboardingCityName === "custom") return;
+
+    const country = POPULAR_LOCATIONS.find(c => c.countryName === onboardingCountryName);
+    const city = country?.cities.find(ct => ct.name === onboardingCityName);
+
+    if (city) {
+      setIsOnboardingSearching(true);
+      try {
+        // Countries that follow Hanafi madhab
+        const hanafiCountries = ["Bangladesh", "Pakistan", "India", "Afghanistan", "Turkey"];
+        const madhab = hanafiCountries.includes(onboardingCountryName) ? "hanafi" : settings.madhab;
+
+        await handleSaveSettings({
           coordinates: { lat: city.lat, lng: city.lng },
           cityName: city.name,
+          madhab,
         });
+      } catch (err) {
+        setOnboardingError(t("errorSaving"));
+      } finally {
+        setIsOnboardingSearching(false);
       }
     }
   };
@@ -339,6 +372,21 @@ export default function Popup() {
                         )}
                       </div>
 
+                      {onboardingCountryName && onboardingCityName && onboardingCountryName !== "custom" && onboardingCityName !== "custom" && (
+                        <button
+                          onClick={handleConfirmOnboarding}
+                          disabled={isOnboardingSearching}
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-600 transition-all duration-200"
+                        >
+                          {isOnboardingSearching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                          {t("saveSettings")}
+                        </button>
+                      )}
+
                       <button
                         onClick={() => setActiveTab("settings")}
                         className="text-xs font-semibold text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 block w-full text-center"
@@ -354,10 +402,25 @@ export default function Popup() {
                 ) : (
                   <div className="space-y-4">
                     <NextPrayer nextPrayer={nextPrayer} isLoading={isLoadingPrayers} />
+                    <div className="flex items-center justify-between px-1">
+                       <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("prayerTimes")}</h3>
+                       <button
+                         onClick={() => setIsEditingOffsets(!isEditingOffsets)}
+                         className={cn(
+                           "p-1.5 rounded-lg transition-all active:scale-95",
+                           isEditingOffsets ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20" : "text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                         )}
+                       >
+                         {isEditingOffsets ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                       </button>
+                    </div>
                     <PrayerList
                       prayerStatuses={prayerStatuses}
                       isLoading={isLoadingPrayers}
                       onToggleReminder={handleToggleReminder}
+                      isEditing={isEditingOffsets}
+                      offsets={settings.prayerOffsets}
+                      onOffsetChange={handleOffsetChange}
                     />
                     <IslamicEventCard />
                   </div>

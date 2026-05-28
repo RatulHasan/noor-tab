@@ -1,24 +1,33 @@
 import React from "react";
-import type { PrayerName, PrayerUIStatus } from "../../types";
-import { Bell, BellOff } from "lucide-react";
-import { cn } from "../../utils/cn";
+import type { PrayerName, PrayerUIStatus } from "~types";
+import { Bell, BellOff, Minus, Plus } from "lucide-react";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props
  * @param {PrayerUIStatus[] | null} props.prayerStatuses - Array of prayer statuses.
  * @param {boolean} props.isLoading - Whether the component is in a loading state.
  * @param {(name: PrayerName) => void} props.onToggleReminder - Callback when the reminder bell is clicked.
+ * @param {Record<string, number>} [props.offsets] - Optional prayer offsets.
+ * @param {(name: PrayerName, delta: number) => void} [props.onOffsetChange] - Callback for offset changes.
+ * @param {boolean} [props.isEditing] - Whether editing mode is active.
  */
 interface PrayerListProps {
   prayerStatuses: PrayerUIStatus[] | null;
   isLoading: boolean;
   onToggleReminder: (name: PrayerName) => void;
+  offsets?: Record<string, number>;
+  onOffsetChange?: (name: PrayerName, delta: number) => void;
+  isEditing?: boolean;
 }
 
 export default function PrayerList({
   prayerStatuses,
   isLoading,
   onToggleReminder,
+  offsets,
+  onOffsetChange,
+  isEditing,
 }: PrayerListProps) {
   if (isLoading || !prayerStatuses) {
     return (
@@ -106,22 +115,42 @@ export default function PrayerList({
                 {prayer.arabicName}
               </span>
 
-              <button
-                onClick={() => onToggleReminder(prayer.name)}
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg border border-transparent transition-all duration-200 hover:bg-stone-100 dark:hover:bg-stone-800",
-                  prayer.reminderEnabled
-                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20"
-                    : "text-stone-400 dark:text-stone-500 hover:text-stone-600"
-                )}
-                title={prayer.reminderEnabled ? "Disable Reminder" : "Enable Reminder"}
-              >
-                {prayer.reminderEnabled ? (
-                  <Bell className="h-4 w-4" />
-                ) : (
-                  <BellOff className="h-4 w-4" />
-                )}
-              </button>
+              {isEditing ? (
+                 <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5 border border-stone-200 dark:border-stone-700">
+                    <button 
+                      onClick={() => onOffsetChange?.(prayer.name, -1)}
+                      className="p-1 hover:bg-white dark:hover:bg-stone-700 rounded-md text-stone-500 transition-colors"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 min-w-[24px] text-center">
+                      {(offsets?.[prayer.name] || 0) > 0 ? `+${offsets?.[prayer.name]}` : offsets?.[prayer.name] || 0}
+                    </span>
+                    <button 
+                      onClick={() => onOffsetChange?.(prayer.name, 1)}
+                      className="p-1 hover:bg-white dark:hover:bg-stone-700 rounded-md text-stone-500 transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                 </div>
+              ) : (
+                <button
+                  onClick={() => onToggleReminder(prayer.name)}
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-lg border border-transparent transition-all duration-200 hover:bg-stone-100 dark:hover:bg-stone-800",
+                    prayer.reminderEnabled
+                      ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20"
+                      : "text-stone-400 dark:text-stone-500 hover:text-stone-600"
+                  )}
+                  title={prayer.reminderEnabled ? "Disable Reminder" : "Enable Reminder"}
+                >
+                  {prayer.reminderEnabled ? (
+                    <Bell className="h-4 w-4" />
+                  ) : (
+                    <BellOff className="h-4 w-4" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
         );

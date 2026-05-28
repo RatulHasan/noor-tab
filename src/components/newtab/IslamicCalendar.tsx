@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
-import { ISLAMIC_EVENTS } from "../../data/islamicEvents";
-import { getHijriDateParts } from "../../utils/hijriConverter";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { ISLAMIC_EVENTS } from "~data/islamicEvents";
+import { getHijriDateParts } from "~utils/hijriConverter";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 import IslamicPattern from "../shared/IslamicPattern";
 import { Calendar } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { getCoordinatesLocalDate } from "../../utils/locationService";
+import { cn } from "~utils/cn";
+import { getCoordinatesLocalDate } from "~utils/locationService";
 
 /**
  * @param {Object} props

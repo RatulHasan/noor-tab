@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { calculatePrayerTimes } from "../../utils/prayerCalculator";
-import { POPULAR_LOCATIONS } from "../../data/popularLocations";
-import { format } from "../../utils/dateUtils";
+import { calculatePrayerTimes } from "~utils/prayerCalculator";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
+import { format } from "~utils/dateUtils";
 import { Globe, Settings2, Check, Plus, X } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function GlobalPrayerWidget() {
   const [worldCities, setWorldCities] = useStorage<string[]>("worldCities", ["Istanbul", "London", "New York"]);
@@ -183,7 +183,14 @@ export default function GlobalPrayerWidget() {
           </thead>
           <tbody className="divide-y divide-stone-100/50 dark:divide-stone-800/40">
             {citiesToDisplay.map((city) => {
-              const times = calculatePrayerTimes(city.lat, city.lng, "ummAlQura", "standard");
+              const times = calculatePrayerTimes(
+                city.lat,
+                city.lng,
+                settings?.method || "muslimWorldLeague",
+                settings?.madhab || "standard",
+                new Date(),
+                settings?.prayerOffsets
+              );
               return (
                 <tr key={city.name} className="hover:bg-stone-50/20 dark:hover:bg-stone-900/20">
                   <td className="py-3 font-bold text-stone-850 dark:text-stone-100">

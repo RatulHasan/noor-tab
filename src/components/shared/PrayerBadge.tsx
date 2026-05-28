@@ -1,7 +1,7 @@
 import React from "react";
-import type { PrayerName, PrayerUIStatus } from "../../types";
-import { PRAYER_METADATA } from "../../data/prayerNames";
-import { cn } from "../../utils/cn";
+import type { PrayerName, PrayerUIStatus } from "~types";
+import { PRAYER_METADATA } from "~data/prayerNames";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

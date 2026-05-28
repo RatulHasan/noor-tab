@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { asmaUlHusna } from "../../data/asmaUlHusna";
-import type { AsmaName } from "../../types";
-import { cn } from "../../utils/cn";
+import { asmaUlHusna } from "~data/asmaUlHusna";
+import type { AsmaName } from "~types";
+import { cn } from "~utils/cn";
 import { BookOpen, ChevronDown, ChevronUp, Sparkles, X } from "lucide-react";
 
 export default function AsmaCard() {

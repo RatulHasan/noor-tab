@@ -105,12 +105,20 @@ export function detectLocation(): Promise<{
 
 /**
  * Returns a Date object adjusted to the estimated timezone of the given coordinates (based on longitude).
- * This ensures calendar dates and events update correctly to the selected city's timezone.
+ * This is primarily used for UI date display (Hijri calendar, greeting time, etc).
+ *
+ * For prayer time calculations, the prayerCalculator handles timezone adjustment separately.
  */
 export function getCoordinatesLocalDate(coordinates: { lat: number; lng: number } | null, baseDate: Date = new Date()): Date {
   if (!coordinates) return baseDate;
-  
+
   const estimatedOffsetHours = Math.round(coordinates.lng / 15);
-  const utcTime = baseDate.getTime() + (baseDate.getTimezoneOffset() * 60 * 1000);
-  return new Date(utcTime + (estimatedOffsetHours * 60 * 60 * 1000));
+  const browserOffsetMinutes = baseDate.getTimezoneOffset(); // Browser's offset from UTC (in minutes, inverted sign)
+  const targetOffsetMinutes = estimatedOffsetHours * 60;
+
+  // Calculate the difference between browser timezone and target timezone
+  const offsetDiffMinutes = targetOffsetMinutes + browserOffsetMinutes; // + because getTimezoneOffset is inverted
+
+  // Adjust the date by the difference
+  return new Date(baseDate.getTime() + offsetDiffMinutes * 60 * 1000);
 }

@@ -1,9 +1,9 @@
 import React from "react";
-import { useQibla } from "../../hooks/useQibla";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useQibla } from "~hooks/useQibla";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 import { Compass, RotateCw } from "lucide-react";
-import { cn } from "../../utils/cn";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

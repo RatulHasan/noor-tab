@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { format } from "../../utils/dateUtils";
-import { quizQuestions } from "../../data/quizQuestions";
-import type { QuizQuestion, QuizRecord } from "../../types";
-import { cn } from "../../utils/cn";
+import { format } from "~utils/dateUtils";
+import { quizQuestions } from "~data/quizQuestions";
+import type { QuizQuestion, QuizRecord, QuizTranslation } from "~types";
+import { cn } from "~utils/cn";
 import { HelpCircle, Award, CheckCircle2, AlertCircle } from "lucide-react";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
+
+// Helper to get translated text from QuizTranslation object
+function getTranslatedText(translation: QuizTranslation | string, lang: string): string {
+  if (typeof translation === "string") {
+    return translation;
+  }
+  return translation[lang] || translation.en || "";
+}
 
 export default function IslamicQuiz() {
   const [quizRecord, setQuizRecord] = useStorage<QuizRecord>("quizRecord", {
@@ -18,7 +26,7 @@ export default function IslamicQuiz() {
   });
 
   const [settings] = useSettings();
-  const [questionOffset, setQuestionOffset] = useState(0);
+  const [questionOffset, setQuestionOffset] = useStorage<number>("quizQuestionOffset", 0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
 
@@ -35,6 +43,8 @@ export default function IslamicQuiz() {
     setSelectedIndex(null);
     setAnswered(false);
   }, [questionOffset]);
+
+  if (questionOffset === undefined) return null;
 
   // Sync state if already answered today
   const hasAnsweredToday = quizRecord.date === today && quizRecord.questionId === quizQuestions[seed % quizQuestions.length].id;
@@ -81,6 +91,36 @@ export default function IslamicQuiz() {
     }
   };
 
+  const getTranslatedDifficulty = (diff: QuizQuestion["difficulty"]) => {
+    switch (diff) {
+      case "easy":
+        return t("difficultyEasy");
+      case "medium":
+        return t("difficultyMedium");
+      case "hard":
+        return t("difficultyHard");
+      default:
+        return diff;
+    }
+  };
+
+  const getTranslatedCategory = (category: string) => {
+    switch (category) {
+      case "quran":
+        return t("categoryQuran");
+      case "seerah":
+        return t("categorySeerah");
+      case "fiqh":
+        return t("categoryFiqh");
+      case "history":
+        return t("categoryHistory");
+      case "general":
+        return t("categoryGeneral");
+      default:
+        return category;
+    }
+  };
+
   return (
     <div className="rounded-xl shadow-sm bg-white dark:bg-stone-900 p-4 border border-stone-200/50 dark:border-stone-800/60 flex flex-col space-y-4 font-sans select-none">
       <div className="flex justify-between items-center">
@@ -89,12 +129,12 @@ export default function IslamicQuiz() {
             {questionOffset === 0 ? t("dailyIslamicQuiz") : t("islamicQuizPractice")}
           </p>
           <span className="text-[9px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider block mt-0.5">
-            {t("category")}: {question.category}
+            {t("category")}: {getTranslatedCategory(question.category)}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className={cn("text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider", getDifficultyColor(question.difficulty))}>
-            {question.difficulty}
+            {getTranslatedDifficulty(question.difficulty)}
           </span>
         </div>
       </div>
@@ -102,7 +142,7 @@ export default function IslamicQuiz() {
       {/* Question Text */}
       <div className="text-sm font-semibold text-stone-800 dark:text-stone-100 flex gap-2">
         <HelpCircle className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">{question.question}</p>
+        <p className="leading-relaxed">{getTranslatedText(question.question, lang)}</p>
       </div>
 
       {/* Options */}
@@ -123,7 +163,7 @@ export default function IslamicQuiz() {
             } else if (wasChosen) {
               optionStyle = "bg-rose-600 text-white border-rose-700 dark:bg-rose-700 shadow-sm";
             } else {
-              optionStyle = "opacity-50 border-stone-200 dark:border-stone-800 bg-stone-50/30 text-stone-400 dark:text-stone-500 cursor-not-allowed";
+              optionStyle = "border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/30 text-stone-600 dark:text-stone-400 cursor-not-allowed";
             }
           }
 
@@ -137,7 +177,7 @@ export default function IslamicQuiz() {
                 optionStyle
               )}
             >
-              {option}
+              {getTranslatedText(option, lang)}
             </button>
           );
         })}
@@ -161,7 +201,7 @@ export default function IslamicQuiz() {
               )}
             </div>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
-              {question.explanation}
+              {getTranslatedText(question.explanation, lang)}
             </p>
           </div>
 

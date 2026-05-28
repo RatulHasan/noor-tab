@@ -29,3 +29,17 @@ export function degreesToCardinal(degrees: number): string {
   const val = Math.floor(degrees / 22.5 + 0.5);
   return directions[val % 16];
 }
+
+export function calculateDistanceToKaaba(lat: number, lng: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((KAABA_LAT - lat) * Math.PI) / 180;
+  const dLng = ((KAABA_LNG - lng) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat * Math.PI) / 180) *
+      Math.cos((KAABA_LAT * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}

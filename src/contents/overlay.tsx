@@ -46,19 +46,19 @@ const OverlayCSUI = () => {
         if (storedSettings?.overlayPosition) {
           setOverlayPosition(storedSettings.overlayPosition);
         }
-        
+
         const adhanAudio = storedSettings?.adhanAudio || "none";
         setHasAdhanConfigured(adhanAudio !== "none");
-        
+
+        // Auto-play adhan for both reminders and prayer time
         if (adhanAudio !== "none") {
           const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === adhanAudio);
           if (option && option.url) {
             const audio = new Audio(option.url);
             overlayAudioRef.current = audio;
             setIsOverlayAudioPlaying(true);
-            
+
             audio.play().catch((err) => {
-              console.log("Autoplay of Adhan blocked by browser autoplay policies on this active web tab:", err);
               setIsOverlayAudioPlaying(false);
             });
 

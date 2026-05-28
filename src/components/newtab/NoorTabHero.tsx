@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import type { DailyPrayers, PrayerName, PrayerUIStatus } from "../../types";
-import { useHijriDate } from "../../hooks/useHijriDate";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import type { DailyPrayers, PrayerName, PrayerUIStatus } from "~types";
+import { useHijriDate } from "~hooks/useHijriDate";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 import CountdownTimer from "../shared/CountdownTimer";
 import { Clock, MapPin, Bell, X, Calendar, Play, Pause } from "lucide-react";
-import { PRAYER_METADATA } from "../../data/prayerNames";
-import { cn } from "../../utils/cn";
-import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
+import { PRAYER_METADATA } from "~data/prayerNames";
+import { cn } from "~utils/cn";
+import { ADHAN_AUDIO_OPTIONS } from "~data/adhanAudios";
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
@@ -128,6 +128,7 @@ export default function NoorTabHero({
       setShowReminder(true);
 
       const configuredAdhan = settings.adhanAudio || "none";
+      // Always play adhan for prayer time notifications (both reminder and actual prayer time)
       if (configuredAdhan !== "none") {
         const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === configuredAdhan);
         if (option && option.url) {

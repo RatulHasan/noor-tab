@@ -1,4 +1,4 @@
-import type { Dua } from "../types";
+import type { Dua } from "~types";
 
 export const duas: Dua[] = [
   // ── Morning & Evening (5) ──
@@ -146,11 +146,20 @@ export const duas: Dua[] = [
   {
     id: "dua_sleeping_01",
     category: "sleeping",
-    title: "Dua Before Sleeping",
-    arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.",
-    transliteration: "Bismika Allahumma amutu wa ahya.",
-    translation: "In Your name, O Allah, I die and I live.",
+    title: "Dua Before Sleeping (Short)",
+    arabic: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+    transliteration: "Allahumma bismika amutu wa ahya.",
+    translation: "O Allah, with Your name I die and I live.",
     source: "Bukhari 6324"
+  },
+  {
+    id: "dua_sleeping_01_alt",
+    category: "sleeping",
+    title: "Dua Before Sleeping (Sunnah)",
+    arabic: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي ، وَبِكَ أَرْفَعُهُ ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا ، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ",
+    transliteration: "Bismika Rabbi wada'tu janbi wa bika arfa'uhu, fa-in amsakta nafsi farhamha, wa in arsaltaha fahfazha bima tahfazu bihi 'ibadakas-salihin.",
+    translation: "In Your name my Lord, I lay down my side and by You I raise it. If You take my soul, have mercy upon it, and if You send it back, protect it as You protect Your righteous servants.",
+    source: "Bukhari 6320 / Muslim 2714"
   },
   {
     id: "dua_sleeping_02",
@@ -606,5 +615,208 @@ export const duas: Dua[] = [
     transliteration: "Rabbana atina min ladunka rahmatan wa hayyi' lana min amrina rashada.",
     translation: "Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance.",
     source: "Quran 18:10"
+  },
+
+  // ── Death & Funeral (3) ──
+  {
+    id: "dua_death_01",
+    category: "death",
+    title: "Upon Hearing of Death",
+    arabic: "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ، اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا.",
+    transliteration: "Inna lillahi wa inna ilayhi raji'un. Allahumma-jurni fi musibati wa akhlif li khayran minha.",
+    translation: "To Allah we belong and unto Him is our return. O Allah, reward me for my affliction and compensate me with something better than it.",
+    source: "Muslim 918"
+  },
+  {
+    id: "dua_death_02",
+    category: "death",
+    title: "Dua for the Deceased",
+    arabic: "اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ.",
+    transliteration: "Allahummagh-fir lahu warhamhu, wa 'afihi wa'fu 'anhu, wa akrim nuzulahu, wa wassi' mudkhalahu.",
+    translation: "O Allah, forgive him and have mercy on him, grant him wellbeing and pardon him. Make his resting place honorable and expand his entrance [into the grave].",
+    source: "Muslim 963"
+  },
+  {
+    id: "dua_death_03",
+    category: "death",
+    title: "Dua for a Good End",
+    arabic: "اللَّهُمَّ اجْعَلْ خَيْرَ عُمْرِي آخِرَهُ، وَخَيْرَ عَمَلِي خَوَاتِمَهُ، وَخَيْرَ أَيَّامِي يَوْمَ أَلْقَاكَ فِيهِ.",
+    transliteration: "Allahummaj-'al khayra 'umri akhirahu, wa khayra 'amali khawatimahu, wa khayra ayyami yawma alqaka fih.",
+    translation: "O Allah, make the end of my life the best part of it, my best deeds my last ones, and my best day the day I meet You.",
+    source: "Majma'uz-Zawa'id 10/158"
+  },
+
+  // ── Nature & Environment (3) ──
+  {
+    id: "dua_nature_01",
+    category: "nature",
+    title: "Dua When it Rains",
+    arabic: "اللَّهُمَّ صَيِّبًا نَافِعًا.",
+    transliteration: "Allahumma sayyiban nafi'an.",
+    translation: "O Allah, let it be a beneficial rain.",
+    source: "Bukhari 1032"
+  },
+  {
+    id: "dua_nature_02",
+    category: "nature",
+    title: "Dua When Hearing Thunder",
+    arabic: "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلَائِكَةُ مِنْ خِيفَتِهِ.",
+    transliteration: "Subhanal-ladhi yusabbihur-ra'du bihamdihi wal-mala'ikatu min khifatih.",
+    translation: "Glory is to Him Whom the thunder exalts with praise and the angels out of fear of Him.",
+    source: "Muwatta Malik 1801"
+  },
+  {
+    id: "dua_nature_03",
+    category: "nature",
+    title: "Dua Upon Seeing the New Moon",
+    arabic: "اللَّهُمَّ أَهْلِلْهُ عَلَيْنَا بِالْأَمْنِ وَالْإِيمَانِ وَالسَّلَامَةِ وَالْإِسْلَامِ، رَبِّي وَرَبُّكَ اللَّهُ.",
+    transliteration: "Allahumma ahlilhu 'alayna bil-amni wal-imani was-salamati wal-Islami, Rabbi wa Rabbukallah.",
+    translation: "O Allah, bring it over us with security and faith, with peace and Islam. My Lord and your Lord is Allah.",
+    source: "Tirmidhi 3451"
+  },
+
+  // ── Guidance (3) ──
+  {
+    id: "dua_guidance_01",
+    category: "guidance",
+    title: "Dua for Guidance and Success",
+    arabic: "اللَّهُمَّ اهْدِنِي وَسَدِّدْنِي.",
+    transliteration: "Allahummah-dini wa saddidni.",
+    translation: "O Allah, guide me and keep me on the right path.",
+    source: "Muslim 2725"
+  },
+  {
+    id: "dua_guidance_02",
+    category: "guidance",
+    title: "Dua for Firmness in Faith",
+    arabic: "اللَّهُمَّ اهْدِنِي لِمَا اخْتُلِفَ فِيهِ مِنَ الْحَقِّ بِإِذْنِكَ، إِنَّكَ تَهْدِي مَنْ تَشَاءُ إِلَى صِرَاطٍ مُسْتَقِيمٍ.",
+    transliteration: "Allahummah-dini limakh-tulifa fihi minal-haqqi bi-idhnik, innaka tahdi man tasha'u ila siratim-mustaqim.",
+    translation: "O Allah, guide me to the truth in matters of difference by Your permission. Indeed, You guide whom You will to a straight path.",
+    source: "Muslim 770"
+  },
+  {
+    id: "dua_guidance_03",
+    category: "guidance",
+    title: "Dua for Protective Guidance",
+    arabic: "اللَّهُمَّ اهْدِنَا فِيمَنْ هَدَيْتَ، وَعَافِنَا فِيمَنْ عَافَيْتَ.",
+    transliteration: "Allahummah-dina fiman hadayt, wa 'afina fiman 'afayt.",
+    translation: "O Allah, guide us among those You have guided, and grant us wellbeing among those You have granted wellbeing.",
+    source: "Tirmidhi 464"
+  },
+
+  // ── Rizq & Provision (3) ──
+  {
+    id: "dua_rizq_01",
+    category: "rizq",
+    title: "Dua for Lawful Provision",
+    arabic: "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ.",
+    transliteration: "Allahummak-fini bi-halalika 'an haramik, wa aghnini bi-fadlika 'amman siwak.",
+    translation: "O Allah, suffice me with Your lawful blessings instead of Your unlawful actions, and enrich me with Your grace so that I am independent of anyone other than You.",
+    source: "Tirmidhi 3563"
+  },
+  {
+    id: "dua_rizq_02",
+    category: "rizq",
+    title: "Dua for Blessed Wealth",
+    arabic: "اللَّهُمَّ بَارِكْ لِي فِيمَا رَزَقْتَنِي.",
+    transliteration: "Allahumma barik li fima razaqtani.",
+    translation: "O Allah, bless me in what You have provided for me.",
+    source: "Ibn Sunni"
+  },
+  {
+    id: "dua_rizq_03",
+    category: "rizq",
+    title: "Seek Good Provision",
+    arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا.",
+    transliteration: "Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbala.",
+    translation: "O Allah, I ask You for beneficial knowledge, goodly provision, and acceptable deeds.",
+    source: "Ibn Majah 925"
+  },
+
+  // ── Tawhid & Faith (3) ──
+  {
+    id: "dua_tawhid_01",
+    category: "tawhid",
+    title: "The Shahada",
+    arabic: "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ.",
+    transliteration: "Ash-hadu an la ilaha illallah, wa ash-hadu anna Muhammadan rasulullah.",
+    translation: "I bear witness that there is no deity worthy of worship except Allah, and I bear witness that Muhammad is the Messenger of Allah.",
+    source: "Fundamental Faith"
+  },
+  {
+    id: "dua_tawhid_02",
+    category: "tawhid",
+    title: "Declaration of Oneness",
+    arabic: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
+    transliteration: "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu wa Huwa 'ala kulli shay'in Qadir.",
+    translation: "There is no deity worthy of worship except Allah alone, without partner. To Him belongs sovereignty and to Him belongs praise, and He is over all things Competent.",
+    source: "Bukhari 6403"
+  },
+  {
+    id: "dua_tawhid_03",
+    category: "tawhid",
+    title: "Dua for Renewal of Faith",
+    arabic: "اللَّهُمَّ جَدِّدِ الْإِيمَانَ فِي قَلْبِي.",
+    transliteration: "Allahumma jaddidil-imana fi qalbi.",
+    translation: "O Allah, renew faith in my heart.",
+    source: "Mustadrak Al-Hakim"
+  },
+
+  // ── Health & Well-being (3) ──
+  {
+    id: "dua_health_01",
+    category: "health",
+    title: "Dua for Physical Well-being",
+    arabic: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي.",
+    transliteration: "Allahumma 'afini fi badani, Allahumma 'afini fi sam'i, Allahumma 'afini fi basari.",
+    translation: "O Allah, grant me health in my body, O Allah, grant me health in my hearing, O Allah, grant me health in my sight.",
+    source: "Abu Dawud 5090"
+  },
+  {
+    id: "dua_health_02",
+    category: "health",
+    title: "Dua for Healing",
+    arabic: "أَذْهِبِ الْبَاسَ رَبَّ النَّاسِ، اشْفِ وَأَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ.",
+    transliteration: "Adhibil-bas, Rabban-nas, ishfi wa Antash-Shafi, la shifa'a illa shifa'uk.",
+    translation: "Remove the hardship, O Lord of mankind, grant healing for You are the Healer, there is no healing but Your healing.",
+    source: "Bukhari 5743"
+  },
+  {
+    id: "dua_health_03",
+    category: "health",
+    title: "Seek Forgiveness and Health",
+    arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ.",
+    transliteration: "Allahumma inni as'alukal-'afwa wal-'afiyah fid-dunya wal-akhirah.",
+    translation: "O Allah, I ask You for forgiveness and health in this world and the hereafter.",
+    source: "Ibn Majah 3848"
+  },
+
+  // ── Salah & Mosque (3) ──
+  {
+    id: "dua_salah_01",
+    category: "salah",
+    title: "The Opening Supplication (Sana)",
+    arabic: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ.",
+    transliteration: "Subhanaka Allahumma wa bihamdika, wa tabarakasmuka, wa ta'ala jadduka, wa la ilaha ghayruka.",
+    translation: "Glory be to You, O Allah, and all praise. Blessed is Your name and exalted is Your majesty. There is no deity worthy of worship except You.",
+    source: "Abu Dawud 775"
+  },
+  {
+    id: "dua_salah_02",
+    category: "salah",
+    title: "Dua for Prostration",
+    arabic: "سُبْحَانَ رَبِّيَ الْأَعْلَى.",
+    transliteration: "Subhana Rabbiyal-A'la.",
+    translation: "Glory be to my Lord, the Most High.",
+    source: "Muslim 772"
+  },
+  {
+    id: "dua_mosque_01",
+    category: "mosque",
+    title: "Dua for Light",
+    arabic: "اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي بَصَرِي نُورًا، وَفِي سَمْعِي نُورًا.",
+    transliteration: "Allahummaj-'al fi qalbi nuran, wa fi basari nuran, wa fi sam'i nuran.",
+    translation: "O Allah, place light in my heart, light in my sight, and light in my hearing.",
+    source: "Bukhari 6316"
   }
 ];

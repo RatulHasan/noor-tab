@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, Dhikr tools, a Qibla compass, and much more, all wrapped in a beautifully designed, distraction-free experience.
+  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, spiritual tools like **How to Pray Salah**, a comprehensive **Dua Library**, and much more, all wrapped in a beautifully designed, distraction-free experience.
 </p>
 
 <br/>
@@ -28,15 +28,46 @@
 
 ## ✨ Core Features
 
+<p align="center">
+  <img src="assets/banner-1.png" alt="Core Features" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-2.png" alt="Phase 2 Features" width="100%" />
+</p>
+
+<p align="center">
+  <img src="assets/banner-3.png" alt="Phase 3 Features" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-4.png" alt="Tech Stack" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-5.png" alt="Settings" width="100%" />
+</p>
+
 ### 🕌 Prayer Times & Adhan
 - **Accurate prayer time calculation** using industry-standard algorithms (Adhan.js) supporting 8+ calculation methods (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
 - **Madhab support** for Hanafi and standard Asr calculation
 - **Per-prayer reminders** - individually enable or disable Fajr, Dhuhr, Asr, Maghrib, and Isha notifications
 - **Configurable reminder offset** - be notified 0–30 minutes before each prayer
+- **Prayer time adjustment** - manually fine-tune each prayer time by +/- minutes for accuracy
 - **Adhan audio playback** - choose from a curated selection of high-quality Adhan recordings; audio plays automatically when the prayer reminder fires
 - **Global stop control** - a pulsing mute button appears in the popup header *only while the Adhan is actively playing*, letting you stop it instantly from anywhere
 - **Live countdown** to the next prayer with a smooth animated timer
 - **Dynamic background gradients** in the new tab that shift throughout the day - dawn blues, midday greens, sunset ambers, and night indigos
+
+### 🤲 Enhanced Dua Library
+- **150+ Authenticated Supplications** organized by category.
+- **Masnun Duas**: Verified supplications from the Sunnah for daily actions.
+- **Quranic Ayats**: Powerful verses from the Noble Quran (e.g., Ayatul Kursi).
+- **Useful Surahs**: Key Surahs for daily recitation (e.g., Al-Ikhlas, Al-Falaq, An-Nas, Al-Mulk).
+- **Categorized for Life**: Supplications for Morning/Evening, Travel, Stress, Rizq, Health, Forgiveness, and more.
+
+### 🕋 How To Pray Salah
+A comprehensive guide to performing the daily ritual prayers:
+- **Step-by-Step Instructions**: Visual and textual guide for every action in Salah.
+- **Essential Duas & Surahs**: Collection of supplications and verses used within the prayer.
+- **Prayer Rakat Table**: Detailed breakdown of Rakat (Sunnah, Fard, Witr, etc.) for all five daily prayers.
 
 ### 📅 Islamic Calendar
 - **Hijri date** displayed in both English transliteration and Arabic script
@@ -65,7 +96,7 @@
 
 ---
 
-## 🚀 Extended Features (Phase 2)
+## 🚀 Phase 2 Features
 
 ### 📿 Adhkar Player
 A full **morning & evening Adhkar companion** built into both the new tab and the popup:
@@ -112,29 +143,46 @@ A world-clock-style table showing prayer times for multiple cities simultaneousl
 - Live prayer time calculations using each city's coordinates and the Umm al-Qura method
 - Persistent city selections via storage - survives page refreshes
 
-### 🧠 Islamic Quiz
-A gamified knowledge tool to deepen Islamic understanding:
-- 50+ curated multiple-choice questions covering Fiqh, Seerah, Quranic topics, and Islamic history
-- Timed questions with difficulty levels (Easy / Medium / Hard)
-- Score tracking and personal-best records persisted across sessions
-- Instant feedback with correct answer explanations after each question
+---
 
-### 📚 Dua Library
-A searchable library of authentic supplications:
-- 100+ duas organised by category (Morning, Evening, Eating, Travelling, Sleep, etc.)
-- Full Arabic text with transliteration and translation for each dua
-- **Favourite system** - star any dua to pin it to a personal quick-access list
-- Copy to clipboard in one tap
+## 💎 Phase 3: Modern Dashboard & Islamic Apps
+
+### 🏗️ 3-Column Modern Dashboard
+A sophisticated, responsive layout that organizes your Islamic life:
+- **Left Panel**: Fixed area for Prayer Times, Streak tracking, and location info.
+- **Center Panel**: Dynamic "Hero" section with daily Ayah, Clock, Purpose Search, and the Quick Access Hub.
+- **Right Panel**: Qibla compass and utility widgets like 99 Names and Islamic Calendar.
+- **Bottom Activity Bar**: A collapsible "Daily Activities" zone for Dhikr, Quiz, and more.
+- **Full Responsive Support**: Seamlessly transitions between 3-column (XL), 2-column (LG/MD), and single-column (SM) views with mobile drawers.
+
+### 🚀 Quick Access Hub
+Integrated, full-featured Islamic applications accessible directly within your new tab:
+- **📖 Quran & Hadith Explorer**: Combined tab to browse all 114 Surahs and access authentic Hadith collections with search and navigation.
+- **🤲 Dua Library**: Searchable collection of 150+ supplications (Masnun, Ayats, and Surahs) for every occasion.
+- **🕋 How To Pray Salah**: Full guide with instructions, essential duas, and a rakat table.
+- **🧭 Qibla Tab**: A full-sized, animated Qibla compass with distance-to-Kaaba calculation.
+- **📅 Islamic Calendar**: A complete monthly Hijri calendar with highlighted Islamic events and holidays.
+- **🧮 Zakat Calculator**: Calculate your Zakat obligations with a built-in asset and liability tracker.
+- **🧠 Islamic Quiz**: 100 multiple-choice questions across Quran, Fiqh, Seerah, History, and General Knowledge - fully translated in 4 languages.
+
+### 🔍 Purpose Search Bar
+A powerful search tool designed for the modern Muslim:
+- **Standard Search**: Use Google, DuckDuckGo, Bing, or Ecosia as your default engine.
+- **Islamic Prefixes**: Jump directly to specific tabs by typing `quran:`, `hadith:`, or `dua:` followed by your query.
+- **Keyboard Shortcut**: Press `/` to focus the search bar instantly.
+
+### 🎨 Drag & Drop Customization
+Total control over your dashboard layout:
+- **Inter-panel Draggability**: Move widgets between Left, Right, Center, and Bottom panels.
+- **Persistence**: Your custom layout is saved automatically and restored on every new tab.
+- **Locked Essentials**: Core items like Prayer Times and the Hero section remain anchored for stability.
+
+### 🌙 Glowing "Daily Activities"
+The bottom dashboard area now features a subtle emerald glow to gently draw attention to daily spiritual goals like Dhikr and the Islamic Quiz.
 
 ### ☕ Jumuah Banner
-- Every Friday the new tab displays a special Jumu'ah greeting banner with an emerald accent
-- Subtle background gradient shift distinguishes Friday from other days
-
-### 🎨 Customisable Dashboard
-A drag-and-drop-style widget manager:
-- Toggle any of the 10+ widgets on or off
-- Reorder widgets by dragging them to preferred positions
-- Changes persist immediately via Plasmo storage
+- Every Friday the new tab displays a special Jumu'ah greeting banner with an emerald accent.
+- Subtle background gradient shifts distinguish Friday from other days.
 
 ---
 
@@ -157,15 +205,15 @@ Export and restore all your personal data in one click:
 
 ## 🌐 Multi-Language Support
 Full UI localisation for:
-| Language | Code |
-|---|---|
-| English | `en` |
-| Bengali | `bn` |
-| Arabic | `ar` |
-| Hindi | `hi` |
-| Urdu | `ur` |
+| Language | Code | Coverage |
+|---|---|---|
+| English | `en` | Full UI + Quiz |
+| Bengali | `bn` | Full UI + Quiz |
+| Arabic | `ar` | Full UI + Quiz |
+| Hindi | `hi` | Full UI + Quiz |
+| Urdu | `ur` | Full UI + Quiz |
 
-Clock, date, and number formatting adapts to the selected locale using native `Intl` APIs.
+All 100 Islamic Quiz questions are fully translated in Bengali, Arabic, Hindi, and Urdu. Clock, date, and number formatting adapts to the selected locale using native `Intl` APIs.
 
 ---
 
@@ -206,16 +254,25 @@ noor-tab/
 │   │
 │   ├── components/
 │   │   ├── newtab/
-│   │   │   ├── NoorTabHero.tsx        # Clock, Hijri date, prayer bar, Adhan banner
-│   │   │   ├── AsmaUlHusna.tsx        # 99 Names of Allah widget + modal
-│   │   │   ├── GlobalPrayerWidget.tsx # World prayer times table
-│   │   │   ├── PrayerStreakWidget.tsx # Streak summary card for new tab
-│   │   │   ├── JumuahBanner.tsx       # Friday Jumu'ah greeting
-│   │   │   ├── WidgetCustomizer.tsx   # Widget toggle & reorder drawer
-│   │   │   ├── AyahDisplay.tsx        # Quran Ayah of the day
-│   │   │   ├── HadithOfDay.tsx        # Hadith of the day card
-│   │   │   ├── DhikrCounter.tsx       # Digital Tasbih counter
-│   │   │   └── IslamicCalendar.tsx    # Hijri calendar card
+│   │   │   ├── layout/            # 3-Column Dashboard architecture
+│   │   │   │   ├── LeftPanel.tsx
+│   │   │   │   ├── CenterPanel.tsx
+│   │   │   │   ├── RightPanel.tsx
+│   │   │   │   ├── HeroSection.tsx
+│   │   │   │   └── DragProvider.tsx
+│   │   │   ├── hub/               # Islamic Apps Hub
+│   │   │   │   ├── QuickAccessHub.tsx
+│   │   │   │   └── tabs/          # Quran, Hadith, Zakat, etc.
+│   │   │   ├── search/            # Purpose Search implementation
+│   │   │   ├── AsmaUlHusna.tsx
+│   │   │   ├── GlobalPrayerWidget.tsx
+│   │   │   ├── PrayerStreakWidget.tsx
+│   │   │   ├── JumuahBanner.tsx
+│   │   │   ├── WidgetCustomizer.tsx
+│   │   │   ├── AyahDisplay.tsx
+│   │   │   ├── HadithOfDay.tsx
+│   │   │   ├── DhikrCounter.tsx
+│   │   │   └── IslamicCalendar.tsx
 │   │   │
 │   │   ├── popup/
 │   │   │   ├── HijriDate.tsx          # Compact Hijri date badge
@@ -238,10 +295,20 @@ noor-tab/
 │   │       ├── CountdownTimer.tsx     # Reusable countdown display
 │   │       └── BuyMeCoffee.tsx        # Support button (badge & floating variants)
 │   │
+│   ├── services/
+│   │   ├── api/                   # Unified API layer with caching
+│   │   │   ├── quranApi.ts
+│   │   │   ├── hadithApi.ts
+│   │   │   └── apiCache.ts
+│   │   └── zakat/                 # Zakat calculation logic
+│   │
 │   ├── hooks/
 │   │   ├── useSettings.ts         # Global user settings with Plasmo Storage
 │   │   ├── usePrayerTimes.ts      # Prayer time computation hook
-│   │   └── useHijriDate.ts        # Hijri date formatting hook
+│   │   ├── useHijriDate.ts        # Hijri date formatting hook
+│   │   ├── useQibla.ts            # Device orientation & Qibla hook
+│   │   ├── useLayoutState.ts      # Dashboard widget layout state
+│   │   └── useCountdown.ts        # Reusable countdown timer logic
 │   │
 │   ├── utils/
 │   │   ├── prayerCalculator.ts    # Adhan.js wrapper for prayer time calc
@@ -256,15 +323,24 @@ noor-tab/
 │   │
 │   ├── data/
 │   │   ├── adhanAudios.ts         # Adhan audio option registry
-│   │   ├── adhkarData.ts          # Morning & evening Adhkar content
+│   │   ├── adhkar.ts              # Morning & evening Adhkar content
 │   │   ├── asmaUlHusna.ts         # All 99 names with meanings & benefits
+│   │   ├── ayahs.ts               # Daily Ayah dataset
+│   │   ├── ayats.ts               # Quranic Ayats for Dua Library
 │   │   ├── defaultSettings.ts     # Default UserSettings shape
-│   │   ├── duaData.ts             # Categorised Dua library content
+│   │   ├── duas.ts                # Categorised supplications
+│   │   ├── hadiths.ts             # Daily Hadith dataset
+│   │   ├── hubTabs.ts             # Quick Access Hub tab definitions
 │   │   ├── islamicEvents.ts       # Upcoming Islamic events dataset
+│   │   ├── masnun.ts              # Masnun Duas for Dua Library
 │   │   ├── popularLocations.ts    # 500+ cities with coordinates
 │   │   ├── prayerNames.ts         # Prayer metadata (Arabic, transliteration)
-│   │   ├── quizData.ts            # Islamic quiz questions
-│   │   ├── quranData.ts           # Surah list with metadata
+│   │   ├── quizQuestions.ts       # 100 Islamic quiz questions (English)
+│   │   ├── quizTranslations.ts    # Bengali translations for all quiz questions
+│   │   ├── quizTranslationsAr.ts  # Arabic translations for all quiz questions
+│   │   ├── quizTranslationsHi.ts  # Hindi translations for all quiz questions
+│   │   ├── quizTranslationsUr.ts  # Urdu translations for all quiz questions
+│   │   ├── surahs.ts              # Useful Surahs for Dua Library
 │   │   └── translations.ts        # UI strings in 5 languages
 │   │
 │   └── types/

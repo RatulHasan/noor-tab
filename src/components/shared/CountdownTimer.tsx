@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { useCountdown } from "../../hooks/useCountdown";
-import { cn } from "../../utils/cn";
+import { useCountdown } from "~hooks/useCountdown";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props

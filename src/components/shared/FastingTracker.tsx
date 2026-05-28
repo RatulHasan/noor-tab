@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
-import { usePrayerTimes } from "../../hooks/usePrayerTimes";
-import type { FastingData, FastType, FastingRecord } from "../../types";
-import { isTodayRamadan, isTodayMonday, isTodayThursday, isAyyamulBidh, getSuhoorTime, getIftarTime, calculateFastingStreak } from "../../utils/fastingHelper";
-import { getHijriDateParts, getHijriDateString } from "../../utils/hijriConverter";
-import { format, subDays, isSameDay, differenceInSeconds } from "../../utils/dateUtils";
+import { usePrayerTimes } from "~hooks/usePrayerTimes";
+import type { FastingData, FastType, FastingRecord } from "~types";
+import { isTodayRamadan, isTodayMonday, isTodayThursday, isAyyamulBidh, getSuhoorTime, getIftarTime, calculateFastingStreak } from "~utils/fastingHelper";
+import { getHijriDateParts, getHijriDateString } from "~utils/hijriConverter";
+import { format, subDays, isSameDay, differenceInSeconds } from "~utils/dateUtils";
 import { Moon, Sun, Flame, Check, X, ShieldAlert, Award, Calendar, ChevronDown, ChevronUp } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { cn } from "~utils/cn";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function FastingTracker() {
   const [settings] = useSettings();

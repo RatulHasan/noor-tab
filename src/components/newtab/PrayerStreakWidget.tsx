@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useStorage } from "@plasmohq/storage/hook";
 import { Flame, Trophy, X } from "lucide-react";
-import { format, subDays } from "../../utils/dateUtils";
-import type { PrayerStreakData } from "../../types";
-import { getDayScore } from "../../utils/streakCalculator";
-import { cn } from "../../utils/cn";
+import { format, subDays } from "~utils/dateUtils";
+import type { PrayerStreakData } from "~types";
+import { getDayScore } from "~utils/streakCalculator";
+import { cn } from "~utils/cn";
 import PrayerStreakTracker from "../shared/PrayerStreakTracker";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
 export default function PrayerStreakWidget() {
   const [streakData] = useStorage<PrayerStreakData>("prayerStreak", {

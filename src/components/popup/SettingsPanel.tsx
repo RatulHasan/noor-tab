@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "../../types";
-import { detectLocation, geocodeLocation } from "../../utils/locationService";
-import { getTranslation } from "../../data/translations";
-import { POPULAR_LOCATIONS } from "../../data/popularLocations";
+import type { UserSettings, CalculationMethodKey, MadhabKey, NotificationStyle, PrayerName, AppLanguage } from "~types";
+import { detectLocation, geocodeLocation } from "~utils/locationService";
+import { getTranslation } from "~data/translations";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
 import { MapPin, Loader2, Save, Trash2, Search, Play, Pause, Volume2 } from "lucide-react";
-import { cn } from "../../utils/cn";
-import { ADHAN_AUDIO_OPTIONS } from "../../data/adhanAudios";
+import { cn } from "~utils/cn";
+import { ADHAN_AUDIO_OPTIONS } from "~data/adhanAudios";
 
 /**
  * @param {Object} props
@@ -77,6 +77,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
   const [showFastingCountdown, setShowFastingCountdown] = useState(settings.showFastingCountdown ?? true);
   const [remindMorningAdhkar, setRemindMorningAdhkar] = useState(settings.remindMorningAdhkar ?? true);
   const [remindEveningAdhkar, setRemindEveningAdhkar] = useState(settings.remindEveningAdhkar ?? true);
+  const [searchEngine, setSearchEngine] = useState<UserSettings["searchEngine"]>(settings.searchEngine || "google");
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -284,6 +285,7 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
         showFastingCountdown,
         remindMorningAdhkar,
         remindEveningAdhkar,
+        searchEngine,
       });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2500);
@@ -583,6 +585,24 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
 
           <div>
             <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
+              Search Engine
+            </label>
+            <select
+              value={searchEngine}
+              onChange={(e) => setSearchEngine(e.target.value as any)}
+              className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+            >
+              <option value="google">Google</option>
+              <option value="duckduckgo">DuckDuckGo</option>
+              <option value="bing">Bing</option>
+              <option value="ecosia">Ecosia</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          <div>
+            <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
               {t("theme")}
             </label>
             <select
@@ -597,23 +617,23 @@ export default function SettingsPanel({ settings, onSave }: SettingsPanelProps) 
               ))}
             </select>
           </div>
-        </div>
 
-        <div>
-          <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
-            {t("language")}
-          </label>
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value as AppLanguage)}
-            className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
-          >
-            {LANGUAGES.map((langOpt) => (
-              <option key={langOpt.key} value={langOpt.key}>
-                {langOpt.label}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase">
+              {t("language")}
+            </label>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as AppLanguage)}
+              className="mt-0.5 w-full rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+            >
+              {LANGUAGES.map((langOpt) => (
+                <option key={langOpt.key} value={langOpt.key}>
+                  {langOpt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Adhan Sound Alert & Play/Pause preview */}

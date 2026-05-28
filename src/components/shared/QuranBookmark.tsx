@@ -1,13 +1,13 @@
 import { useStorage } from "@plasmohq/storage/hook";
-import { format } from "../../utils/dateUtils";
+import { format } from "~utils/dateUtils";
 import { BookOpen, ChevronDown, ChevronUp, ExternalLink, Save } from "lucide-react";
 import { useState } from "react";
-import { useSettings } from "../../hooks/useSettings";
-import { getTranslation } from "../../data/translations";
+import { useSettings } from "~hooks/useSettings";
+import { getTranslation } from "~data/translations";
 
-import type { QuranBookmark as QuranBookmarkType } from "../../types";
-import { SURAH_LIST, getSurahAyahCount } from "../../utils/quranData";
-import { cn } from "../../utils/cn";
+import type { QuranBookmark as QuranBookmarkType } from "~types";
+import { SURAH_LIST, getSurahAyahCount } from "~utils/quranData";
+import { cn } from "~utils/cn";
 
 export default function QuranBookmark() {
   const [settings] = useSettings();

@@ -1,4 +1,4 @@
-export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+export type PrayerName = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
 
 export type NotificationStyle = "newtab" | "overlay" | "both";
 
@@ -17,6 +17,7 @@ export type CalculationMethodKey =
 
 export type MadhabKey = "standard" | "hanafi";
 
+export type SearchEngine = 'google' | 'duckduckgo' | 'bing' | 'ecosia';
 export type AppLanguage = "en" | "bn" | "ar" | "hi" | "ur";
 
 export interface UserSettings {
@@ -32,6 +33,7 @@ export interface UserSettings {
   perPrayerReminder: Record<PrayerName, boolean>;
   theme: "light" | "dark" | "system";
   language: AppLanguage;
+  searchEngine: SearchEngine;
   adhanAudio: string; // "none" or name of the adhan file (e.g. "azan1")
   overlayPosition: "bottom" | "modal";
   // Phase 2 Settings
@@ -41,6 +43,7 @@ export interface UserSettings {
   remindMorningAdhkar: boolean;
   remindEveningAdhkar: boolean;
   worldCities: string[];
+  prayerOffsets: Record<PrayerName, number>;
 }
 
 export type DailyPrayers = Record<PrayerName, Date>;
@@ -173,9 +176,30 @@ export interface AsmaName {
 
 // ── Dua Library ────────────────────────────────────────────
 export type DuaCategory =
-  | 'morning_evening' | 'travel' | 'eating' | 'sleeping'
-  | 'stress' | 'gratitude' | 'protection' | 'forgiveness'
-  | 'family' | 'knowledge' | 'general';
+  | "morning_evening"
+  | "travel"
+  | "eating"
+  | "sleeping"
+  | "stress"
+  | "gratitude"
+  | "protection"
+  | "forgiveness"
+  | "family"
+  | "knowledge"
+  | "general"
+  | "rizq"
+  | "tawhid"
+  | "salah"
+  | "mosque"
+  | "daily"
+  | "purification"
+  | "health"
+  | "death"
+  | "nature"
+  | "guidance"
+  | "masnun"
+  | "ayat"
+  | "surah"
 
 export interface Dua {
   id: string;
@@ -191,13 +215,21 @@ export interface Dua {
 // ── Islamic Quiz ────────────────────────────────────────────
 export type QuizCategory = 'quran' | 'history' | 'fiqh' | 'seerah' | 'general';
 
+export type QuizTranslation = {
+  en: string;
+  bn?: string;
+  ar?: string;
+  hi?: string;
+  ur?: string;
+};
+
 export interface QuizQuestion {
   id: string;
   category: QuizCategory;
-  question: string;
-  options: string[];
+  question: QuizTranslation;
+  options: QuizTranslation[];
   correctIndex: number;
-  explanation: string;
+  explanation: QuizTranslation;
   difficulty: 'easy' | 'medium' | 'hard';
 }
 
@@ -221,12 +253,14 @@ export interface FocusMode {
 export type WidgetId =
   | 'ayah' | 'hadith' | 'dhikr' | 'islamicCalendar'
   | 'adhkar' | 'asmaName' | 'duaLibrary' | 'quiz'
-  | 'fastingTracker' | 'quranBookmark' | 'prayerStreak';
+  | 'fastingTracker' | 'quranBookmark' | 'prayerStreak'
+  | 'globalPrayer';
 
 export interface WidgetConfig {
   id: WidgetId;
   visible: boolean;
   order: number;
+  panel: 'left' | 'center' | 'right' | 'bottom';
 }
 
 // ── Backup / Export / Import ───────────────────────────────
@@ -243,6 +277,54 @@ export interface NoorTabBackup {
   duaFavorites: string[];   // dua IDs
   quizRecord: QuizRecord;
   widgetLayout: WidgetConfig[];
+  layoutState?: LayoutState;
+  // Additional user data
+  focusMode?: FocusMode;
+  zakatHistory?: ZakatCalculation[];
+  quizQuestionOffset?: number;
+}
+
+// Zakat calculation type for backup
+export interface ZakatCalculation {
+  totalAssets: number;
+  totalLiabilities: number;
+  netAssets: number;
+  nisabThreshold: number;
+  isEligible: boolean;
+  zakatDue: number;
+  currency: string;
+  savedAt: string;
+}
+
+// ── Panel Layout ───────────────────────────────────────────
+
+export type PanelId = 'left' | 'center' | 'right' | 'bottom';
+
+export type BreakpointId = 'xl' | 'lg' | 'md' | 'sm';
+
+export interface PanelItem {
+  id: string;           // unique: 'widget-prayerStreak', 'hub-quran', 'fixed-prayerTimes'
+  type: 'widget' | 'hub' | 'fixed';
+  widgetId?: WidgetId;  // if type === 'widget'
+  hubTabId?: string;    // if type === 'hub'
+  visible: boolean;
+  order: number;        // sort order within panel
+  panel: PanelId;
+  locked?: boolean;     // if true: cannot be dragged (e.g. Prayer Times in left, Ayah in center)
+}
+
+export interface PanelLayout {
+  left: PanelItem[];
+  center: PanelItem[];
+  right: PanelItem[];
+  bottom: PanelItem[];
+}
+
+export interface LayoutState {
+  panels: PanelLayout;
+  activeBreakpoint: BreakpointId;
+  lastModified: string; // ISO timestamp
+  version: '1.0';
 }
 
 export type BackupVersion = '1.0';

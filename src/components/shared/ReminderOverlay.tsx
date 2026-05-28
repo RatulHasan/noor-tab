@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import type { PrayerName } from "../../types";
-import { PRAYER_METADATA } from "../../data/prayerNames";
-import { HADITHS } from "../../data/hadiths";
+import type { PrayerName } from "~types";
+import { PRAYER_METADATA } from "~data/prayerNames";
+import { HADITHS } from "~data/hadiths";
 import { Bell, X, ExternalLink, Play, Pause } from "lucide-react";
-import { cn } from "../../utils/cn";
+import { cn } from "~utils/cn";
 
 /**
  * @param {Object} props
@@ -90,7 +90,7 @@ export default function ReminderOverlay({
             <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400 mt-2">
               Prayer Alert
             </span>
-            <h2 className="text-xl font-black text-stone-850 dark:text-stone-50">
+            <h2 className="text-xl font-black text-stone-800 dark:text-stone-50">
               It is time for {meta.displayName}
             </h2>
             <span className="font-amiri font-bold text-2xl text-emerald-800 dark:text-emerald-300 mt-0.5">

@@ -22,7 +22,8 @@ export const POPULAR_LOCATIONS: PopularCountry[] = [
       { name: "Khulna", lat: 22.8456, lng: 89.5403 },
       { name: "Barisal", lat: 22.7010, lng: 90.3535 },
       { name: "Rangpur", lat: 25.7508, lng: 89.2519 },
-      { name: "Mymensingh", lat: 24.7471, lng: 90.4203 }
+      { name: "Mymensingh", lat: 24.7471, lng: 90.4203 },
+      { name: "Jhenaidah", lat: 23.5448, lng: 89.1539 }
     ]
   },
   {
