@@ -1,7 +1,7 @@
 {
   "name": "noor-tab",
   "displayName": "NoorTab - Islamic New Tab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Transform every new tab into an Islamic companion - prayer times, Adhan reminders, Qibla compass, Adhkar, Quran bookmarks, and more.",
   "author": "Ratul Hasan <ratulhasan.com>",
   "scripts": {
