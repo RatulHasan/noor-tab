@@ -37,30 +37,6 @@ function stripDevDomains() {
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
 }
 
-function updateReadmeVersion() {
-    const readmePath = path.resolve(__dirname, '../README.md');
-    if (!fs.existsSync(readmePath)) {
-        console.warn('⚠️  README.md not found, skipping version update.');
-        return;
-    }
-
-    let readmeContent = fs.readFileSync(readmePath, 'utf-8');
-    const version = pkg.version;
-    
-    console.log(`📝 Updating README.md version to ${version}...`);
-
-    // Regular expression to match the shields.io badge version
-    const badgeRegex = /https:\/\/img\.shields\.io\/badge\/version-([\d.]+)-emerald/g;
-    
-    if (badgeRegex.test(readmeContent)) {
-        const updatedContent = readmeContent.replace(badgeRegex, `https://img.shields.io/badge/version-${version}-emerald`);
-        fs.writeFileSync(readmePath, updatedContent, 'utf-8');
-        console.log('✅ README.md version updated.');
-    } else {
-        console.warn('⚠️  Could not find version badge in README.md');
-    }
-}
-
 // Handle interrupts to ensure cleanup
 process.on('SIGINT', () => {
     restorePackageJson();
@@ -81,8 +57,6 @@ try {
     const target = process.argv[2] || 'chrome-mv3';
     
     stripDevDomains();
-    updateReadmeVersion();
-
     // Edge strictly requires the manifest author field to be an email address
     if (target === 'edge-mv3') {
         console.log('🔧 Applying Edge MV3 manifest fix (using email for author)...');
