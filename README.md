@@ -28,6 +28,23 @@
 
 ## ✨ Core Features
 
+<p align="center">
+  <img src="assets/banner-1.png" alt="Core Features" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-2.png" alt="Phase 2 Features" width="100%" />
+</p>
+
+<p align="center">
+  <img src="assets/banner-3.png" alt="Phase 3 Features" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-4.png" alt="Tech Stack" width="100%" />
+</p>
+<p align="center">
+  <img src="assets/banner-5.png" alt="Settings" width="100%" />
+</p>
+
 ### 🕌 Prayer Times & Adhan
 - **Accurate prayer time calculation** using industry-standard algorithms (Adhan.js) supporting 8+ calculation methods (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
 - **Madhab support** for Hanafi and standard Asr calculation
