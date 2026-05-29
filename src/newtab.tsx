@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useSettings } from "./hooks/useSettings";
-import { usePrayerTimes } from "./hooks/usePrayerTimes";
+import { useSettings } from "~hooks/useSettings";
+import { usePrayerTimes } from "~hooks/usePrayerTimes";
 import NoorTabHero from "./components/newtab/NoorTabHero";
 import AyahDisplay from "./components/newtab/AyahDisplay";
 import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
-import { getTranslation } from "./data/translations";
+import { getTranslation } from "~data/translations";
 import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check, ChevronDown, Sparkles, RotateCcw, Eye, Upload, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
-import { detectLocation, geocodeLocation } from "./utils/locationService";
-import { POPULAR_LOCATIONS } from "./data/popularLocations";
+import { detectLocation, geocodeLocation } from "~utils/locationService";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
 import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem, NoorTabBackup } from "./types";
 import { useStorage } from "@plasmohq/storage/hook";
 import { parseBackupFile, validateBackup, importBackup, getBackupSummary } from "./utils/backupManager";
@@ -468,7 +468,7 @@ export default function NewTab() {
           </div>
         );
         case 'fixed-hub': return (
-          <div className="flex-1 px-4 pb-8">
+          <div className="flex-1 px-4 pb-8" data-hub-container>
             <QuickAccessHub activeTabId={activeHubTabId} onTabChange={handleHubTabChange} />
           </div>
         );
@@ -506,7 +506,7 @@ export default function NewTab() {
         {/* Pattern background overlay */}
         <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
 
-      {!hasCoordinates ? (
+      {!isLoadingSettings && !hasCoordinates ? (
         /* Full-screen Onboarding */
         <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-6 relative z-10 px-6">
           <div className="space-y-3">

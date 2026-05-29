@@ -1,16 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import QuranTab from "./QuranTab";
 import HadithTab from "./HadithTab";
 import { cn } from "~utils/cn";
 import { BookOpen, BookMarked } from "lucide-react";
 import { getTranslation } from "~data/translations";
 import { useSettings } from "~hooks/useSettings";
+import { useStorage } from "@plasmohq/storage/hook";
+import { Storage } from "@plasmohq/storage";
 
 export default function QuranHadithTab() {
   const [activeSubTab, setActiveSubTab] = useState<"quran" | "hadith">("quran");
   const [settings] = useSettings();
   const lang = settings?.language || "en";
   const t = (key: any) => getTranslation(lang, key);
+  const [targetTab] = useStorage<string>("targetHubTab", "quranHadith");
+
+  // Auto-switch to Quran sub-tab when target is quranHadith and pending surah exists
+  useEffect(() => {
+    if (targetTab === "quranHadith") {
+      setActiveSubTab("quran");
+      // Clear the target tab after processing
+      const storage = new Storage();
+      storage.set("targetHubTab", "").catch(() => {});
+    }
+  }, [targetTab]);
 
   return (
     <div className="flex flex-col h-full">

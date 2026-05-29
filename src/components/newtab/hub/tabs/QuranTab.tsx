@@ -20,6 +20,7 @@ export default function QuranTab() {
   const [visibleAyahs, setVisibleAyahs] = useState(10);
   const [isListLoading, setIsListLoading] = useState(true);
   const [bookmark, setBookmark] = useStorage<QuranBookmark | null>("quranBookmark", null);
+  const [pendingSurah, setPendingSurah] = useStorage<number | null>("pendingQuranSurah", null);
 
   useEffect(() => {
     setIsListLoading(true);
@@ -28,6 +29,18 @@ export default function QuranTab() {
       setIsListLoading(false);
     });
   }, []);
+
+  // Handle pending surah selection (e.g., from Jumu'ah banner)
+  useEffect(() => {
+    if (pendingSurah && surahs.length > 0) {
+      const surahExists = surahs.some(s => s.number === pendingSurah);
+      if (surahExists) {
+        handleSurahSelect(pendingSurah);
+        // Clear the pending surah after selection
+        setPendingSurah(null);
+      }
+    }
+  }, [pendingSurah, surahs]);
 
   const handleSurahSelect = async (num: number) => {
     setLoading(true);
@@ -168,7 +181,7 @@ export default function QuranTab() {
                   {selectedSurah.ayahs.slice(0, visibleAyahs).map((ayah, i) => (
                     <div key={i} className="space-y-6 group relative">
                       <div className="flex justify-between items-start gap-4">
-                        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-50 dark:bg-stone-800 text-[10px] font-bold text-stone-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-stone-50 dark:bg-stone-800 text-[10px] font-bold text-stone-400 transition-colors">
                           {i + 1}
                         </span>
                         <button 

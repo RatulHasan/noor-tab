@@ -5,7 +5,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   cityName: null,
   madhab: "standard",
   method: "muslimWorldLeague",
-  notificationStyle: "both",
+  notificationStyle: "overlay",
   reminderMinutes: 15,
   perPrayerReminder: {
     fajr: true,
@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   language: "en",
   searchEngine: "google",
   adhanAudio: "none",
-  overlayPosition: "bottom",
+  overlayPosition: "modal",
   // Phase 2 Settings
   enableAutoRamadan: true,
   trackSunnahFasts: true,
