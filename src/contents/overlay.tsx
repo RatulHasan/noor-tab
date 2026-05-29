@@ -1,10 +1,9 @@
 import cssText from "data-text:~style.css";
 import type { PlasmoCSConfig } from "plasmo";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ReminderOverlay from "../components/shared/ReminderOverlay";
 import type { PrayerName } from "../types";
 import { Storage } from "@plasmohq/storage";
-import { ADHAN_AUDIO_OPTIONS } from "../data/adhanAudios";
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -34,12 +33,10 @@ const OverlayCSUI = () => {
   const [prayer, setPrayer] = useState<PrayerName | null>(null);
   const [minutes, setMinutes] = useState(15);
   const [overlayPosition, setOverlayPosition] = useState<"bottom" | "modal">("bottom");
-  const [isOverlayAudioPlaying, setIsOverlayAudioPlaying] = useState(false);
   const [hasAdhanConfigured, setHasAdhanConfigured] = useState(false);
-  const overlayAudioRef = useRef<HTMLAudioElement | null>(null);
   const storage = new Storage();
 
-  // Load settings & Play configured Adhan sound if shown
+  // Load settings
   useEffect(() => {
     if (visible && prayer) {
       storage.get("noortab-user-settings").then((storedSettings: any) => {
@@ -49,34 +46,8 @@ const OverlayCSUI = () => {
 
         const adhanAudio = storedSettings?.adhanAudio || "none";
         setHasAdhanConfigured(adhanAudio !== "none");
-
-        // Auto-play adhan for both reminders and prayer time
-        if (adhanAudio !== "none") {
-          const option = ADHAN_AUDIO_OPTIONS.find((o) => o.key === adhanAudio);
-          if (option && option.url) {
-            const audio = new Audio(option.url);
-            overlayAudioRef.current = audio;
-            setIsOverlayAudioPlaying(true);
-
-            audio.play().catch((err) => {
-              setIsOverlayAudioPlaying(false);
-            });
-
-            audio.onended = () => {
-              setIsOverlayAudioPlaying(false);
-            };
-          }
-        }
       });
     }
-
-    return () => {
-      if (overlayAudioRef.current) {
-        overlayAudioRef.current.pause();
-        overlayAudioRef.current = null;
-        setIsOverlayAudioPlaying(false);
-      }
-    };
   }, [visible, prayer]);
 
   useEffect(() => {
@@ -87,18 +58,12 @@ const OverlayCSUI = () => {
         setVisible(true);
         sendResponse({ received: true });
       }
-      if (message.type === "STOP_ALL_ADHAN") {
-        if (overlayAudioRef.current) {
-          overlayAudioRef.current.pause();
-          setIsOverlayAudioPlaying(false);
-        }
-      }
     };
 
     if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
       chrome.runtime.onMessage.addListener(handleMessage);
     }
-    
+
     return () => {
       if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.removeListener(handleMessage);
@@ -108,20 +73,8 @@ const OverlayCSUI = () => {
 
   if (!visible || !prayer) return null;
 
-  const handleToggleAudio = () => {
-    if (overlayAudioRef.current) {
-      if (isOverlayAudioPlaying) {
-        overlayAudioRef.current.pause();
-        setIsOverlayAudioPlaying(false);
-      } else {
-        overlayAudioRef.current.play().catch(() => {});
-        setIsOverlayAudioPlaying(true);
-      }
-    }
-  };
-
   const handleAction = () => {
-    setVisible(false);
+    // Don't close the modal - let user dismiss with X button
     if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ type: "OPEN_NEW_TAB", prayer });
     }
@@ -129,10 +82,6 @@ const OverlayCSUI = () => {
 
   const handleDismiss = () => {
     setVisible(false);
-    if (overlayAudioRef.current) {
-      overlayAudioRef.current.pause();
-      setIsOverlayAudioPlaying(false);
-    }
   };
 
   const isModal = overlayPosition === "modal";
@@ -153,8 +102,6 @@ const OverlayCSUI = () => {
         onDismiss={handleDismiss}
         onAction={handleAction}
         isModal={isModal}
-        isAdhanPlaying={isOverlayAudioPlaying}
-        onToggleAdhan={handleToggleAudio}
         showAdhanControls={hasAdhanConfigured}
       />
     </div>

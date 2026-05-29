@@ -56,15 +56,6 @@ export default function ReminderOverlay({
         {/* Pattern background overlay */}
         <div className="absolute inset-0 bg-islamic-pattern opacity-5 pointer-events-none" />
 
-        {/* Close Button top-right */}
-        <button
-          onClick={onDismiss}
-          className="absolute top-4 right-4 z-20 rounded-full p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors"
-          aria-label="Dismiss"
-        >
-          <X className="h-4.5 w-4.5" />
-        </button>
-
         {/* Mosque Silhouette SVG Watermark */}
         <div className="absolute bottom-0 right-0 h-28 w-44 text-emerald-950/[0.04] dark:text-emerald-400/[0.03] pointer-events-none select-none z-0">
           <svg viewBox="0 0 200 100" fill="currentColor" className="w-full h-full">
@@ -116,53 +107,24 @@ export default function ReminderOverlay({
         </div>
 
         {/* Button controls */}
-        <div className="relative z-10 flex items-center justify-between gap-3 pt-3 border-t border-stone-150 dark:border-stone-800/60">
-          <div>
-            {showAdhanControls && onToggleAdhan && (
-              <button
-                type="button"
-                onClick={onToggleAdhan}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors shadow-sm",
-                  isAdhanPlaying
-                    ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-950/20 dark:border-rose-900/40 dark:text-rose-400 hover:bg-rose-100"
-                    : "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-900/40 dark:text-emerald-400 hover:bg-emerald-100"
-                )}
-              >
-                {isAdhanPlaying ? (
-                  <>
-                    <Pause className="h-3.5 w-3.5" />
-                    Mute Adhan
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
-                    Play Adhan
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-
-          <div className="flex gap-2">
+        <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-stone-150 dark:border-stone-800/60">
+          {showAdhanControls && onAction && (
             <button
               type="button"
-              onClick={onDismiss}
-              className="rounded-xl px-3.5 py-1.5 text-xs font-bold text-stone-500 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-750 transition-colors"
+              onClick={onAction}
+              className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
             >
-              Dismiss
+              <Play className="h-4 w-4 fill-current" />
+              Play Adhan
             </button>
-            {onAction && (
-              <button
-                type="button"
-                onClick={onAction}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-md hover:bg-emerald-600 transition-colors"
-              >
-                Open NoorTab
-                <ExternalLink className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
+          )}
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="rounded-xl px-4 py-2 text-sm font-bold text-stone-500 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-750 transition-colors"
+          >
+            Dismiss
+          </button>
         </div>
       </div>
     );

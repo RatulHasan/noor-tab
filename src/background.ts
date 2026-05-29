@@ -141,10 +141,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
               prayer: prayerName,
               minutes: 0, // 0 means it's prayer time
               isPrayerTime: true,
-            }, (response) => {
-              if (chrome.runtime.lastError) {
-                chrome.tabs.create({ url });
-              }
+            }).catch(() => {
+              // Content script not loaded (e.g. system page), fallback to new tab
+              chrome.tabs.create({ url });
             });
           }
         });
@@ -175,12 +174,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             type: "SHOW_PRAYER_OVERLAY",
             prayer: prayerName,
             minutes: settings.reminderMinutes,
-          }, (response) => {
-            // If message sending failed (e.g. no content script loaded on system pages),
-            // fallback to opening new tab so the reminder is not missed
-            if (chrome.runtime.lastError) {
-              chrome.tabs.create({ url });
-            }
+          }).catch(() => {
+            // Content script not loaded (e.g. system page), fallback to new tab
+            chrome.tabs.create({ url });
           });
         } else {
           // No active tab or system tab, open new tab
@@ -209,7 +205,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "STOP_ALL_ADHAN") {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
-        if (tab.id) {
+        if (tab.id && tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
+          // Only send to http/https pages where content script can be injected
           chrome.tabs.sendMessage(tab.id, { type: "STOP_ALL_ADHAN" }).catch(() => {
             // Ignore error for pages without content script loaded
           });
