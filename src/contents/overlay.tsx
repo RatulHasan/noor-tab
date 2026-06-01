@@ -2,7 +2,7 @@ import cssText from "data-text:~style.css";
 import type { PlasmoCSConfig } from "plasmo";
 import React, { useState, useEffect } from "react";
 import ReminderOverlay from "../components/shared/ReminderOverlay";
-import type { PrayerName } from "../types";
+import type { PrayerName, PrayerStatus } from "../types";
 import { Storage } from "@plasmohq/storage";
 
 export const config: PlasmoCSConfig = {
@@ -84,6 +84,16 @@ const OverlayCSUI = () => {
     setVisible(false);
   };
 
+  const handleTrackPrayer = (status: PrayerStatus) => {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({
+        type: "MARK_PRAYER",
+        prayer,
+        status
+      });
+    }
+  };
+
   const isModal = overlayPosition === "modal";
 
   const containerClasses = isModal
@@ -103,6 +113,7 @@ const OverlayCSUI = () => {
         onAction={handleAction}
         isModal={isModal}
         showAdhanControls={hasAdhanConfigured}
+        onTrackPrayer={handleTrackPrayer}
       />
     </div>
   );

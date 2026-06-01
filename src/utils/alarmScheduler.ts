@@ -26,19 +26,20 @@ export async function scheduleAllPrayerAlarms(
   const prayerNames: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
 
   for (const name of prayerNames) {
-    if (!perPrayerReminder[name]) continue;
-
     const prayerTime = new Date(prayers[name]).getTime();
-    const reminderTime = prayerTime - reminderMinutes * 60 * 1000;
 
-    // Schedule reminder alarm (before prayer time)
-    if (reminderTime > now) {
-      chrome.alarms.create(`prayer-reminder-${name}`, { when: reminderTime });
-    }
-
-    // Schedule actual prayer time alarm (for adhan/notification at 100% elapsed)
+    // Schedule actual prayer time alarm (for adhan/notification at prayer time)
+    // This should always be scheduled regardless of reminder setting
     if (prayerTime > now) {
       chrome.alarms.create(`prayer-time-${name}`, { when: prayerTime });
+    }
+
+    // Schedule reminder alarm (before prayer time) - only if enabled for this prayer
+    if (perPrayerReminder[name]) {
+      const reminderTime = prayerTime - reminderMinutes * 60 * 1000;
+      if (reminderTime > now) {
+        chrome.alarms.create(`prayer-reminder-${name}`, { when: reminderTime });
+      }
     }
   }
 }

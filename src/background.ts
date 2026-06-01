@@ -235,8 +235,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "MARK_PRAYER") {
-    // Storage update handled by component directly via @plasmohq/storage
-    // Background just logs for debugging
+    // Store the prayer status
+    const { prayer, status } = message;
+    storage.get("noortab-prayer-statuses").then((statuses: any) => {
+      const updated = { ...statuses, [prayer]: status };
+      storage.set("noortab-prayer-statuses", updated);
+    });
     sendResponse({ success: true });
     return true;
   }

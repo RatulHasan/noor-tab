@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import type { PrayerName } from "~types";
+import type { PrayerName, PrayerStatus } from "~types";
 import { PRAYER_METADATA } from "~data/prayerNames";
 import { HADITHS } from "~data/hadiths";
-import { Bell, X, ExternalLink, Play, Pause } from "lucide-react";
+import { Bell, X, ExternalLink, Play, Pause, Check } from "lucide-react";
 import { cn } from "~utils/cn";
 
 /**
@@ -15,6 +15,7 @@ import { cn } from "~utils/cn";
  * @param {() => void} [props.onToggleAdhan] - Callback to toggle Adhan sound.
  * @param {boolean} [props.showAdhanControls] - Whether to show the Adhan control buttons.
  * @param {boolean} [props.isModal] - Whether this overlay is rendered as a center modal.
+ * @param {(status: PrayerStatus) => void} [props.onTrackPrayer] - Callback to track prayer status.
  */
 interface ReminderOverlayProps {
   prayerName: PrayerName;
@@ -25,6 +26,7 @@ interface ReminderOverlayProps {
   onToggleAdhan?: () => void;
   showAdhanControls?: boolean;
   isModal?: boolean;
+  onTrackPrayer?: (status: PrayerStatus) => void;
 }
 
 export default function ReminderOverlay({
@@ -36,6 +38,7 @@ export default function ReminderOverlay({
   onToggleAdhan,
   showAdhanControls = false,
   isModal = false,
+  onTrackPrayer,
 }: ReminderOverlayProps) {
   const meta = PRAYER_METADATA[prayerName];
 
@@ -58,16 +61,34 @@ export default function ReminderOverlay({
 
         {/* Mosque Silhouette SVG Watermark */}
         <div className="absolute bottom-0 right-0 h-28 w-44 text-emerald-950/[0.04] dark:text-emerald-400/[0.03] pointer-events-none select-none z-0">
-          <svg viewBox="0 0 200 100" fill="currentColor" className="w-full h-full">
+          <svg
+            viewBox="0 0 200 100"
+            fill="currentColor"
+          >
             <rect x="0" y="96" width="200" height="4" />
             <path d="M 40 96 L 40 70 C 40 65, 45 60, 50 60 L 150 60 C 155 60, 160 65, 160 70 L 160 96 Z" />
             <path d="M 80 60 C 80 50, 75 42, 100 32 C 125 42, 120 50, 120 60 Z" />
             <line x1="100" y1="32" x2="100" y2="16" stroke="currentColor" strokeWidth="1.5" />
             <path d="M 98.5 17 C 98.5 15.5, 100 14.5, 101.5 15 C 100.5 15.5, 100.5 16.5, 101.5 17 C 100 17.5, 98.5 18.5, 98.5 17 Z" />
+            <path d="M 54 60 C 54 52, 50 46, 66 38 C 82 46, 78 52, 78 60 Z" />
+            <line x1="66" y1="38" x2="66" y2="28" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M 122 60 C 122 52, 118 46, 134 38 C 150 46, 146 52, 146 60 Z" />
+            <line x1="134" y1="38" x2="134" y2="28" stroke="currentColor" strokeWidth="1.2" />
             <rect x="26" y="30" width="8" height="66" />
+            <rect x="24" y="55" width="12" height="3" rx="0.5" />
+            <rect x="24" y="30" width="12" height="3" rx="0.5" />
             <path d="M 26 30 C 26 22, 34 22, 34 30 Z" />
+            <line x1="30" y1="22" x2="30" y2="12" stroke="currentColor" strokeWidth="1" />
             <rect x="166" y="30" width="8" height="66" />
+            <rect x="164" y="55" width="12" height="3" rx="0.5" />
+            <rect x="164" y="30" width="12" height="3" rx="0.5" />
             <path d="M 166 30 C 166 22, 174 22, 174 30 Z" />
+            <line x1="170" y1="22" x2="170" y2="12" stroke="currentColor" strokeWidth="1" />
+
+            {/* Archway details */}
+            <path d="M 92 96 L 92 82 C 92 78, 108 78, 108 82 L 108 96 Z" />
+            <path d="M 72 96 L 72 85 C 72 82, 84 82, 84 85 L 84 96 Z" />
+            <path d="M 116 96 L 116 85 C 116 82, 128 82, 128 85 L 128 96 Z" />
           </svg>
         </div>
 
@@ -107,24 +128,57 @@ export default function ReminderOverlay({
         </div>
 
         {/* Button controls */}
-        <div className="relative z-10 flex items-center justify-center gap-3 pt-3 border-t border-stone-150 dark:border-stone-800/60">
-          {showAdhanControls && onAction && (
+        <div className="relative z-10 space-y-3 pt-3 border-t border-stone-150 dark:border-stone-800/60">
+          {/* Prayer tracking buttons */}
+          {onTrackPrayer && (
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => onTrackPrayer("on_time")}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 border border-emerald-200 shadow-sm transition-colors hover:bg-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+              >
+                <Check className="h-3 w-3" />
+                On Time
+              </button>
+              <button
+                type="button"
+                onClick={() => onTrackPrayer("late")}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 border border-amber-200 shadow-sm transition-colors hover:bg-amber-100 dark:bg-amber-950/20 dark:border-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-950/30"
+              >
+                <Check className="h-3 w-3" />
+                Late
+              </button>
+              <button
+                type="button"
+                onClick={() => onTrackPrayer("missed")}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 border border-rose-200 shadow-sm transition-colors hover:bg-rose-100 dark:bg-rose-950/20 dark:border-rose-900/40 dark:text-rose-400 dark:hover:bg-rose-950/30"
+              >
+                <X className="h-3 w-3" />
+                Missed
+              </button>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="flex items-center justify-center gap-3">
+            {showAdhanControls && onAction && (
+              <button
+                type="button"
+                onClick={onAction}
+                className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+              >
+                <Play className="h-4 w-4 fill-current" />
+                Play Adhan
+              </button>
+            )}
             <button
               type="button"
-              onClick={onAction}
-              className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+              onClick={onDismiss}
+              className="rounded-xl px-4 py-2 text-sm font-bold text-stone-500 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-750 transition-colors"
             >
-              <Play className="h-4 w-4 fill-current" />
-              Play Adhan
+              Dismiss
             </button>
-          )}
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="rounded-xl px-4 py-2 text-sm font-bold text-stone-500 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-750 transition-colors"
-          >
-            Dismiss
-          </button>
+          </div>
         </div>
       </div>
     );
