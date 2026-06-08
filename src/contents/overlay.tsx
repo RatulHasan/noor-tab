@@ -90,6 +90,11 @@ const OverlayCSUI = () => {
         type: "MARK_PRAYER",
         prayer,
         status
+      }, (response) => {
+        // Close modal after successful tracking
+        if (response?.success) {
+          setVisible(false);
+        }
       });
     }
   };

@@ -235,12 +235,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "MARK_PRAYER") {
-    // Store the prayer status
+    // Store the prayer status in prayerStreak
     const { prayer, status } = message;
-    storage.get("noortab-prayer-statuses").then((statuses: any) => {
-      const updated = { ...statuses, [prayer]: status };
-      storage.set("noortab-prayer-statuses", updated);
+    const today = new Date().toISOString().split('T')[0]; // ISO date string
+
+    storage.get("prayerStreak").then((data: any) => {
+      const streakData = data || {
+        records: {},
+        currentStreak: 0,
+        longestStreak: 0,
+        totalOnTime: 0,
+        totalLate: 0,
+        totalMissed: 0,
+      };
+
+      // Get or create today's record
+      const todayRecord = streakData.records[today] || {
+        date: today,
+        fajr: null,
+        dhuhr: null,
+        asr: null,
+        maghrib: null,
+        isha: null
+      };
+
+      // Update the prayer status
+      todayRecord[prayer] = status;
+
+      // Update stats
+      const previousStatus = streakData.records[today]?.[prayer];
+      if (previousStatus === "on_time") streakData.totalOnTime--;
+      if (previousStatus === "late") streakData.totalLate--;
+      if (previousStatus === "missed") streakData.totalMissed--;
+
+      if (status === "on_time") streakData.totalOnTime++;
+      if (status === "late") streakData.totalLate++;
+      if (status === "missed") streakData.totalMissed++;
+
+      // Save updated record
+      streakData.records[today] = todayRecord;
+      storage.set("prayerStreak", streakData);
     });
+
     sendResponse({ success: true });
     return true;
   }
