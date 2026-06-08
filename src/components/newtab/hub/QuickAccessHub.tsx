@@ -15,20 +15,30 @@ export default function QuickAccessHub({ activeTabId: externalTabId, onTabChange
   const [settings] = useSettings();
   const lang = settings?.language || 'en';
   const t = (key: any) => getTranslation(lang, key);
-  
+
   const [internalTabId, setInternalTabId] = useStorage<string>("activeHubTab", "quranHadith");
-  
+  const [targetTab, setTargetTab] = useStorage<string>("targetHubTab", "");
+
   // Use external tab ID if provided, otherwise use internal storage state
   // If both are loading, default to "quranHadith" to avoid flickering/stuck loaders
   const activeTabId = externalTabId || internalTabId || "quranHadith";
   const setActiveTabId = onTabChange || setInternalTabId;
-  
+
   // Sync internal storage if external tab changes (e.g. from search)
   useEffect(() => {
     if (externalTabId && externalTabId !== internalTabId) {
       setInternalTabId(externalTabId);
     }
   }, [externalTabId, internalTabId]);
+
+  // Handle target tab from external sources (e.g., Jumu'ah banner)
+  useEffect(() => {
+    if (targetTab && targetTab !== activeTabId) {
+      setActiveTabId(targetTab);
+      // Clear the target after processing
+      setTargetTab("");
+    }
+  }, [targetTab, activeTabId, setActiveTabId, setTargetTab]);
 
   const activeTab = defaultHubTabs.find(t => t.id === activeTabId) || defaultHubTabs[0];
 

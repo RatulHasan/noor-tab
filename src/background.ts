@@ -141,10 +141,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
               prayer: prayerName,
               minutes: 0, // 0 means it's prayer time
               isPrayerTime: true,
-            }, (response) => {
-              if (chrome.runtime.lastError) {
-                chrome.tabs.create({ url });
-              }
+            }).catch(() => {
+              // Content script not loaded (e.g. system page), fallback to new tab
+              chrome.tabs.create({ url });
             });
           }
         });
@@ -175,12 +174,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             type: "SHOW_PRAYER_OVERLAY",
             prayer: prayerName,
             minutes: settings.reminderMinutes,
-          }, (response) => {
-            // If message sending failed (e.g. no content script loaded on system pages),
-            // fallback to opening new tab so the reminder is not missed
-            if (chrome.runtime.lastError) {
-              chrome.tabs.create({ url });
-            }
+          }).catch(() => {
+            // Content script not loaded (e.g. system page), fallback to new tab
+            chrome.tabs.create({ url });
           });
         } else {
           // No active tab or system tab, open new tab
@@ -209,7 +205,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "STOP_ALL_ADHAN") {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
-        if (tab.id) {
+        if (tab.id && tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
+          // Only send to http/https pages where content script can be injected
           chrome.tabs.sendMessage(tab.id, { type: "STOP_ALL_ADHAN" }).catch(() => {
             // Ignore error for pages without content script loaded
           });
@@ -238,8 +235,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "MARK_PRAYER") {
-    // Storage update handled by component directly via @plasmohq/storage
-    // Background just logs for debugging
+    // Store the prayer status in prayerStreak
+    const { prayer, status } = message;
+    const today = new Date().toISOString().split('T')[0]; // ISO date string
+
+    storage.get("prayerStreak").then((data: any) => {
+      const streakData = data || {
+        records: {},
+        currentStreak: 0,
+        longestStreak: 0,
+        totalOnTime: 0,
+        totalLate: 0,
+        totalMissed: 0,
+      };
+
+      // Get or create today's record
+      const todayRecord = streakData.records[today] || {
+        date: today,
+        fajr: null,
+        dhuhr: null,
+        asr: null,
+        maghrib: null,
+        isha: null
+      };
+
+      // Update the prayer status
+      todayRecord[prayer] = status;
+
+      // Update stats
+      const previousStatus = streakData.records[today]?.[prayer];
+      if (previousStatus === "on_time") streakData.totalOnTime--;
+      if (previousStatus === "late") streakData.totalLate--;
+      if (previousStatus === "missed") streakData.totalMissed--;
+
+      if (status === "on_time") streakData.totalOnTime++;
+      if (status === "late") streakData.totalLate++;
+      if (status === "missed") streakData.totalMissed++;
+
+      // Save updated record
+      streakData.records[today] = todayRecord;
+      storage.set("prayerStreak", streakData);
+    });
+
     sendResponse({ success: true });
     return true;
   }

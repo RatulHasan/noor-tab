@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useSettings } from "./hooks/useSettings";
-import { usePrayerTimes } from "./hooks/usePrayerTimes";
+import { useSettings } from "~hooks/useSettings";
+import { usePrayerTimes } from "~hooks/usePrayerTimes";
 import NoorTabHero from "./components/newtab/NoorTabHero";
 import AyahDisplay from "./components/newtab/AyahDisplay";
 import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
 import IslamicCalendar from "./components/newtab/IslamicCalendar";
-import { getTranslation } from "./data/translations";
+import { getTranslation } from "~data/translations";
 import { MapPin, Loader2, Search, Settings2, ChevronRight, ChevronLeft, Check, ChevronDown, Sparkles, RotateCcw, Eye, Upload, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
-import { detectLocation, geocodeLocation } from "./utils/locationService";
-import { POPULAR_LOCATIONS } from "./data/popularLocations";
-import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem, NoorTabBackup } from "./types";
+import { detectLocation, geocodeLocation } from "~utils/locationService";
+import { POPULAR_LOCATIONS } from "~data/popularLocations";
+import type { UserSettings, WidgetConfig, WidgetId, FastingData, PanelId, PanelItem, NoorTabBackup, PrayerStatus } from "./types";
 import { useStorage } from "@plasmohq/storage/hook";
 import { parseBackupFile, validateBackup, importBackup, getBackupSummary } from "./utils/backupManager";
 
 // Import DnD Kit
 import { type DragEndEvent, type DragOverEvent } from "@dnd-kit/core";
+import Icon from 'assets/icon.png';
 
 // Import Phase 2 widgets and components
 import PrayerStreakWidget from "./components/newtab/PrayerStreakWidget";
@@ -58,6 +59,7 @@ import { isTodayRamadan } from "./utils/fastingHelper";
 
 // Import CSS style
 import "./style.css";
+import ReminderOverlay from "~components/shared/ReminderOverlay";
 
 export default function NewTab() {
   const [settings, updateSettings, isLoadingSettings] = useSettings();
@@ -72,6 +74,7 @@ export default function NewTab() {
 
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
+  const [testModalOpen, setTestModalOpen] = useState(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [fastingData] = useStorage<FastingData>("fastingData");
   const [devMockCityName] = useStorage<string>("devMockCityName", "");
@@ -468,7 +471,7 @@ export default function NewTab() {
           </div>
         );
         case 'fixed-hub': return (
-          <div className="flex-1 px-4 pb-8">
+          <div className="flex-1 px-4 pb-8" data-hub-container>
             <QuickAccessHub activeTabId={activeHubTabId} onTabChange={handleHubTabChange} />
           </div>
         );
@@ -506,7 +509,12 @@ export default function NewTab() {
         {/* Pattern background overlay */}
         <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
 
-      {!hasCoordinates ? (
+        {/* Static center icon */}
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">
+          <img src={Icon} alt="" className="w-80 h-80 opacity-10 select-none object-contain" />
+        </div>
+
+      {!isLoadingSettings && !hasCoordinates ? (
         /* Full-screen Onboarding */
         <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-6 relative z-10 px-6">
           <div className="space-y-3">
@@ -889,6 +897,41 @@ export default function NewTab() {
 
       <WidgetCustomizer isOpen={showCustomizer} onClose={() => setShowCustomizer(false)} />
       <SettingsDrawer isOpen={showSettingsDrawer} onClose={() => setShowSettingsDrawer(false)} />
+
+      {/* Test button for modal - development only */}
+      {process.env.PLASMO_PUBLIC_DEV_MODE === "true" && (
+        <>
+          <button
+            onClick={() => {
+              setTestModalOpen(true);
+            }}
+            className="fixed bottom-4 left-4 z-50 bg-stone-800 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-stone-700 transition-colors opacity-50 hover:opacity-100"
+            title="Test Modal"
+          >
+            🧪 Test Modal
+          </button>
+
+          {/* Test Modal Overlay */}
+          {testModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm z-[2147483647] p-4">
+              <ReminderOverlay
+                prayerName="maghrib"
+                timeRemaining="15 minutes"
+                onDismiss={() => setTestModalOpen(false)}
+                onAction={() => {
+                  // Just a placeholder for test
+                  console.log("Open new tab clicked");
+                }}
+                isModal={true}
+                showAdhanControls={true}
+                onTrackPrayer={(status) => {
+                  console.log("Prayer tracked:", status);
+                }}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
     </DragProvider>
   );
