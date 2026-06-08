@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSettings } from "~hooks/useSettings";
 import { usePrayerTimes } from "~hooks/usePrayerTimes";
-import NoorTabHero from "./components/newtab/NoorTabHero";
+// import NoorTabHero from "./components/newtab/NoorTabHero";
 import AyahDisplay from "./components/newtab/AyahDisplay";
 import DhikrCounter from "./components/newtab/DhikrCounter";
 import HadithOfDay from "./components/newtab/HadithOfDay";
@@ -16,20 +16,20 @@ import { parseBackupFile, validateBackup, importBackup, getBackupSummary } from 
 
 // Import DnD Kit
 import { type DragEndEvent, type DragOverEvent } from "@dnd-kit/core";
-import Icon from 'assets/icon.png';
+// import Icon from 'assets/icon.png';
 
 // Import Phase 2 widgets and components
 import PrayerStreakWidget from "./components/newtab/PrayerStreakWidget";
 import AsmaUlHusna from "./components/newtab/AsmaUlHusna";
 import GlobalPrayerWidget from "./components/newtab/GlobalPrayerWidget";
-import JumuahBanner from "./components/newtab/JumuahBanner";
+// import JumuahBanner from "./components/newtab/JumuahBanner";
 import WidgetCustomizer from "./components/newtab/WidgetCustomizer";
 import SettingsDrawer from "./components/newtab/SettingsDrawer";
 import AdhkarPlayer from "./components/shared/AdhkarPlayer";
 import FastingTracker from "./components/shared/FastingTracker";
 import QuranBookmark from "./components/shared/QuranBookmark";
 import IslamicQuiz from "./components/shared/IslamicQuiz";
-import AsmaCard from "./components/shared/AsmaCard";
+// import AsmaCard from "./components/shared/AsmaCard";
 import DuaLibrary from "./components/shared/DuaLibrary";
 import BuyMeCoffee from "./components/shared/BuyMeCoffee";
 import { ADHAN_AUDIO_OPTIONS } from "./data/adhanAudios";
@@ -80,7 +80,7 @@ export default function NewTab() {
   const [devMockCityName] = useStorage<string>("devMockCityName", "");
   const isRamadan = fastingData?.isRamadanMode || isTodayRamadan();
   const isFriday = isTodayFriday();
-  
+
   // Layout and Responsive hooks
   const { layoutState, reorderWithinPanel, moveBetweenPanels, resetLayout } = useLayoutState();
   const breakpoint = useBreakpoint();
@@ -127,12 +127,12 @@ export default function NewTab() {
     } else {
       const targetItems = layoutState.panels[targetPanel];
       const overIndex = overIsPanel
-        ? targetItems.length 
+        ? targetItems.length
         : targetItems.findIndex(i => i.id === over.id);
       moveBetweenPanels(active.id as string, sourcePanel, targetPanel, overIndex);
     }
   }, [layoutState.panels, reorderWithinPanel, moveBetweenPanels]);
-  
+
   // Onboarding Location Access Detection states
   const [isOnboardingDetecting, setIsOnboardingDetecting] = useState(false);
   const [onboardingError, setOnboardingError] = useState("");
@@ -218,7 +218,7 @@ export default function NewTab() {
 
   const handleSaveSettings = async (newSettings: Partial<UserSettings>) => {
     await updateSettings(newSettings);
-    
+
     // Broadcast setting change to background worker to update alarms
     try {
       if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
@@ -399,7 +399,7 @@ export default function NewTab() {
     }
 
     if (!nextPrayer) return "from-stone-50 to-stone-100 dark:from-stone-950 dark:to-stone-900";
-    
+
     switch (nextPrayer.name.toLowerCase()) {
       case "fajr":
         // Night (Isha to Fajr): deep indigo / slate / dark green hues
@@ -500,8 +500,8 @@ export default function NewTab() {
   }
 
   return (
-    <DragProvider 
-      onDragEnd={handleDragEnd} 
+    <DragProvider
+      onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       panels={layoutState.panels}
     >
@@ -510,9 +510,9 @@ export default function NewTab() {
         <div className="absolute inset-0 bg-islamic-pattern opacity-[0.03] pointer-events-none" />
 
         {/* Static center icon */}
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">
-          <img src={Icon} alt="" className="w-80 h-80 opacity-10 select-none object-contain" />
-        </div>
+        {/*<div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">*/}
+        {/*  <img src={Icon} alt="" className="w-80 h-80 opacity-10 select-none object-contain" />*/}
+        {/*</div>*/}
 
       {!isLoadingSettings && !hasCoordinates ? (
         /* Full-screen Onboarding */
@@ -549,7 +549,7 @@ export default function NewTab() {
               <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
                 {t("selectCountryCity")}
               </span>
-              
+
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <select
@@ -732,10 +732,10 @@ export default function NewTab() {
             title={t("prayerTimesAndWidgets")}
             side="left"
           >
-            <LeftPanel 
-              items={layoutState.panels.left} 
-              isDragMode={isDragMode && breakpoint === 'xl'} 
-              renderPanelItem={renderPanelItem} 
+            <LeftPanel
+              items={layoutState.panels.left}
+              isDragMode={isDragMode && breakpoint === 'xl'}
+              renderPanelItem={renderPanelItem}
             />
           </MobilePanelDrawer>
 
@@ -745,14 +745,14 @@ export default function NewTab() {
             title={t("qiblaAndWidgets")}
             side="right"
           >
-            <RightPanel 
-              items={layoutState.panels.right} 
-              isDragMode={isDragMode && breakpoint === 'xl'} 
-              renderPanelItem={renderPanelItem} 
+            <RightPanel
+              items={layoutState.panels.right}
+              isDragMode={isDragMode && breakpoint === 'xl'}
+              renderPanelItem={renderPanelItem}
             />
           </MobilePanelDrawer>
 
-          <BannerZone 
+          <BannerZone
             reminder={reminderPrayer}
             isJumuah={isFriday}
             isRamadan={isRamadan}
@@ -762,13 +762,13 @@ export default function NewTab() {
              {/* Mobile Drawer Toggles */}
              {breakpoint === 'md' && (
                 <>
-                  <button 
+                  <button
                     onClick={() => setIsLeftDrawerOpen(true)}
                     className="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-stone-900/80 p-2 rounded-r-2xl border-y border-r border-stone-200 dark:border-stone-800 text-emerald-700 shadow-md hover:pl-4 transition-all"
                   >
                     <ChevronRight size={20} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsRightDrawerOpen(true)}
                     className="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-white/80 dark:bg-stone-900/80 p-2 rounded-l-2xl border-y border-l border-stone-200 dark:border-stone-800 text-emerald-700 shadow-md hover:pr-4 transition-all"
                   >
@@ -777,22 +777,22 @@ export default function NewTab() {
                 </>
              )}
 
-             <LeftPanel 
-                items={layoutState.panels.left} 
+             <LeftPanel
+                items={layoutState.panels.left}
                 isDragMode={isDragMode && breakpoint !== 'sm'}
                 renderPanelItem={renderPanelItem}
                 collapsed={breakpoint === 'lg'}
                 hidden={breakpoint === 'md' || breakpoint === 'sm'}
              />
 
-             <CenterPanel 
-                items={layoutState.panels.center} 
-                isDragMode={isDragMode && breakpoint !== 'sm'} 
-                renderPanelItem={renderPanelItem} 
+             <CenterPanel
+                items={layoutState.panels.center}
+                isDragMode={isDragMode && breakpoint !== 'sm'}
+                renderPanelItem={renderPanelItem}
              />
 
-             <RightPanel 
-                items={layoutState.panels.right} 
+             <RightPanel
+                items={layoutState.panels.right}
                 isDragMode={isDragMode && breakpoint !== 'sm'}
                 renderPanelItem={renderPanelItem}
                 collapsed={breakpoint === 'lg'}
@@ -802,7 +802,7 @@ export default function NewTab() {
 
           {layoutState.panels.bottom.some(i => i.visible) && (
             <div className="px-6 pb-6 overflow-hidden flex flex-col items-center">
-               <button 
+               <button
                  onClick={() => setIsBottomPanelCollapsed(!isBottomPanelCollapsed)}
                  className="flex items-center gap-2 mb-3 transition-all group px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 shadow-sm shadow-emerald-200/50 dark:shadow-none"
                >
@@ -811,13 +811,13 @@ export default function NewTab() {
                  </span>
                  {isBottomPanelCollapsed ? <ChevronRight size={14} className="text-emerald-600" /> : <ChevronDown size={14} className="text-emerald-600" />}
                </button>
-               
+
                {isBottomPanelCollapsed === false && (
                  <div className="overflow-x-auto pb-2 w-full">
-                    <BottomWidgetRow 
-                     items={layoutState.panels.bottom} 
-                     isDragMode={isDragMode && breakpoint !== 'sm'} 
-                     renderPanelItem={renderPanelItem} 
+                    <BottomWidgetRow
+                     items={layoutState.panels.bottom}
+                     isDragMode={isDragMode && breakpoint !== 'sm'}
+                     renderPanelItem={renderPanelItem}
                     />
                  </div>
                )}
@@ -881,7 +881,7 @@ export default function NewTab() {
                         {t("noorTabSlogan")}
                       </span>
                    </div>
-                   
+
                    <button
                     onClick={() => setIsDragMode(true)}
                     className="group flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black bg-emerald-700 text-white hover:bg-emerald-600 shadow-md hover:shadow-emerald-500/20 active:scale-95 transition-all"
