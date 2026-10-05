@@ -1,0 +1,7 @@
+# Noor Tab icon
+
+Created with the built-in image generation tool. A bold ivory crescent and gold light spark on emerald replace the detailed badge so the mark remains readable at toolbar sizes. Original retained in `previous-icon.png`. `noor-tab-master.png` is the generated master; `../icon.png` is the Plasmo build input. Numbered PNGs are exported from the production build.
+
+## Generation prompt
+
+Use case: logo-brand. Create ONE final production app icon for Noor Tab, an Islamic new-tab browser extension. Square 1024x1024 canvas. A premium, exceptionally simple flat vector-style symbol: a bold warm ivory crescent opening toward upper right with a small four-point warm gold light spark nestled in the opening. This expresses Islam and Noor (light). Center the complete symbol optically on a solid deep emerald #083F32 square background, full bleed opaque to all edges. Crescent should be substantial, smoothly geometric, elegant and unmistakable at 16 pixels. Symbol occupies roughly 66% of canvas with generous equal breathing space. Spark is bold, four-point, not a detailed star; large enough to survive favicon reduction. Restrained palette: deep emerald, warm ivory #F5F0DA, muted warm gold #D8BC70. Clean precise smooth edges. No text, no letters, no words, no calligraphy, no mosque, no outlines, no border, no ornate detail, no mockup, no multiple alternatives, no gradients, no shadows, no 3D, no photographic texture, no watermark. This is the icon asset itself, not a presentation.

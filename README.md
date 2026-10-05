@@ -5,7 +5,7 @@ Prayer times, Quran, and daily remembrance in every new tab.
 [Chrome Web Store product details and description](store/chrome-web-store-product-details.md)
 
 <p align="center">
-  <img src="assets/banner.png" alt="Noor Tab - Your Islamic New Tab Experience" width="100%" />
+  <img src="assets/promo/marquee-promo-1400x560.png" alt="Noor Tab - Your Islamic New Tab Experience" width="100%" />
 </p>
 
 <p align="center">
@@ -35,20 +35,20 @@ Prayer times, Quran, and daily remembrance in every new tab.
 ## ✨ Core Features
 
 <p align="center">
-  <img src="assets/banner-1.png" alt="Core Features" width="100%" />
+  <img src="assets/screenshots/01-islamic-new-tab.png" alt="Noor Tab Islamic new tab dashboard" width="100%" />
 </p>
 <p align="center">
-  <img src="assets/banner-2.png" alt="Phase 2 Features" width="100%" />
+  <img src="assets/screenshots/02-prayer-times.png" alt="Prayer times and reminders" width="100%" />
 </p>
 
 <p align="center">
-  <img src="assets/banner-3.png" alt="Phase 3 Features" width="100%" />
+  <img src="assets/screenshots/03-quran-remembrance.png" alt="Quran, duas, and remembrance" width="100%" />
 </p>
 <p align="center">
-  <img src="assets/banner-4.png" alt="Tech Stack" width="100%" />
+  <img src="assets/screenshots/04-daily-routine.png" alt="Prayer tracking and daily routine" width="100%" />
 </p>
 <p align="center">
-  <img src="assets/banner-5.png" alt="Settings" width="100%" />
+  <img src="assets/screenshots/05-customize-dashboard.png" alt="Customizable dashboard widgets" width="100%" />
 </p>
 
 ### 🕌 Prayer Times & Adhan
