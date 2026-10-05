@@ -204,7 +204,7 @@ export default function Popup() {
         <header className="relative z-20 overflow-visible flex items-center justify-between border-b border-stone-200/60 bg-white/70 px-4 py-3.5 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-950/70">
           <div className="flex flex-col">
             <h1 className="text-base font-extrabold text-emerald-800 dark:text-emerald-400 tracking-wide leading-none">
-              NoorTab
+              Noor Tab
             </h1>
             <span className="text-[10px] text-stone-400 dark:text-stone-500 font-semibold mt-1 uppercase tracking-wider">
               {settings.cityName || t("calcSettings")}

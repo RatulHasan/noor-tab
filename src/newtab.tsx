@@ -343,7 +343,7 @@ export default function NewTab() {
 
       // Verify backup has coordinates
       if (!validatedBackup.settings?.coordinates) {
-        throw new Error("Backup file does not contain location coordinates. Please use a backup exported from NoorTab.");
+        throw new Error("Backup file does not contain location coordinates. Please use a backup exported from Noor Tab.");
       }
 
       await importBackup(validatedBackup, "replace");
@@ -519,7 +519,7 @@ export default function NewTab() {
         <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-6 relative z-10 px-6">
           <div className="space-y-3">
             <h1 className="text-4xl font-black text-emerald-800 dark:text-emerald-400 tracking-wide">
-              NoorTab
+              Noor Tab
             </h1>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
               {t("welcomeSub")}
@@ -655,7 +655,7 @@ export default function NewTab() {
                   <span className="text-xs font-semibold">Restore from Backup</span>
                 </div>
                 <p className="text-[10px] text-stone-500 dark:text-stone-500 leading-relaxed text-center">
-                  Import your previous NoorTab backup to restore all settings, prayer history, and preferences.
+                  Import your previous Noor Tab backup to restore all settings, prayer history, and preferences.
                 </p>
                 <input
                   ref={fileInputRef}

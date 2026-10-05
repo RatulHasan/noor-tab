@@ -1,5 +1,11 @@
+# Islamic New Tab - Noor Tab
+
+Prayer times, Quran, and daily remembrance in every new tab.
+
+[Chrome Web Store product details and description](store/chrome-web-store-product-details.md)
+
 <p align="center">
-  <img src="assets/banner.png" alt="NoorTab - Your Islamic New Tab Experience" width="100%" />
+  <img src="assets/banner.png" alt="Noor Tab - Your Islamic New Tab Experience" width="100%" />
 </p>
 
 <p align="center">
@@ -19,7 +25,7 @@
 </p>
 
 <p align="center">
-  <strong>NoorTab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, spiritual tools like **How to Pray Salah**, a comprehensive **Dua Library**, and much more, all wrapped in a beautifully designed, distraction-free experience.
+  <strong>Noor Tab</strong> transforms every new browser tab into a tranquil Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, Hadith, spiritual tools like **How to Pray Salah**, a comprehensive **Dua Library**, and much more, all wrapped in a beautifully designed, distraction-free experience.
 </p>
 
 <br/>
@@ -112,7 +118,7 @@ A motivational accountability tool for establishing consistent Salah:
 - Monthly calendar view showing which prayers were prayed, missed, or skipped
 - Mark each prayer as **Prayed ✓**, **Missed ✗**, or **Excused (Qada) ◎**
 - Current streak counter and longest-ever streak badge
-- All data stored locally - 100% private, no account required
+- No Noor Tab account required; saved records may sync through Chrome when browser sync is enabled
 
 ### 🌙 Fasting Tracker
 Tracks Ramadan and voluntary fasting with full historical logging:
@@ -219,11 +225,11 @@ All 100 Islamic Quiz questions are fully translated in Bengali, Arabic, Hindi, a
 
 ## 📍 Location & Privacy
 
-NoorTab is **entirely local**. There are no accounts, no tracking, and no data is sent to any server.
+Noor Tab requires no account. Prayer times and Qibla direction are calculated on-device. Online Quran and Hadith content, Adhan audio, location lookups, and web searches use external services.
 
-- Location is detected once via the browser Geolocation API and stored in local extension storage
+- Location detection uses the browser Geolocation API; coordinates are sent to OpenStreetMap Nominatim to look up the city name
 - Alternatively, choose from 500+ popular cities with a single dropdown or enter coordinates manually
-- All streak, fasting, Quran, and quiz data lives in `chrome.storage` (Plasmo Storage) on-device only
+- Settings and saved progress use browser extension storage and may sync through Chrome when browser sync is enabled; see the [privacy policy](privacy-policy.md)
 
 ---
 
@@ -392,7 +398,7 @@ The production bundle is output to `build/chrome-mv3-prod/`.
 
 ### 🛠️ Developer Mode & Testing Tools
 
-NoorTab includes a built-in suite of Developer Testing Tools, which are consolidated in the **Widget Customizer** sidebar (New Tab page) when built in dev mode:
+Noor Tab includes a built-in suite of Developer Testing Tools, which are consolidated in the **Widget Customizer** sidebar (New Tab page) when built in dev mode:
 - **Enable Developer Mode**: Build or start the extension with the environment variable `PLASMO_PUBLIC_DEV_MODE=true` set in the environment or `.env` file.
 - **Local Time Simulator**: Speed up testing by simulating any hour/minute of the day. The tab's dynamic background gradient transitions and clock adjust instantly.
 - **Global Location Simulator**: Select any country and city from a dropdown to simulate different geographic locations. The prayer times and timezone offset recalculate instantly.
