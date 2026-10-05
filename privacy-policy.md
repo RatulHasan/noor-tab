@@ -1,157 +1,87 @@
-# Privacy Policy
+# Islamic New Tab - Noor Tab Privacy Policy
 
-<div align="center">
-
-<img src="assets/icon.png" alt="NoorTab" width="80" />
-
-# NoorTab - Privacy Policy
-
-**Your privacy is not just a policy - it is a principle.**
-
-*Last updated: May 2026*
-*Effective date: May 2026*
-
-</div>
-
----
+Last updated: October 5, 2026
 
 ## Overview
 
-NoorTab is an Islamic prayer companion browser extension built for the Muslim Ummah. It was designed from the ground up with a single, unwavering commitment: **your data belongs to you, stays with you, and never leaves your device.**
+Noor Tab replaces your browser's new tab page with prayer times and Islamic tools. It does not require a Noor Tab account and does not include advertising or analytics trackers. The extension saves settings and activity records in browser extension storage, and some features connect to external services.
 
-There are no accounts. No servers. No tracking. No analytics. No advertisements. Nothing is collected. Nothing is transmitted. Nothing is sold.
+This policy describes the current extension's storage, network requests, permissions, and your choices.
 
-This document explains, in plain language, exactly what NoorTab does and does not do with your information.
+## Information saved by the extension
 
----
+Noor Tab stores information needed for the features you use, including:
 
-## 1. Information We Do Not Collect
+- Location coordinates and city name, calculation method, Asr setting, prayer adjustments, and reminder preferences.
+- Theme, language, search engine, widget layout, and Adhan selection.
+- Prayer records, fasting records, Quran bookmarks and notes, dua favorites, dhikr goals, Adhkar progress, and quiz records.
+- Saved Zakat calculation results, including asset and liability totals, net assets, Nisab threshold, Zakat due, currency, and save date.
+- Cached Quran and Hadith responses to reduce repeat requests.
 
-NoorTab does **not** collect, store on any server, transmit, share, or sell any of the following:
+Settings and progress generally use Chrome's `storage.sync` through the extension's storage library. When Chrome Sync is enabled, this information may be synchronized through Google's infrastructure to your other signed-in Chrome browsers. This can include location, worship records, and saved Zakat results. When sync is disabled, Chrome keeps this storage on the device. API caches and some backup-import writes use `storage.local`.
 
-| Data Type | Collected? |
+Noor Tab does not send these saved records to a developer-operated backend. Browser synchronization is separate from Noor Tab and is controlled by your browser and account settings. See [Chrome's storage documentation](https://developer.chrome.com/docs/extensions/reference/api/storage#storage_areas).
+
+## Location
+
+Prayer times and Qibla direction are calculated on your device from your selected coordinates.
+
+- Selecting a city from the bundled city list does not require a geocoding request.
+- Searching by city and country sends those terms to OpenStreetMap Nominatim to obtain coordinates.
+- Choosing automatic location detection requests location through your browser's Geolocation API. The extension then sends the detected latitude and longitude to Nominatim to obtain a city name. Your browser or operating system may also use its own location services.
+
+Location lookups can happen again when you use these controls; they are not limited to a single request after installation.
+
+## External services
+
+These connections support the features described below. Service providers receive the requested URL and ordinary connection information, such as your IP address, and may process it under their own policies. Noor Tab does not control their retention practices.
+
+| Service | When it is used | Information in the request |
+|---|---|---|
+| OpenStreetMap Nominatim (`nominatim.openstreetmap.org`) | City search or automatic location lookup | Entered city and country, or detected coordinates |
+| AlQuran Cloud (`api.alquran.cloud`) | Loading or searching online Quran content | Requested surah, ayah, edition, or Quran search query |
+| Hadith API (`api.hadith.gading.dev`) | Loading online Hadith collections | Requested book, Hadith number, or range |
+| IslamCan (`www.islamcan.com`) | Loading selected Adhan audio for preview or playback | Requested audio file |
+| Google, DuckDuckGo, Bing, or Ecosia | Submitting a web search from the dashboard | Search terms sent to the selected search engine |
+
+External links can also open Quran.com for a bookmarked verse, Google Maps for the Kaaba, and Buy Me a Coffee for optional support. The destination receives the requested page and handles any further interaction under its own policies. Noor Tab does not process support payments.
+
+Prayer calculations and Qibla calculations do not require an external calculation service. Online content and audio may require a connection even when other dashboard features work offline.
+
+## Browsing and permissions
+
+Noor Tab does not build a browsing-history database or transmit the content of websites you visit to the developer. It checks tab information to route reminders and audio-control messages. A content script is registered on supported pages to display the reminder overlay.
+
+The current Chrome build declares:
+
+| Permission or access | Current behavior |
 |---|---|
-| Name, email address, or any personal identifier | ❌ Never |
-| Browsing history or visited URLs | ❌ Never |
-| Clicks, keystrokes, or user activity | ❌ Never |
-| Device identifiers or IP addresses | ❌ Never |
-| Financial or payment information | ❌ Never |
-| Health or biometric information | ❌ Never |
-| Passwords or authentication credentials | ❌ Never |
-| Personal communications | ❌ Never |
-| Website content from pages you visit | ❌ Never |
+| `storage` | Saves settings, activity records, and cached content using browser extension storage, including sync storage |
+| `alarms` | Schedules prayer reminders and daily rescheduling |
+| `tabs` | Opens reminder tabs and queries tabs to deliver reminder and audio-control messages |
+| `activeTab` | Declared in the manifest; current reminders use the registered content script and tab messaging |
+| `scripting` | Declared in the manifest; the current implementation does not call `chrome.scripting` for location detection or reminders |
+| `https://*/*` host access | Allows access to HTTPS hosts, including external content and location services |
+| `<all_urls>` content-script matches | Registers the reminder overlay on supported websites, subject to browser restrictions |
 
----
+Automatic location detection uses the browser Geolocation API in the extension interface; it is not performed by injecting a geolocation script into another website.
 
-## 2. Information Stored Locally on Your Device
+## Backups, reports, and data removal
 
-NoorTab stores the following data **exclusively in your browser's local extension storage** (`chrome.storage.local`). This data never leaves your device and is never accessible to us or any third party.
+You can export a JSON backup or supported PDF report to your device. These files can contain location, worship records, or saved financial calculation results. The extension does not upload exported files to a developer server. If you choose to import a backup, the extension reads and validates the selected file and restores its contents to browser storage.
 
-### 2.1 Location Coordinates
+Keep exported files somewhere you trust. Sharing a backup or report shares the information in that file. Removing the extension does not delete files you previously downloaded.
 
-- **What:** Latitude and longitude coordinates used to calculate accurate prayer times.
-- **How obtained:** Either via the browser's built-in Geolocation API (only when you explicitly click "Auto-detect location") or manually entered by you as a city and country name, which is resolved to coordinates via a one-time request to OpenStreetMap's Nominatim API - a free, open-source geocoding service.
-- **Where stored:** Only in `chrome.storage.local` on your device.
-- **Transmitted?** No. After the initial coordinate resolution, all prayer time calculations happen entirely on your device.
+Stored information remains until it is overwritten, removed through an available feature or browser storage controls, or the extension is uninstalled. Chrome removes local extension storage on uninstall. Manage Chrome Sync through your browser and Google account settings; clearing browsing history alone does not clear extension storage. Data already received by external services is governed by those services' policies.
 
-### 2.2 Prayer Settings & Preferences
+## Accounts, analytics, and support
 
-- Calculation method (e.g. Muslim World League, ISNA, Umm al-Qura)
-- Madhab selection (Shafi / Hanafi)
-- Per-prayer reminder toggles and offset minutes
-- Notification style preference
-- Theme, language, and widget layout configuration
-- Adhan reciter selection and audio preferences
+Noor Tab has no account-registration flow and does not include advertising or analytics tracking. It does not sell your saved extension records. The extension does not ask for passwords, payment-card details, or personal communications.
 
-### 2.3 Devotional & Worship Data
+If you contact the developer through GitHub, the information you choose to post is handled by GitHub and may be public. Please do not attach private backups, exact coordinates, worship records, or financial details to public issues.
 
-- **Prayer streak records:** Daily logs of prayers marked as on time, late, or missed
-- **Fasting records:** Ramadan and Sunnah fast completion logs
-- **Quran bookmark:** Your current Surah and Ayah reading position and notes
-- **Dhikr counter:** Session and goal progress
-- **Adhkar progress:** Daily morning and evening session completion state
-- **Islamic quiz records:** Daily answers and lifetime score
+## Changes and contact
 
-All of the above is personal worship data that you create. It is stored locally, belongs entirely to you, and can be exported and deleted at any time.
+This policy will be updated when the extension's data practices change. The date above identifies the latest revision.
 
----
-
-## 3. Third-Party Services
-
-NoorTab uses **no third-party analytics, advertising networks, or tracking services** of any kind.
-
-The only external network request NoorTab may make is a **one-time geocoding lookup** when you choose to search for your city by name:
-
-| Service | Purpose | Data sent | Privacy policy |
-|---|---|---|---|
-| [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org) | Resolve city name to coordinates | City name + country string only | [OSM Privacy Policy](https://wiki.osmfoundation.org/wiki/Privacy_Policy) |
-
-This request contains no personal identifiers. After your coordinates are resolved and saved locally, no further external requests are made for prayer time calculations - the `adhan-js` library performs all calculations on-device.
-
----
-
-## 4. Permissions Explained
-
-NoorTab requests the following browser permissions. Each is used exclusively for the feature described:
-
-| Permission | Why it is needed |
-|---|---|
-| `storage` | Saves all your settings, prayer records, and preferences locally in `chrome.storage.local` on your device |
-| `alarms` | Schedules prayer reminder notifications at the correct time for each of the five daily prayers, and resets daily session data at midnight |
-| `tabs` | Opens the NoorTab new tab reminder page when a prayer time arrives, if you have chosen that notification style |
-| `activeTab` | Injects the prayer reminder overlay into your current tab when a prayer reminder fires, if you have chosen the overlay notification style |
-| `scripting` | Executes the geolocation detection script inside your active tab (required in Manifest V3 since popups cannot access the Geolocation API directly) and injects the reminder overlay |
-| `<all_urls>` (host permission) | Required because prayer reminders are time-based and fire regardless of which website you are visiting - the extension cannot know your current tab's URL in advance. No page content is read or stored |
-
----
-
-## 5. Data You Export & Import
-
-NoorTab includes a **Backup & Restore** feature that allows you to export all your local data as a `.json` file and import it on another device or browser.
-
-- Exported files are downloaded directly to your device.
-- They are never uploaded to any server by NoorTab.
-- The contents of exported files are your own data, under your own control.
-- NoorTab does not have access to files you export or import.
-
----
-
-## 6. Children's Privacy
-
-NoorTab does not knowingly collect any information from anyone, including children under the age of 13. Since NoorTab collects no personal information whatsoever, it is safe for users of all ages.
-
----
-
-## 7. Changes to This Policy
-
-If this privacy policy is ever updated, the updated version will be published in this repository with a revised "Last updated" date at the top of this document. Since NoorTab collects no data, any future changes would only reflect new features or clarifications - not new data practices.
-
-You can track all changes to this file in the [commit history](https://github.com/RatulHasan/noor-tab/commits/main/PRIVACY.md).
-
----
-
-## 8. Open Source
-
-NoorTab's source code is open and auditable. You do not need to take our word for any of the privacy claims in this document - you can verify them directly in the code.
-
-🔗 [github.com/RatulHasan/noor-tab](https://github.com/RatulHasan/noor-tab)
-
----
-
-## 9. Contact
-
-If you have any questions about this privacy policy or NoorTab's data practices, please open an issue in the GitHub repository:
-
-🔗 [github.com/RatulHasan/noor-tab/issues](https://github.com/RatulHasan/noor-tab/issues)
-
----
-
-<div align="center">
-
-**NoorTab collects nothing. Tracks nothing. Sells nothing.**
-
-*Made with 🤍 for the Muslim Ummah*
-
-*"And He is with you wherever you are." - Quran 57:4*
-
-</div>
+For questions, visit the [project's issue tracker](https://github.com/ratulhasan/noor-tab/issues). You can inspect the [source code](https://github.com/ratulhasan/noor-tab) and [policy history](https://github.com/ratulhasan/noor-tab/commits/main/privacy-policy.md).

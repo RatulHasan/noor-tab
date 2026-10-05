@@ -1,3 +1,18 @@
+# Chrome Web Store product details
+
+## Product name
+
+Islamic New Tab - Noor Tab
+
+## Short description
+
+Your Islamic new tab companion with prayer times, Adhan reminders, Quran bookmarks, duas, dhikr and a Qibla compass.
+
+## Product details — description
+
+Copy the text inside this block into the Chrome Web Store description field. The matching `.txt` file contains only this publishable description.
+
+```text
 Noor Tab is an Islamic new tab extension for Chrome that brings prayer times, Adhan reminders, Quran, Hadith, and a Qibla compass to your browser. Replace your new tab page with a calm, customizable Muslim dashboard for daily worship, learning, and remembrance.
 
 Whether you are working or studying, keep your next prayer in sight, return to your Quran reading, and make space for a moment of dhikr.
@@ -54,3 +69,32 @@ Add Noor Tab to Chrome, open a new tab, and choose your location and prayer sett
 
 Make every new tab a moment of faith.
 Made with care for the Muslim Ummah.
+```
+
+## Naming and positioning decisions
+
+- **Store title:** Islamic New Tab - Noor Tab. Lead with the product category so a new visitor immediately understands the extension, then introduce the brand.
+- **Brand in the interface:** Noor Tab. Use this spelling in visible headings, messages, and exported reports.
+- **Core promise:** Make every new tab a moment of faith.
+- **Primary audience:** Muslims who want prayer awareness and daily remembrance within their existing work or study routine.
+- **Feature order:** Prayer times and reminders first, Quran and Qibla next, then remembrance, habit tools, and customization.
+- **Search language:** Use “Islamic new tab,” “prayer times,” “Adhan reminders,” “Quran,” “duas,” and “Qibla” naturally where they describe a real feature. These are relevance choices, not measured keyword-volume findings or a guarantee of higher rankings.
+- **Compatibility:** Keep the package slug `noor-tab`, storage keys, internal identifiers, and the backup discriminator `NoorTab` stable so existing settings and backups remain compatible.
+
+Google recommends a concise, descriptive title, an accurate feature-led description, and a summary of no more than 132 characters. This copy follows that guidance without repetitive keyword lists. See [Google's listing guidance](https://developer.chrome.com/docs/webstore/best-listing) and [manifest description requirements](https://developer.chrome.com/docs/extensions/reference/manifest/description).
+
+## Suggested screenshot story
+
+Use current product screenshots with these short captions:
+
+1. A moment of faith in every new tab — full dashboard.
+2. Keep your next prayer in sight — prayer times and countdown.
+3. Return to Quran and remembrance — Quran, duas, and Adhkar.
+4. Build your daily routine — prayer and fasting trackers.
+5. Your space, your rhythm — widget arrangement and themes.
+
+## Publishing notes
+
+The title and short description are configured in `package.json` and included in the production manifest. Paste only the description block above into the store's description field. The strategy and publishing notes are internal guidance.
+
+The [privacy policy](../privacy-policy.md) documents external services, location lookups, browser sync, saved Zakat results, and the current permissions. Keep the store privacy disclosures consistent with that policy and the submitted build.

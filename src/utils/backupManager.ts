@@ -133,7 +133,7 @@ export async function exportPrayerLogPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(22);
-  doc.text("NoorTab - Monthly Prayer Log", 14, 20);
+  doc.text("Noor Tab - Monthly Prayer Log", 14, 20);
   
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(10);
@@ -266,7 +266,7 @@ export async function exportAnalyticsPDF(
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      `NoorTab Prayer Analytics - Page ${pageNo} of ${totalPages}`,
+      `Noor Tab Prayer Analytics - Page ${pageNo} of ${totalPages}`,
       105,
       pageHeight - 10,
       { align: "center" }
@@ -288,7 +288,7 @@ export async function exportAnalyticsPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(24);
-  doc.text("NoorTab - Prayer Analytics", 14, 22);
+  doc.text("Noor Tab - Prayer Analytics", 14, 22);
 
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(11);
@@ -676,7 +676,7 @@ export function validateBackup(raw: unknown): {
   }
   const d = raw as Record<string, any>;
   if (d.app !== "NoorTab") {
-    return { valid: false, error: "This file is not a NoorTab backup." };
+    return { valid: false, error: "This file is not a Noor Tab backup." };
   }
   if (!SUPPORTED_BACKUP_VERSIONS.includes(d.version)) {
     return { valid: false, error: `Unsupported backup version: ${d.version}` };

@@ -245,7 +245,7 @@ export default function ReminderOverlay({
                 onClick={onAction}
                 className="inline-flex items-center gap-1 rounded-md bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                Open NoorTab
+                Open Noor Tab
                 <ExternalLink className="h-3 w-3" />
               </button>
             </div>

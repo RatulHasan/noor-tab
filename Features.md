@@ -1,4 +1,4 @@
-NoorTab transforms every new browser tab into a serene Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, a Qibla compass, and a full suite of spiritual tools, all in a beautifully designed, distraction-free experience.
+Noor Tab transforms every new browser tab into a serene Islamic companion - delivering accurate prayer times, Adhan reminders, daily Quranic verses, a Qibla compass, and a full suite of spiritual tools, all in a beautifully designed, distraction-free experience.
 
 🕌 PRAYER TIMES & ADHAN REMINDERS
 • Accurate prayer times using industry-standard algorithms (Muslim World League, ISNA, Egyptian, Umm al-Qura, and more)
@@ -109,9 +109,11 @@ NoorTab transforms every new browser tab into a serene Islamic companion - deliv
 • Islamic prefixes: `quran:`, `hadith:`, `dua:` for direct access to specific tabs
 • Keyboard shortcut: Press `/` to focus search instantly
 
-📍 100% PRIVATE & OFFLINE-CAPABLE
-• No accounts, no tracking, no data sent to any server
-• Location detected once and stored locally - or choose from 500+ cities manually
-• All data lives on your device in local extension storage
+📍 STORAGE & ONLINE FEATURES
+• No Noor Tab account required
+• Prayer times and Qibla direction are calculated on-device
+• Settings and saved progress may sync through Chrome when browser sync is enabled
+• Online Quran, Hadith, Adhan audio, location lookups, and web searches use external services
+• Location lookups send entered place names or detected coordinates to OpenStreetMap Nominatim
 
 Made with ❤️ for the Muslim Ummah.
